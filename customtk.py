@@ -129,3 +129,103 @@ class App(customtkinter.CTk):
         self.email.place(relx=0.3, rely=0.3, anchor=tkinter.CENTER)
         self.email_entry.place(relx=0.5, rely=0.3, anchor=tkinter.CENTER)
         self.save_BTN.place(relx=0.75, rely=0.3, anchor=tkinter.CENTER)
+
+        #  self.right_dashboard   ----> categories widget
+        def manager(self):
+            self.clear_frame()
+
+            # The email selection combo box
+            email_type = {}  # keys = emails, values = user type
+            response = requests.get(url + 'getUsersTypes')
+            if response.status_code == 200:
+                result = response.json()
+                # print(result)
+                for x in result['users']:
+                    email_type[x[0]] = int(x[1])
+
+            def add_definition(n):
+                if n == 1:
+                    return '1 - Student'
+                elif n == 2:
+                    return '2 - Staff'
+                else:
+                    return '3 - Manager'
+
+            def save_callback():
+                email_type[combobox1.get()] = int(combobox2.get()[0])
+
+                temp_data = {}
+                temp_email = combobox1.get()
+                temp_data['email'] = temp_email
+                temp_type = int(combobox2.get()[0])
+                temp_data['type'] = temp_type
+
+                response = requests.post(url + 'changeType', data=temp_data)
+                if response.status_code == 200:
+                    print(email_type, temp_data)
+                    result = response.json()
+
+            def delete_callback():
+
+                temp_data = {}
+                temp_email = combobox1.get()
+                temp_data['email'] = temp_email
+
+                if CTkMessagebox(icon='warning', title="Warning", option_1="Yes", option_2="Cancel",
+                                 message="Are you sure you want to delete this user?").get() == 'Yes':
+                    del email_type[combobox1.get()]
+                    response = requests.post(url + 'removeUser', data=temp_data)
+                    if response.status_code == 200:
+                        print(email_type, temp_data)
+                        result = response.json()
+
+                    # combobox1['values'] = list(test_dictionary.keys())
+                    combobox1.configure(values=list(email_type.keys()))
+                    if len(email_type) > 0:
+                        combobox1.set(list(email_type.keys())[0])
+                        update_combobox2()
+
+            def update_combobox2(*args):
+                key = combobox1.get()
+                value = add_definition(email_type.get(key))
+                if email_type.get(key) is not None:
+                    combobox2.set(str(value))
+
+            combobox1_var = customtkinter.StringVar(value=list(email_type.keys())[0])
+            combobox1 = customtkinter.CTkComboBox(master=self.right_dashboard, values=list(email_type.keys()),
+                                                  variable=combobox1_var, width=200, height=40,
+                                                  corner_radius=5, dropdown_font=('Arial', 12),
+                                                  command=update_combobox2)
+            combobox1.pack(pady=10)
+
+            combobox2_var = customtkinter.StringVar(value=add_definition(list(email_type.values())[0]))
+            combobox2 = customtkinter.CTkComboBox(master=self.right_dashboard,
+                                                  values=['1 - Student', '2 - Staff', '3 - Manager'],
+                                                  variable=combobox2_var, width=200, height=40, corner_radius=5,
+                                                  dropdown_font=('Arial', 12))
+            combobox2.pack(pady=10)
+
+            save_button = customtkinter.CTkButton(master=self.right_dashboard, text="Save", font=('Arial', 14),
+                                                  corner_radius=5,
+                                                  hover=True, command=save_callback)
+            save_button.pack(pady=10)
+
+            delete_button = customtkinter.CTkButton(master=self.right_dashboard, text="Delete User", font=('Arial', 14),
+                                                    corner_radius=5,
+                                                    hover=True, command=delete_callback)
+            delete_button.pack(pady=10)  #
+
+        # Change scaling of all widget 80% to 120%
+        def change_scaling_event(self, new_scaling: str):
+            new_scaling_float = int(new_scaling.replace("%", "")) / 100
+            customtkinter.set_widget_scaling(new_scaling_float)
+
+        # close the entire window
+        def close_window(self):
+            App.destroy(self)
+
+        # CLEAR ALL THE WIDGET FROM self.right_dashboard(frame) BEFORE loading the widget of the concerned page
+        def clear_frame(self):
+            for widget in self.right_dashboard.winfo_children():
+                widget.destroy()
+
