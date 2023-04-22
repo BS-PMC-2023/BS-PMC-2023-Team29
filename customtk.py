@@ -82,3 +82,50 @@ class App(customtkinter.CTk):
         self.id = id
         self.homie(id)
 
+    def profile(self):
+        self.clear_frame()
+        # self.bt_from_frame3 = customtkinter.CTkButton(self.right_dashboard, text="Profile",
+        #                                               command=lambda: print("test profile"))
+        # self.bt_from_frame3.grid(row=0, column=0, padx=20, pady=(10, 0))
+
+        self.name = customtkinter.CTkLabel(master=self.right_dashboard, text="First name: ",
+                                           font=('Century Gothic', 18))
+        self.name_entry = customtkinter.CTkEntry(master=self.right_dashboard, width=220)
+        self.name_entry.insert(0, user.name)
+
+        self.lastname = customtkinter.CTkLabel(master=self.right_dashboard, text="Last name: ",
+                                               font=('Century Gothic', 18))
+        self.lastname_entry = customtkinter.CTkEntry(master=self.right_dashboard, width=220)
+        self.lastname_entry.insert(0, user.lastname)
+
+        self.email = customtkinter.CTkLabel(master=self.right_dashboard, text="E-mail: ",
+                                            font=('Century Gothic', 18))
+        self.email_entry = customtkinter.CTkEntry(master=self.right_dashboard, width=220)
+        self.email_entry.insert(0, user.email)
+
+        def save_changes_func():
+            data = {'email': self.email_entry.get(), 'name': self.name_entry.get(),
+                    'lastname': self.lastname_entry.get()}
+            response = requests.post(url + 'changeInfo', data=data)
+            if response.status_code == 200:
+                result = response.json()
+                if result['message'] == 'change successful':
+                    ctypes.windll.user32.MessageBoxW(0, "Your changes have been saved in the system.", "Saved Changes",
+                                                     0)
+                    user.name = data['name']
+                    user.email = data['email']
+                    user.lastname = data['lastname']
+                else:
+                    ctypes.windll.user32.MessageBoxW(0, "Your changes have NOT been saved in the system.", "ERROR", 0)
+
+        self.save_BTN = customtkinter.CTkButton(master=self.right_dashboard, width=60, height=20, text="Save changes",
+                                                command=save_changes_func,
+                                                corner_radius=6)
+
+        self.name.place(relx=0.3, rely=0.1, anchor=tkinter.CENTER)
+        self.name_entry.place(relx=0.5, rely=0.1, anchor=tkinter.CENTER)
+        self.lastname.place(relx=0.3, rely=0.2, anchor=tkinter.CENTER)
+        self.lastname_entry.place(relx=0.5, rely=0.2, anchor=tkinter.CENTER)
+        self.email.place(relx=0.3, rely=0.3, anchor=tkinter.CENTER)
+        self.email_entry.place(relx=0.5, rely=0.3, anchor=tkinter.CENTER)
+        self.save_BTN.place(relx=0.75, rely=0.3, anchor=tkinter.CENTER)
