@@ -21,6 +21,15 @@ def login():
         return jsonify({'message': 'Invalid username or password'})
 
 
+@app.route('/register',methods=['POST'])
+def register():
+    temp = User()
+    temp.insert(request.form['email'],request.form['password'],request.form['firstname'],request.form['Last_name'])
+    if db.insert_user(temp):
+        return jsonify({'message': 'register successful'})
+    else:
+        return jsonify({'message': 'register not successful'})
+
 @app.route('/changeType', methods=['POST'])
 def change_type():
     email, type = request.form['email'], request.form['type']
