@@ -57,3 +57,24 @@ class UserDb:
         lg.debug(self.cursor.rowcount, "record(s) inserted.")
         lg.debug("great success")
         return True
+    def get_user_by_id(self,id):
+        self.cursor.execute("SELECT * FROM users")
+        result = self.cursor.fetchall()
+        for i in result:
+            if id == i[0]:
+                user = User()
+                user.tupple_insert(i)
+                lg.debug(user)
+                return user
+        return False
+
+    def get_user_by_email(self,email):
+        self.cursor.execute("SELECT * FROM users")
+        result = self.cursor.fetchall()
+        for i in result:
+            if email == i[1]:
+                user = User()
+                user.tupple_insert(i)
+                lg.debug(user)
+                return user
+        return False
