@@ -327,4 +327,56 @@ def login_page(app):
         def clear_frame(self):
             for widget in self.right_dashboard.winfo_children():
                 widget.destroy()
+def register_in_db(w, entry1, entry2, entry3, entry4):
+    data = {
+        'email': entry1.get(),
+        'password': entry4.get(),
+        'firstname': entry2.get(),
+        'Last name': entry3.get(),
+    }
+    response = requests.post(url + 'register', data=data)
+    if response.status_code == 200:
+        result = response.json()
+        if result['message'] == 'register successful':
+            w.destroy()
+            app = customtkinter.CTk()  # creating custom tkinter window
+            app.geometry("600x440")
+            app.title('Login')
+            login_page(app)
+        else:
+            print('shpih')
+    else:
+        print('Failed to authenticate user')
+
+
+def register_function(app):
+    app.destroy()  # destroy current window and creating new one
+    w = customtkinter.CTk()
+    w.geometry("600x440")
+    w.title('Register')
+    img1 = ImageTk.PhotoImage(Image.open("pattern.png"))
+    l1 = customtkinter.CTkLabel(master=w, image=img1)
+    l1.pack()
+
+    # creating custom frame
+    frame = customtkinter.CTkFrame(master=l1, width=320, height=400, corner_radius=15)
+    frame.place(relx=0.5, rely=0.5, anchor=tkinter.CENTER)
+
+    l2 = customtkinter.CTkLabel(master=frame, text="Register to our system", font=('Century Gothic', 20))
+    l2.place(x=50, y=45)
+
+    entry1 = customtkinter.CTkEntry(master=frame, width=220, placeholder_text='Email')
+    entry1.place(x=50, y=100)
+    entry2 = customtkinter.CTkEntry(master=frame, width=220, placeholder_text='First name')
+    entry2.place(x=50, y=155)
+    entry3 = customtkinter.CTkEntry(master=frame, width=220, placeholder_text='Last name')
+    entry3.place(x=50, y=210)
+    entry4 = customtkinter.CTkEntry(master=frame, width=220, placeholder_text='Password', show="*")
+    entry4.place(x=50, y=265)
+    register_button = customtkinter.CTkButton(master=frame, width=120, height=40, text="Register",
+                                              command=lambda: register_in_db(w, entry1, entry2, entry3, entry4),
+                                              corner_radius=6)
+    register_button.place(x=105, y=325)
+
+    w.mainloop()
 
