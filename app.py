@@ -30,6 +30,14 @@ def register():
     else:
         return jsonify({'message': 'register not successful'})
 
+@app.route('/user',methods=['POST'])
+def user():
+    id = request.form['id']
+    user = db.get_user_by_id(int(id))
+    if user:
+        return jsonify({'message': 'register successful', 'user': user.totuple()})
+    else:
+        return jsonify({'message': 'register not successful'})
 @app.route('/changeType', methods=['POST'])
 def change_type():
     email, type = request.form['email'], request.form['type']
