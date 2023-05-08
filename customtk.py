@@ -6,14 +6,14 @@ import tksheet
 import customtkinter
 from PIL import ImageTk, Image
 import requests
-from models import User
+from models import User,supllyList
 import ctypes
 from CTkMessagebox import CTkMessagebox
 
 # backend connection
 url = 'http://localhost:5000/'
 user = User()
-
+supply_lst = supllyList()
 customtkinter.set_appearance_mode("System")  # Modes: system (default), light, dark
 customtkinter.set_default_color_theme("green")  # Themes: blue (default), dark-blue, green
 
@@ -26,7 +26,37 @@ class App(customtkinter.CTk):
 
     def __init__(self):
         super().__init__()
+        # --------- bar example --------
+        response = requests.get(url + 'getAllSupply')
+        if response.status_code == 200:
+            result = response.json()
+            if result['message'] == 'successful':
+                temp = result['supply']
+                supply_lst.insert_list(temp)
+                print(supply_lst)
+        # --------- bar example --------
 
+        # ---------- borrow example ----------
+        num_of_items = 4
+        remain = supply_lst.borrow_item_by_id(1,num_of_items)
+        if remain :
+            data = {
+                'user_id' : user.id,
+                'item_id' : 1,
+                'return_time' : "2023-05-08 18:02:30",
+                'num_of_items_remain' : remain,
+                'num_of_items' : num_of_items
+            }
+            response = requests.post(url + 'borrowItem', data=data)
+            if response.status_code == 200:
+                result = response.json()
+                if result['message'] == 'change successful':
+                    print(supply_lst)
+                else:
+                    print('shpih')
+            else:
+                print('shpih2')
+        # ---------- borrow example ----------
         self.title("Supply Solutions")
         # remove title bar , page reducer and closing page !!!most have a quit button with app.destroy!!! (this app have a quit button so don't worry about that)
         self.overrideredirect(True)

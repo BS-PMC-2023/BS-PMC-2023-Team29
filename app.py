@@ -1,9 +1,9 @@
-from db import UserDb
+from db import Db
 from flask import Flask, jsonify, request
 from models import User
 
 
-db = UserDb()
+db = Db()
 # Create a cursor object to execute SQL queries
 cursor = db.cursor
 
@@ -75,11 +75,28 @@ def get_users_types():
     tupple_lst = db.get_users_types()
     return jsonify({'message': 'change successful', 'users': tupple_lst})
 
-@app.route('/removeUser',methods = ['Post'])
+@app.route('/removeUser',methods = ['POST'])
 def delete_user_email():
     if db.delete_user_by_email(request.form['email']):
         return jsonify({'message': 'change successful'})
     else:
         return jsonify({'message': 'change not successful'})
+
+@app.route('/getAllSupply',methods = ['GET'])
+def get_all_supply():
+    supply = db.get_all_supply()
+    return jsonify({'message': 'successful', 'supply': supply})
+
+@app.route('/borrowItem',methods = ['POST'])
+def borrow_item():
+    if db.borrow_item(request.form['user_id'], request.form['item_id'],
+                      request.form['return_time'], request.form['num_of_items'], request.form['num_of_items_remain']):
+        return jsonify({'message': 'change successful'})
+    return jsonify({'message': 'change not successful'})
+
+@app.route('/returnAllItems',methods = ['POST'])
+def return_all_items():
+    if db.
+
 if __name__ == '__main__':
     app.run(debug=True)

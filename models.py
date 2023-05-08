@@ -31,3 +31,70 @@ class User:
 
     def __str__(self):
         return str(self.totuple())
+
+class Supply:
+    def __init__(self):
+        self.id = None
+        self.type= None
+        self.name = None
+        self.all_units = None
+        self.available_units = None
+
+    def insert(self,id,type,name,all_units,available_units ):
+        self.id = id
+        self.type = type
+        self.name = name
+        self.all_units = all_units
+        self.available_units = available_units
+
+    def tupple_insert(self, tupple_insert):
+        self.id = tupple_insert[0]
+        self.name = tupple_insert[1]
+        self.all_units = tupple_insert[2]
+        self.available_units = tupple_insert[3]
+        self.type = tupple_insert[4]
+
+    def borrow(self,how_much_items):
+        if self.available_units - how_much_items >= 0:
+            self.available_units -= how_much_items
+            return self.available_units
+        return False
+
+    def totuple(self):
+        return (self.id, self.name,self.all_units,self.available_units,self.type)
+
+    def __str__(self):
+        return str(self.totuple())
+
+class supllyList:
+    def __init__(self):
+        self.list = []
+
+    def insert_list(self,list):
+        for i in list :
+            supply = Supply()
+            supply.tupple_insert(i)
+            self.list.append(supply)
+
+    def borrow_item_by_id(self, id,how_much_items):
+        supply = None
+        for i in self.list:
+            if i.id == id:
+                supply = i
+                break
+        if not supply:
+            return False
+        remain = supply.borrow(how_much_items)
+        if remain:
+            return remain
+        return False
+
+    def get_avl_item_by_id(self, id):
+        for i in self.list:
+            if i.id == id:
+                return i.available_units
+        return False
+
+    def __str__(self):
+        string = ''.join([str(i) for i in self.list])
+        return string
