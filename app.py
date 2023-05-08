@@ -85,7 +85,7 @@ def delete_user_email():
 @app.route('/getAllSupply',methods = ['GET'])
 def get_all_supply():
     supply = db.get_all_supply()
-    return jsonify({'message': 'change successful', 'supply': supply})
+    return jsonify({'message': 'successful', 'supply': supply})
 
 if __name__ == '__main__':
     app.run(debug=True)

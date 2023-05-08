@@ -32,7 +32,7 @@ class User:
     def __str__(self):
         return str(self.totuple())
 
-class supply:
+class Supply:
     def __init__(self):
         self.id = None
         self.type= None
@@ -64,3 +64,18 @@ class supply:
 
     def __str__(self):
         return str(self.totuple())
+
+class supllyList:
+    def __init__(self):
+        self.list = []
+
+    def insert_list(self,list):
+
+        for i in list :
+            supply = Supply()
+            supply.tupple_insert(i)
+            self.list.append(supply)
+
+    def __str__(self):
+        string = ''.join([str(i) for i in self.list])
+        return string
