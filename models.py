@@ -51,14 +51,16 @@ class supply:
         self.id = tupple_insert[0]
         self.name = tupple_insert[1]
         self.all_units = tupple_insert[2]
-        self.available_units= tupple_insert[3]
+        self.available_units = tupple_insert[3]
         self.type = tupple_insert[4]
 
+    def borrow(self,how_much_items):
+        if self.available_units - how_much_items >= 0:
+            return True
+        return False
+
     def totuple(self):
-        if not self.id:
-            return (self.email, self.password,self.type,self.name,self.lastname)
-        else :
-            return (self.id,self.email, self.password, self.type, self.name, self.lastname)
+        return (self.id, self.name,self.all_units,self.available_units,self.type)
 
     def __str__(self):
         return str(self.totuple())
