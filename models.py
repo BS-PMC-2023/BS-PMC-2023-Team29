@@ -31,3 +31,34 @@ class User:
 
     def __str__(self):
         return str(self.totuple())
+
+class supply:
+    def __init__(self):
+        self.id = None
+        self.type= None
+        self.name = None
+        self.all_units = None
+        self.available_units = None
+
+    def insert(self,id,type,name,all_units,available_units ):
+        self.id = id
+        self.type = type
+        self.name = name
+        self.all_units = all_units
+        self.available_units = available_units
+
+    def tupple_insert(self, tupple_insert):
+        self.id = tupple_insert[0]
+        self.name = tupple_insert[1]
+        self.all_units = tupple_insert[2]
+        self.available_units= tupple_insert[3]
+        self.type = tupple_insert[4]
+
+    def totuple(self):
+        if not self.id:
+            return (self.email, self.password,self.type,self.name,self.lastname)
+        else :
+            return (self.id,self.email, self.password, self.type, self.name, self.lastname)
+
+    def __str__(self):
+        return str(self.totuple())

@@ -1,9 +1,9 @@
-from db import UserDb
+from db import Db
 from flask import Flask, jsonify, request
 from models import User
 
 
-db = UserDb()
+db = Db()
 # Create a cursor object to execute SQL queries
 cursor = db.cursor
 
@@ -81,5 +81,11 @@ def delete_user_email():
         return jsonify({'message': 'change successful'})
     else:
         return jsonify({'message': 'change not successful'})
+
+@app.route('/getAllSupply',methods = ['GET'])
+def get_all_supply():
+    supply = db.get_all_supply()
+    return jsonify({'message': 'change successful', 'supply': supply})
+
 if __name__ == '__main__':
     app.run(debug=True)

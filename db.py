@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 import os
 import logging as lg
 
-class UserDb:
+class Db:
     # Connect to the MySQL database
     def __init__(self):
         load_dotenv()
@@ -145,3 +145,9 @@ class UserDb:
         for row in result:
             lg.debug(row)
         return result
+
+#-------- test db model ---------------
+# db = Db()
+# # Create a cursor object to execute SQL queries
+# cursor = db.cursor
+# print(db.get_all_supply())
