@@ -138,3 +138,10 @@ class UserDb:
         self.cursor.execute(query, (email))
         self.mydb.commit()
         return True
+
+    def get_all_supply(self):
+        self.cursor.execute("SELECT * FROM supply")
+        result = self.cursor.fetchall()
+        for row in result:
+            lg.debug(row)
+        return result
