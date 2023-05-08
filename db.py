@@ -162,21 +162,44 @@ class Db:
         return True
 
     def return_all_items(self,user_id):
-        query = "UPDATE supply SET available_units=%s WHERE id = %s"
+        query_find_items = "SELECT id_borrow,num_of_items,id_supply FROM borrow WHERE id_user =%s AND return_real IS NULL"
+        query_return_supply = "UPDATE supply SET available_units=available_units+%s WHERE id = %s"
+        query_update_borrow = "UPDATE borrow SET return_real=%s WHERE id_borrow = %s"
+        now = datetime.now()
+        formatted_date_time = now.strftime("%Y-%m-%d %H:%M:%S")
+        self.cursor.execute(query_find_items, [user_id])
+        result = self.cursor.fetchall()
+        if result:
+            for i in result:
+                self.cursor.execute(query_update_borrow, (formatted_date_time, i[0]))
+                self.cursor.execute(query_return_supply,(i[1],i[2]))
+
+            self.mydb.commit()
+            return True
+        else :
+            return False
+
+    def return_item(self):
+
+
+
 
 
 #-------- test db model ---------------
-# db = Db()
-# # Create a cursor object to execute SQL queries
+db = Db()
+# print(db.return_all_items(6))
+# db.borrow_item(6,1,"2023-05-08 18:02:30",9,11)
+# db.borrow_item(6,2,"2023-05-08 18:02:30",5,165)
+# db.return_all_items(6)
 #
 # temp_lst = [[1,'calculator',20,20,'office'],[2,'pen',170,170,'office']]
 # supply_lst = supllyList()
 # supply_lst.insert_list(temp_lst)
 # db.borrow_item(1,1,"2023-05-08 18:02:30",1,supply_lst)
 
-temp_lst = [[1,'calculator',20,20,'office'],[2,'pen',170,170,'office']]
-supply_lst = supllyList()
-supply_lst.insert_list(temp_lst)
+# temp_lst = [[1,'calculator',20,20,'office'],[2,'pen',170,170,'office']]
+# supply_lst = supllyList()
+# supply_lst.insert_list(temp_lst)
 
 
 # now = datetime.now()

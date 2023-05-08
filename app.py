@@ -96,7 +96,8 @@ def borrow_item():
 
 @app.route('/returnAllItems',methods = ['POST'])
 def return_all_items():
-    if db.
-
+    if db.return_all_items(request.form['user_id']):
+        return jsonify({'message': 'change successful'})
+    return jsonify({'message': 'change not successful'})
 if __name__ == '__main__':
     app.run(debug=True)
