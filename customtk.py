@@ -55,10 +55,16 @@ class App(customtkinter.CTk):
                                                                command=self.change_scaling_event)
         self.scaling_optionemenu.grid(row=8, column=0, padx=20, pady=(10, 20), sticky="s")
 
+        self.bt_Logout = customtkinter.CTkButton(self.left_side_panel, text="Logout", fg_color='#EA0000',
+                                               hover_color='#B20000',
+                                               command=lambda: back_to_login_page(self))
+        self.bt_Logout.grid(row=9, column=0, padx=20, pady=10)
+
+
         self.bt_Quit = customtkinter.CTkButton(self.left_side_panel, text="Quit", fg_color='#EA0000',
                                                hover_color='#B20000',
                                                command=self.close_window)
-        self.bt_Quit.grid(row=9, column=0, padx=20, pady=10)
+        self.bt_Quit.grid(row=10, column=0, padx=20, pady=10)
 
         # button to select correct frame IN self.left_side_panel WIDGET
         self.bt_homepage = customtkinter.CTkButton(self.left_side_panel, text="Homepage",
