@@ -27,7 +27,7 @@ class App(customtkinter.CTk):
         self.title("Supply Solutions")
         # remove title bar , page reducer and closing page !!!most have a quit button with app.destroy!!! (this app have a quit button so don't worry about that)
         self.overrideredirect(True)
-        # make the app as big as the screen (no mater wich screen you use)
+        # make the app as big as the screen (no mater which screen you use)
         self.geometry("{0}x{1}+0+0".format(self.winfo_screenwidth(), self.winfo_screenheight()))
 
         # root!
@@ -309,6 +309,10 @@ def register_function(app):
                                               corner_radius=6)
     register_button.place(x=105, y=325)
 
+    return_button = customtkinter.CTkButton(master=frame, width=50, height=25, text="Back",
+                                           command=lambda: back_to_login_page(w), corner_radius=6)
+    return_button.place(x=2, y=2)
+
     w.mainloop()
 
 
@@ -389,7 +393,10 @@ def login_page(app):
     app.mainloop()
 
 
-
+def back_to_login_page(app):
+    app.destroy()
+    app = customtkinter.CTk()  # creating custom tkinter window
+    login_page(app)
 
 def forget_password(app):
     if app:
@@ -413,15 +420,20 @@ def forget_password(app):
     entry1 = customtkinter.CTkEntry(master=frame, width=220, placeholder_text='Username')
     entry1.place(x=50, y=110)
 
-    entry2 = customtkinter.CTkEntry(master=frame, width=220, placeholder_text='new Password', show="*")
+    entry2 = customtkinter.CTkEntry(master=frame, width=220, placeholder_text='New password', show="*")
     entry2.place(x=50, y=165)
-    entry3 = customtkinter.CTkEntry(master=frame, width=220, placeholder_text='new Password repit', show="*")
+    entry3 = customtkinter.CTkEntry(master=frame, width=220, placeholder_text='New password repeat', show="*")
     entry3.place(x=50, y=195)
 
     # Create custom button
     login_button = customtkinter.CTkButton(master=frame, width=120, height=40, text="generate new password",
                                            command=lambda: change_password(app, entry1, entry2), corner_radius=6)
     login_button.place(x=30, y=235)
+
+    return_button = customtkinter.CTkButton(master=frame, width=50, height=25, text="Back",
+                                           command=lambda: back_to_login_page(app), corner_radius=6)
+    return_button.place(x=2, y=2)
+
 
     img3 = customtkinter.CTkImage(Image.open("samilogo.png").resize((40, 40), Image.ANTIALIAS))
 
