@@ -1,5 +1,8 @@
 # importing required modules
 import tkinter
+import tkinter.ttk as ttk
+import tksheet
+
 import customtkinter
 from PIL import ImageTk, Image
 import requests
@@ -91,16 +94,15 @@ class App(customtkinter.CTk):
     #  self.right_dashboard   ----> dashboard widget
     def homie(self, id):
         self.clear_frame()
+        create_table(self)
+        # self.name = customtkinter.CTkLabel(master=self.right_dashboard, text=user.name,
+        #                                    font=('Century Gothic', 50))
+        # self.lastname = customtkinter.CTkLabel(master=self.right_dashboard, text=user.lastname,
+        #                                        font=('Century Gothic', 50))
+        # self.name.place(relx=0.5, rely=0.1, anchor=tkinter.CENTER)
+        # self.lastname.place(relx=0.5, rely=0.3, anchor=tkinter.CENTER)
 
-        self.name = customtkinter.CTkLabel(master=self.right_dashboard, text=user.name,
-                                           font=('Century Gothic', 50))
-        self.lastname = customtkinter.CTkLabel(master=self.right_dashboard, text=user.lastname,
-                                               font=('Century Gothic', 50))
-        self.name.place(relx=0.5, rely=0.1, anchor=tkinter.CENTER)
-        self.lastname.place(relx=0.5, rely=0.3, anchor=tkinter.CENTER)
 
-        # l1 = customtkinter.CTkLabel(master=w, text="Home Page", font=('Century Gothic', 60))
-        # l1.place(relx=0.5, rely=0.5, anchor=tkinter.CENTER)
 
         def help_func():
             ctypes.windll.user32.MessageBoxW(0,
@@ -263,6 +265,23 @@ class App(customtkinter.CTk):
         for widget in self.right_dashboard.winfo_children():
             widget.destroy()
 
+    def acquire_item(self):
+        selected_item = self.table.item(self.table.selection())
+        item_id = selected_item['values'][0]
+        item_name = selected_item['values'][1]
+        quantity = selected_item['values'][2]
+        loan_time = selected_item['values'][3]
+        print(f"Acquiring {item_name} ({item_id}) for {quantity} with a loan time of {loan_time}.")
+
+    def item_description(self):
+        selected_item = self.table.item(self.table.selection())
+        item_id = selected_item['values'][0]
+        item_name = selected_item['values'][1]
+        quantity = selected_item['values'][2]
+        loan_time = selected_item['values'][3]
+        print(
+            f"Showing description for {item_name} ({item_id}): {item_name} is an item with id {item_id}, available in {quantity} units and can be loaned for {loan_time} days.")
+
 
 def register_in_db(w, entry1, entry2, entry3, entry4):
     data = {
@@ -404,6 +423,7 @@ def back_to_login_page(app):
     app = customtkinter.CTk()  # creating custom tkinter window
     login_page(app)
 
+
 def forget_password(app):
     if app:
         app.destroy()
@@ -470,6 +490,101 @@ def change_password(app, entry1, entry2):
     else:
         print('Failed to authenticate user')
 
+class UI_TabTable(ttk.Frame):
+    def __init__(self, main_window, **kw):
+            self.table = tksheet.Sheet(self, font=GUI_FONT_CONTENT, header_font=GUI_FONT_CONTENT,
+                                       popup_menu_font=GUI_FONT_CONTENT, table_bg=GUI_BG_COLOR)
+            self.table.headers(['Timestamp', 'Temperature, °C', 'Humidity, %', 'Annotation'])
+            self.table.column_width(column=0, width=180, only_set_if_too_small=False)
+            self.table.column_width(column=2, width=100, only_set_if_too_small=False)
+            self.table.column_width(column=3, width=180, only_set_if_too_small=False)
+            self.table.pack(expand=True, fill='both')
+            self.table.enable_bindings('all')
+            self.table.disable_bindings(['rc_insert_column', 'rc_delete_column', 'edit_cell', 'delete', 'paste',
+                                         'cut', 'rc_delete_row', 'rc_insert_row'])
+
+    def add(self, timestamp, temperature, humidity, is_tampered, is_bookmark):
+        self.table.insert_row(values=(timestamp, temperature, humidity, is_tampered, is_bookmark),
+                              idx='end', add_columns=False)
+
+    def clear(self):
+        self.table.select_all(redraw=False, run_binding_func=True)
+        rows_number = len(self.table.get_selected_rows(get_cells_as_rows=True))
+        self.table.MT.del_row_positions(idx=0, numrows=rows_number, deselect_all=True)
+
+
+def create_table(self):
+    # Create a simple table
+    self.table = ttk.Treeview(self.right_dashboard)
+    self.table.pack(side=tkinter.TOP, fill=tkinter.BOTH, expand=True)
+
+    # Define the columns of the table
+    self.table["columns"] = ("Item id", "Item name", "Quantity", "Loan time")
+
+    # Set the headings of the columns
+    self.table.column("Item id", width=100, anchor="center", stretch=True)
+    self.table.heading("Item id", text="Item id")
+
+    self.table.column("Item name", width=200, anchor="center", stretch=True)
+    self.table.heading("Item name", text="Item name")
+
+    self.table.column("Quantity", width=100, anchor="center", stretch=True)
+    self.table.heading("Quantity", text="Quantity")
+
+    self.table.column("Loan time", width=100, anchor="center", stretch=True)
+    self.table.heading("Loan time", text="Loan time")
+
+    # Add some data to the table
+    self.table.insert("", "end", values=("001", "Laptop", 3, "3 days"))
+    self.table.insert("", "end", values=("002", "Projector", 1, "1 day"))
+
+    # Buttons to interact with the selected line of the table
+    self.button_acquire = customtkinter.CTkButton(self.right_dashboard, text="Acquire", fg_color='#EA0000',
+                                                  hover_color='#B20000', command=self.acquire_item)
+    self.button_acquire.pack(side=tkinter.LEFT, padx=10, pady=10)
+
+    self.button_item_desc = customtkinter.CTkButton(self.right_dashboard, text="Item Description", fg_color='#EA0000',
+                                                    hover_color='#B20000', command=self.item_description)
+    self.button_item_desc.pack(side=tkinter.LEFT, padx=10, pady=10)
+
+    # # Create the data for the table
+    # data = [
+    #     ["001", "Item 1", "5", "2023-05-08"],
+    #     ["002", "Item 2", "3", "2023-05-09"],
+    #     ["003", "Item 3", "7", "2023-05-10"],
+    #     ["004", "Item 4", "2", "2023-05-11"],
+    #     ["005", "Item 5", "1", "2023-05-12"]
+    # ]
+    #
+    # # Create a new sheet and set its data
+    # sheet = tksheet.Sheet(frame,
+    #                       headers=["Item ID", "Item Name", "Quantity", "Time of Loan"],
+    #                       data=data)
+    #
+    # # Style the sheet
+    # sheet.enable_bindings(("single_select", "row_select", "column_width_resize", "arrowkeys"))
+    # sheet.set_all_cell_sizes_to_text()
+    #
+    # # Get the actual headers list and add some formatting
+    # headers = sheet.headers()
+    # for i, header in enumerate(headers):
+    #     headers[i] = (header, {"font": "Arial 12 bold"})
+    #
+    # # Set the headers back on the sheet
+    # sheet.headers(headers)
+    #
+    # # Set the width of each column
+    # for i in range(sheet.get_column_count()):
+    #     sheet.set_column_width(i, [150, 250, 100, 150][i])
+    #
+    # # Set the height of the rows
+    # sheet.row_height(30)
+    #
+    # # Place the sheet in the frame using pack
+    # sheet.pack(fill="both", expand=True)
+    #
+    # # Return the sheet
+    # return sheet
 
 
 login_page(app)
