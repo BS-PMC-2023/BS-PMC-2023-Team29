@@ -57,7 +57,7 @@ class Supply:
     def borrow(self,how_much_items):
         if self.available_units - how_much_items >= 0:
             self.available_units -= how_much_items
-            return True
+            return self.available_units
         return False
 
     def totuple(self):
@@ -84,8 +84,9 @@ class supllyList:
                 break
         if not supply:
             return False
-        if supply.borrow(how_much_items):
-            return True
+        remain = supply.borrow(how_much_items)
+        if remain:
+            return remain
         return False
 
     def get_avl_item_by_id(self, id):
@@ -93,6 +94,7 @@ class supllyList:
             if i.id == id:
                 return i.available_units
         return False
+
     def __str__(self):
         string = ''.join([str(i) for i in self.list])
         return string

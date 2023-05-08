@@ -147,14 +147,11 @@ class Db:
             lg.debug(row)
         return result
 
-    def borrow_item(self,user_id,item_id,return_time,num_of_items,supply_lst):
+    def borrow_item(self,user_id,item_id,return_time,num_of_items,num_of_items_remain):
         query_borrow = "INSERT INTO borrow (id_supply, id_user,num_of_items,borrow_date,return_expacted) VALUES (%s, %s,%s, %s,%s)"
         query_supply = "UPDATE supply SET available_units=%s WHERE id = %s"
-        # check if it possible to borrow this item
-        if not supply_lst.borrow_item_by_id(item_id,num_of_items):
-            return False
         # update supply table
-        self.cursor.execute(query_supply,(supply_lst.get_avl_item_by_id(item_id),item_id))
+        self.cursor.execute(query_supply,(num_of_items_remain,item_id))
         # update borrow table
         now = datetime.now()
         formatted_date_time = now.strftime("%Y-%m-%d %H:%M:%S")
@@ -164,17 +161,22 @@ class Db:
         lg.debug("great success")
         return True
 
+    def return_all_items(self,user_id):
+        query = "UPDATE supply SET available_units=%s WHERE id = %s"
 
 
 #-------- test db model ---------------
-db = Db()
-# Create a cursor object to execute SQL queries
+# db = Db()
+# # Create a cursor object to execute SQL queries
+#
+# temp_lst = [[1,'calculator',20,20,'office'],[2,'pen',170,170,'office']]
+# supply_lst = supllyList()
+# supply_lst.insert_list(temp_lst)
+# db.borrow_item(1,1,"2023-05-08 18:02:30",1,supply_lst)
 
 temp_lst = [[1,'calculator',20,20,'office'],[2,'pen',170,170,'office']]
 supply_lst = supllyList()
 supply_lst.insert_list(temp_lst)
-db.borrow_item(1,1,"2023-05-08 18:02:30",1,supply_lst)
-
 
 
 # now = datetime.now()
