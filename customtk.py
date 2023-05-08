@@ -37,25 +37,25 @@ class App(customtkinter.CTk):
         # --------- bar example --------
 
         # ---------- borrow example ----------
-        num_of_items = 4
-        remain = supply_lst.borrow_item_by_id(1,num_of_items)
-        if remain :
-            data = {
-                'user_id' : user.id,
-                'item_id' : 1,
-                'return_time' : "2023-05-08 18:02:30",
-                'num_of_items_remain' : remain,
-                'num_of_items' : num_of_items
-            }
-            response = requests.post(url + 'borrowItem', data=data)
-            if response.status_code == 200:
-                result = response.json()
-                if result['message'] == 'change successful':
-                    print(supply_lst)
-                else:
-                    print('shpih')
-            else:
-                print('shpih2')
+        # num_of_items = 4
+        # remain = supply_lst.borrow_item_by_id(1,num_of_items)
+        # if remain :
+        #     data = {
+        #         'user_id' : user.id,
+        #         'item_id' : 1,
+        #         'return_time' : "2023-05-08 18:02:30",
+        #         'num_of_items_remain' : remain,
+        #         'num_of_items' : num_of_items
+        #     }
+        #     response = requests.post(url + 'borrowItem', data=data)
+        #     if response.status_code == 200:
+        #         result = response.json()
+        #         if result['message'] == 'change successful':
+        #             print(supply_lst)
+        #         else:
+        #             print('shpih')
+        #     else:
+        #         print('shpih2')
         # ---------- borrow example ----------
         self.title("Supply Solutions")
         # remove title bar , page reducer and closing page !!!most have a quit button with app.destroy!!! (this app have a quit button so don't worry about that)
@@ -297,20 +297,19 @@ class App(customtkinter.CTk):
 
     def acquire_item(self):
         selected_item = self.table.item(self.table.selection())
-        item_id = selected_item['values'][0]
-        item_name = selected_item['values'][1]
-        quantity = selected_item['values'][2]
-        loan_time = selected_item['values'][3]
-        print(f"Acquiring {item_name} ({item_id}) for {quantity} with a loan time of {loan_time}.")
+        item_name = selected_item['values'][0]
+        all_units = selected_item['values'][1]
+        available_units = selected_item['values'][2]
+        type = selected_item['values'][3]
+        print(f"Acquiring {item_name} ({available_units}/{all_units}) with a type of {type}.")
 
     def item_description(self):
         selected_item = self.table.item(self.table.selection())
-        item_id = selected_item['values'][0]
-        item_name = selected_item['values'][1]
-        quantity = selected_item['values'][2]
-        loan_time = selected_item['values'][3]
-        print(
-            f"Showing description for {item_name} ({item_id}): {item_name} is an item with id {item_id}, available in {quantity} units and can be loaned for {loan_time} days.")
+        item_name = selected_item['values'][0]
+        all_units = selected_item['values'][1]
+        available_units = selected_item['values'][2]
+        type = selected_item['values'][3]
+        print(f"Showing description for {item_name} ({available_units}/{all_units}) with a type of {type}.")
 
 
 def register_in_db(w, entry1, entry2, entry3, entry4):
@@ -430,7 +429,7 @@ def login_page(app):
                                               command=lambda: register_function(app), corner_radius=6)
     register_button.place(x=170, y=235)
 
-    img3 = customtkinter.CTkImage(Image.open("samilogo.png").resize((40, 40), Image.ANTIALIAS))
+    img3 = customtkinter.CTkImage(Image.open("samilogo.png").resize((40, 40)))
 
     img3 = customtkinter.CTkButton(master=frame, image=img3, text="Sami Shamoon College of Engineering", width=40,
                                    height=40, compound="left", fg_color='white', text_color='black',
@@ -544,29 +543,33 @@ class UI_TabTable(ttk.Frame):
 
 
 def create_table(self):
+    print(supply_lst.list)
     # Create a simple table
     self.table = ttk.Treeview(self.right_dashboard)
     self.table.pack(side=tkinter.TOP, fill=tkinter.BOTH, expand=True)
 
     # Define the columns of the table
-    self.table["columns"] = ("Item id", "Item name", "Quantity", "Loan time")
+    self.table["columns"] = ("Item name", "Quantity", "Avilable", "Type")
 
     # Set the headings of the columns
-    self.table.column("Item id", width=100, anchor="center", stretch=True)
-    self.table.heading("Item id", text="Item id")
-
-    self.table.column("Item name", width=200, anchor="center", stretch=True)
+    self.table.column("Item name", width=100, anchor="center", stretch=True)
     self.table.heading("Item name", text="Item name")
 
-    self.table.column("Quantity", width=100, anchor="center", stretch=True)
+    self.table.column("Quantity", width=200, anchor="center", stretch=True)
     self.table.heading("Quantity", text="Quantity")
 
-    self.table.column("Loan time", width=100, anchor="center", stretch=True)
-    self.table.heading("Loan time", text="Loan time")
+    self.table.column("Avilable", width=100, anchor="center", stretch=True)
+    self.table.heading("Avilable", text="Avilable")
+
+    self.table.column("Type", width=100, anchor="center", stretch=True)
+    self.table.heading("Type", text="Type")
 
     # Add some data to the table
-    self.table.insert("", "end", values=("001", "Laptop", 3, "3 days"))
-    self.table.insert("", "end", values=("002", "Projector", 1, "1 day"))
+    # self.table.insert("", "end", values=("001", "Laptop", 3, "3 days"))
+    # self.table.insert("", "end", values=("002", "Projector", 1, "1 day"))
+    for x in supply_lst.list:
+        self.table.insert("", "end", values=(x.name, x.all_units, x.available_units, x.type))
+
 
     # Buttons to interact with the selected line of the table
     self.button_acquire = customtkinter.CTkButton(self.right_dashboard, text="Acquire", fg_color='#EA0000',
