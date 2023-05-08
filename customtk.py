@@ -29,8 +29,6 @@ class App(customtkinter.CTk):
             result = response.json()
             if result['message'] == 'successful':
                 temp = result['supply']
-                print(temp)
-                print(type(temp))
                 supply_lst.insert_list(temp)
                 print(supply_lst)
         # --------- bar example --------

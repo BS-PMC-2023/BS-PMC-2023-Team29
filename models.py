@@ -56,6 +56,7 @@ class Supply:
 
     def borrow(self,how_much_items):
         if self.available_units - how_much_items >= 0:
+            self.available_units -= how_much_items
             return True
         return False
 
@@ -70,12 +71,28 @@ class supllyList:
         self.list = []
 
     def insert_list(self,list):
-
         for i in list :
             supply = Supply()
             supply.tupple_insert(i)
             self.list.append(supply)
 
+    def borrow_item_by_id(self, id,how_much_items):
+        supply = None
+        for i in self.list:
+            if i.id == id:
+                supply = i
+                break
+        if not supply:
+            return False
+        if supply.borrow(how_much_items):
+            return True
+        return False
+
+    def get_avl_item_by_id(self, id):
+        for i in self.list:
+            if i.id == id:
+                return i.available_units
+        return False
     def __str__(self):
         string = ''.join([str(i) for i in self.list])
         return string
