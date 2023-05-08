@@ -82,7 +82,29 @@ class App(customtkinter.CTk):
         self.id = id
         self.homie(id)
 
+    #  self.right_dashboard   ----> dashboard widget
+    def homie(self, id):
+        self.clear_frame()
 
+        self.name = customtkinter.CTkLabel(master=self.right_dashboard, text=user.name,
+                                           font=('Century Gothic', 50))
+        self.lastname = customtkinter.CTkLabel(master=self.right_dashboard, text=user.lastname,
+                                               font=('Century Gothic', 50))
+        self.name.place(relx=0.5, rely=0.1, anchor=tkinter.CENTER)
+        self.lastname.place(relx=0.5, rely=0.3, anchor=tkinter.CENTER)
+
+        # l1 = customtkinter.CTkLabel(master=w, text="Home Page", font=('Century Gothic', 60))
+        # l1.place(relx=0.5, rely=0.5, anchor=tkinter.CENTER)
+
+        def help_func():
+            ctypes.windll.user32.MessageBoxW(0,
+                                             "Here are the app instructions:\n\n1. asd\n2. sdfs\n3. sdfgsdg\n4. hrth",
+                                             "Help", 0)
+
+        self.help_BTN = customtkinter.CTkButton(master=self.right_dashboard, width=60, height=20, text="Help",
+                                                command=help_func,
+                                                corner_radius=6)
+        self.help_BTN.place(relx=0.9, rely=0.9, anchor=tkinter.CENTER)
 
 
     #  self.right_dashboard   ----> statement widget
