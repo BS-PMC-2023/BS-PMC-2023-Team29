@@ -86,7 +86,6 @@ class App(customtkinter.CTk):
 
 
     #  self.right_dashboard   ----> statement widget
-    # COMMIT bar ------------------- BSPMC2329-32 ---------------------------------------
     def profile(self):
         self.clear_frame()
         # self.bt_from_frame3 = customtkinter.CTkButton(self.right_dashboard, text="Profile",
@@ -135,9 +134,7 @@ class App(customtkinter.CTk):
         self.email_entry.place(relx=0.5, rely=0.3, anchor=tkinter.CENTER)
         self.save_BTN.place(relx=0.75, rely=0.3, anchor=tkinter.CENTER)
 
-    #END COMMIT bar ------------------- BSPMC2329-32 ---------------------------------------
 
-    #COMMIT bar ------------------- BSPMC2329-29 ---------------------------------------
     #  self.right_dashboard   ----> categories widget
     def manager(self):
         self.clear_frame()
@@ -238,10 +235,7 @@ class App(customtkinter.CTk):
         for widget in self.right_dashboard.winfo_children():
             widget.destroy()
 
-# END COMMIT bar ------------------- BSPMC2329-29 ---------------------------------------
 
-
-# COMMIT adan ------------------- BSPMC2329-6 ---------------------------------------
 def register_in_db(w, entry1, entry2, entry3, entry4):
     data = {
         'email': entry1.get(),
@@ -295,10 +289,7 @@ def register_function(app):
 
     w.mainloop()
 
-# END COMMIT adan ------------------- BSPMC2329-6 ---------------------------------------
 
-
-# COMMIT BASEL ------------------- BSPMC2329-27---------------------------------------
 def login_function(app, entry1, entry2):
     email, passord = entry1.get(), entry2.get()
 
@@ -364,11 +355,10 @@ def login_page(app):
                                    height=40, compound="left", fg_color='white', text_color='black',
                                    hover_color='#AFAFAF')
     img3.place(x=160, y=320, anchor=tkinter.CENTER)
-    # COMMIT alex -------------------BSPMC2329 - 34---------------------------------------
+
     def about_func():
         ctypes.windll.user32.MessageBoxW(0, "Made with love by:\n\nAlex, Bar, Aden and Basel", "About Us", 0)
 
-    # end COMMIT alex -------------------BSPMC2329 - 34---------------------------------------
     about_BTN = customtkinter.CTkButton(master=frame, width=60, height=20, text="About us", command=about_func,
                                         corner_radius=6)
     about_BTN.place(x=160, y=370, anchor=tkinter.CENTER)
@@ -376,10 +366,9 @@ def login_page(app):
     # You can easily integrate authentication system
     app.mainloop()
 
-#END COMMIT BASEL ------------------- BSPMC2329-27---------------------------------------
 
 
-# COMMIT alex ------------------- BSPMC2329-31 ---------------------------------------
+
 def forget_password(app):
     if app:
         app.destroy()
@@ -441,7 +430,6 @@ def change_password(app, entry1, entry2):
     else:
         print('Failed to authenticate user')
 
-#end COMMIT alex ------------------- BSPMC2329-31 ---------------------------------------
 
 
 login_page(app)

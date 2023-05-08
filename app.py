@@ -12,7 +12,6 @@ app = Flask("app")
 
 # Define a route to get data from the database
 
-# COMMIT BASEL ------------------- BSPMC2329-27 ---------------------------------------
 @app.route('/login',methods=['POST'])
 def login():
     temp = User()
@@ -22,9 +21,7 @@ def login():
         return jsonify({'message': 'Login successful','user': user})
     else:
         return jsonify({'message': 'Invalid username or password'})
-# end  COMMIT BASEL ------------------- BSPMC2329-27 ---------------------------------------
 
-# COMMIT adan ------------------- BSPMC2329-6 ---------------------------------------
 @app.route('/register',methods=['POST'])
 def register():
     temp = User()
@@ -33,9 +30,7 @@ def register():
         return jsonify({'message': 'register successful'})
     else:
         return jsonify({'message': 'register not successful'})
-# end COMMIT adan ------------------- BSPMC2329-6 ---------------------------------------
 
-# COMMIT adan ------------------- BSPMC2329-7 ---------------------------------------
 @app.route('/user',methods=['POST'])
 def user():
     id = request.form['id']
@@ -44,7 +39,7 @@ def user():
         return jsonify({'message': 'register successful', 'user': user.totuple()})
     else:
         return jsonify({'message': 'register not successful'})
-# end COMMIT adan ------------------- BSPMC2329-7 ---------------------------------------
+
 @app.route('/changeType',methods =['POST'])
 def change_type():
     email, type = request.form['email'], request.form['type']

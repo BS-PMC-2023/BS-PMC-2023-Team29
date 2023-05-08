@@ -33,7 +33,6 @@ class UserDb:
     def create_user_table(self):
         self.cursor.execute("CREATE TABLE Users (id INT AUTO_INCREMENT PRIMARY KEY , email VARCHAR(255) , password VARCHAR(255) , type int(2) , name VARCHAR(255) , lastname VARCHAR(255))")
 
-    # COMMIT adan ------------------- BSPMC2329-6 ---------------------------------------
     def insert_user(self,user):
         query = "INSERT INTO users (email, password,type,name,lastname) VALUES (%s, %s,%s, %s,%s)"
 
@@ -60,7 +59,6 @@ class UserDb:
         lg.debug("great success")
         return True
 
-    # end COMMIT adan ------------------- BSPMC2329-6 ---------------------------------------
 
     # Retrieve some data from the 'customers' table
     def print_user_table(self):
@@ -89,7 +87,6 @@ class UserDb:
             lg.debug("not great success")
             return False
 
-    # COMMIT adan ------------------- BSPMC2329-7 ---------------------------------------
     def get_user_by_id(self,id):
         self.cursor.execute("SELECT * FROM users")
         result = self.cursor.fetchall()
@@ -112,7 +109,6 @@ class UserDb:
                 return user
         return False
 
-    # end COMMIT adan ------------------- BSPMC2329-7 ---------------------------------------
     def change_type_of_user(self,email,type):
         query = "UPDATE users SET type = %s WHERE email = %s"
         self.cursor.execute(query,(type,email))
