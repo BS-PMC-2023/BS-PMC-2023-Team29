@@ -71,6 +71,8 @@ class App(customtkinter.CTk):
         self.bt_categories = customtkinter.CTkButton(self.left_side_panel, text="Manager Options",
                                                      command=self.manager)
         self.bt_categories.grid(row=3, column=0, padx=20, pady=10)
+        self.bt_categories = customtkinter.CTkButton(self.left_side_panel, text="Report",command=self.report)
+        self.bt_categories.grid(row=3, column=0, padx=20, pady=10)
 
         # right side panel -> have self.right_dashboard inside it
         self.right_side_panel = customtkinter.CTkFrame(self.main_container, corner_radius=10, fg_color="#000811")
@@ -154,6 +156,16 @@ class App(customtkinter.CTk):
         self.lastname_entry.place(relx=0.5, rely=0.2, anchor=tkinter.CENTER)
         self.email.place(relx=0.3, rely=0.3, anchor=tkinter.CENTER)
         self.email_entry.place(relx=0.5, rely=0.3, anchor=tkinter.CENTER)
+        self.save_BTN.place(relx=0.75, rely=0.3, anchor=tkinter.CENTER)
+
+
+    def report(self):
+        self.clear_frame()
+        self.name = customtkinter.CTkLabel(master=self.right_dashboard, text="The report: ",font=('Century Gothic', 18))
+        self.name_entry = customtkinter.CTkEntry(master=self.right_dashboard, width=220)
+        self.name.place(relx=0.3, rely=0.1, anchor=tkinter.CENTER)
+        self.name_entry.place(relx=0.5, rely=0.1, anchor=tkinter.CENTER)
+        self.save_BTN = customtkinter.CTkButton(master=self.right_dashboard, width=60, height=20, text="Sent")
         self.save_BTN.place(relx=0.75, rely=0.3, anchor=tkinter.CENTER)
 
 
@@ -263,7 +275,7 @@ def register_in_db(w, entry1, entry2, entry3, entry4):
         'email': entry1.get(),
         'password': entry4.get(),
         'firstname': entry2.get(),
-        'Last name': entry3.get(),
+        'Last_name': entry3.get(),
     }
     response = requests.post(url + 'register', data=data)
     if response.status_code == 200:
