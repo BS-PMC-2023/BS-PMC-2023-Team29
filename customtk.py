@@ -1,13 +1,12 @@
 # importing required modules
 import tkinter
 import tkinter.ttk as ttk
-import tksheet
-
 import customtkinter
 from PIL import ImageTk, Image
 import requests
 from models import User,supllyList
 import ctypes
+from datetime import datetime, timedelta
 from CTkMessagebox import CTkMessagebox
 
 # backend connection
@@ -307,9 +306,13 @@ class App(customtkinter.CTk):
 
     def acquire_item(self):
 
-        def slider_event2(self):
+        def slider_event2(window):
                 label_item2.configure(text=slider.get())
-        def slider_event3(self):
+        def slider_event3(window):
+                label_item3.configure(text=slider2.get())
+
+        def combolicious(window, x):
+                slider2.configure(number_of_steps=supply_lst.get_supply_avl_by_name(x), to=supply_lst.get_supply_avl_by_name(x))
                 label_item3.configure(text=slider2.get())
 
         # Check if there's already an active window
@@ -338,14 +341,18 @@ class App(customtkinter.CTk):
         label_item.pack()
 
         # Create a combo box with the available items
-        items = ['Pen', 'Calculator']
-        combo_item = ttk.Combobox(master=window, values=items)
+        items = supply_lst.get_items_names()
+        combo_item = customtkinter.CTkComboBox(master=window, values=items, command=lambda: combolicious(window, combo_item.get()))
         combo_item.pack()
 
         # Create a label for the return time selection
         label_return = customtkinter.CTkLabel(master=window, text="When will you return it?")
         label_return.pack()
-        slider = customtkinter.CTkSlider(window, from_=0, to=100, number_of_steps=100, command=slider_event2)
+        now = datetime.now()
+        rounded_hour = (now + timedelta(hours=1)).replace(minute=0, second=0, microsecond=0)
+        rounded_hour = rounded_hour.hour
+
+        slider = customtkinter.CTkSlider(window, from_=rounded_hour, to=22, number_of_steps=(22-rounded_hour)*2, command=slider_event2)
         slider.pack()
 
         label_item2 = customtkinter.CTkLabel(master=window, text=slider.get())
@@ -354,8 +361,13 @@ class App(customtkinter.CTk):
         label_quantity = customtkinter.CTkLabel(master=window, text="How many would you like to borrow?")
         label_quantity.pack()
 
-        slider2 = customtkinter.CTkSlider(window, from_=100, to=200, number_of_steps=100, command=slider_event3)
+        slider2 = customtkinter.CTkSlider(window, from_=0, to=supply_lst.get_supply_avl_by_name(combo_item.get()),
+                                          number_of_steps=supply_lst.get_supply_avl_by_name(combo_item.get()), command=slider_event3)
         slider2.pack()
+
+        # slider2 = customtkinter.CTkSlider(window, from_=100, to=200, number_of_steps=100, command=slider_event3)
+        # slider2.pack()
+
         label_item3 = customtkinter.CTkLabel(master=window, text=slider2.get())
         label_item3.pack()
 
