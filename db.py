@@ -211,14 +211,28 @@ class Db:
         self.cursor.execute(query, [user_id])
         return self.cursor.fetchall()
 
+    def add_item_to_supply(self,item_name,units,item_type):
+        query = "INSERT INTO supply (name,all_units,available_units,type) VALUES (%s,%s,%s,%s)"
+        self.cursor.execute(query, (item_name,units,units,item_type))
+        self.mydb.commit()
+        return True
+
+    def add_units_to_supply(self,item_id,add_units):
+        query = "UPDATE supply SET all_units =all_units + %s , available_units=available_units+%s WHERE id = %s"
+        self.cursor.execute(query, (add_units, add_units, item_id))
+        self.mydb.commit()
+        return True
 
 #-------- test db model ---------------
-db = Db()
-# print(db.return_all_items(6))
-
+# db = Db()
+# # print(db.return_all_items(6))
+# db.add_units_to_supply(4,12)
+my_string = "HELLO WORLD@gmaail.Com"
+lowercase_string = my_string.lower()
+print(lowercase_string)
 # db.borrow_item(6,1,"2023-05-08 18:02:30",9,11)
-a= db.get_items_dosent_return(6)
-for i in a : print(i[0])
+# a= db.get_items_dosent_return(6)
+# for i in a : print(i[0])
 # db.borrow_item(6,2,"2023-05-08 18:02:30",5,165)
 # db.return_all_items(6)
 #
