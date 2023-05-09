@@ -135,7 +135,7 @@ class App(customtkinter.CTk):
     #  self.right_dashboard   ----> dashboard widget
     def homie(self, id):
         self.clear_frame()
-        create_table(self)
+        create_table(self, 'supply')
         # self.name = customtkinter.CTkLabel(master=self.right_dashboard, text=user.name,
         #                                    font=('Century Gothic', 50))
         # self.lastname = customtkinter.CTkLabel(master=self.right_dashboard, text=user.lastname,
@@ -151,7 +151,7 @@ class App(customtkinter.CTk):
         self.help_BTN = customtkinter.CTkButton(master=self.right_dashboard, width=60, height=20, text="Help",
                                                 command=help_func,
                                                 corner_radius=6)
-        self.help_BTN.place(relx=0.9, rely=0.9, anchor=tkinter.CENTER)
+        self.help_BTN.place(relx=0.95, rely=0.9, anchor=tkinter.CENTER)
 
 
     #  self.right_dashboard   ----> statement widget
@@ -175,6 +175,8 @@ class App(customtkinter.CTk):
                                             font=('Century Gothic', 18))
         self.email_entry = customtkinter.CTkEntry(master=self.right_dashboard, width=220)
         self.email_entry.insert(0, user.email)
+
+
 
         def save_changes_func():
             data = {'email': self.email_entry.get(), 'name': self.name_entry.get(),
@@ -311,9 +313,10 @@ class App(customtkinter.CTk):
         def slider_event3(window):
                 label_item3.configure(text=slider2.get())
 
-        def combolicious(window, x):
-                slider2.configure(number_of_steps=supply_lst.get_supply_avl_by_name(x), to=supply_lst.get_supply_avl_by_name(x))
-                label_item3.configure(text=slider2.get())
+        def combolicious(choice):
+            slider2.configure(number_of_steps=supply_lst.get_supply_avl_by_name(choice), to=supply_lst.get_supply_avl_by_name(choice))
+            slider2.set(0)
+            label_item3.configure(text="0")
 
         # Check if there's already an active window
         if hasattr(self, "acquire_item_window") and self.acquire_item_window.winfo_exists():
@@ -342,8 +345,9 @@ class App(customtkinter.CTk):
 
         # Create a combo box with the available items
         items = supply_lst.get_items_names()
-        combo_item = customtkinter.CTkComboBox(master=window, values=items, command=lambda: combolicious(window, combo_item.get()))
+        combo_item = customtkinter.CTkComboBox(window, values=items, command=combolicious)
         combo_item.pack()
+        combo_item.bind("<<ComboboxSelected>>", lambda event, window=window: combolicious(event))
 
         # Create a label for the return time selection
         label_return = customtkinter.CTkLabel(master=window, text="When will you return it?")
@@ -602,27 +606,48 @@ def change_password(app, entry1, entry2):
         print('Failed to authenticate user')
 
 
-def create_table(self):
-    print(supply_lst.list)
-    # Create a simple table
-    self.table = ttk.Treeview(self.right_dashboard)
-    self.table.pack(side=tkinter.TOP, fill=tkinter.BOTH, expand=True)
+def create_table(self, type):
+    # print(supply_lst.list)
+    if type == 'supply':
+        # Create a simple table
+        self.table = ttk.Treeview(self.right_dashboard)
+        self.table.pack(side=tkinter.TOP, fill=tkinter.BOTH, expand=True)
 
-    # Define the columns of the table
-    self.table["columns"] = ("Item name", "Quantity", "Avilable", "Type")
+        # Define the columns of the table
+        self.table["columns"] = ("Item name", "Quantity", "Avilable", "Type")
 
-    # Set the headings of the columns
-    self.table.column("Item name", width=100, anchor="center", stretch=True)
-    self.table.heading("Item name", text="Item name")
+        # Set the headings of the columns
+        self.table.column("Item name", width=100, anchor="center", stretch=True)
+        self.table.heading("Item name", text="Item name")
 
-    self.table.column("Quantity", width=100, anchor="center", stretch=True)
-    self.table.heading("Quantity", text="Quantity")
+        self.table.column("Quantity", width=100, anchor="center", stretch=True)
+        self.table.heading("Quantity", text="Quantity")
 
-    self.table.column("Avilable", width=100, anchor="center", stretch=True)
-    self.table.heading("Avilable", text="Avilable")
+        self.table.column("Avilable", width=100, anchor="center", stretch=True)
+        self.table.heading("Avilable", text="Avilable")
 
-    self.table.column("Type", width=100, anchor="center", stretch=True)
-    self.table.heading("Type", text="Type")
+        self.table.column("Type", width=100, anchor="center", stretch=True)
+        self.table.heading("Type", text="Type")
+
+    elif type == 'profile':
+        self.table = ttk.Treeview(self.right_dashboard)
+        self.table.pack(side=tkinter.TOP, fill=tkinter.BOTH, expand=True)
+
+        # Define the columns of the table
+        self.table["columns"] = ("Item name", "Quantity", "Avilable", "Type")
+
+        # Set the headings of the columns
+        self.table.column("Item name", width=100, anchor="center", stretch=True)
+        self.table.heading("Item name", text="Item name")
+
+        self.table.column("Quantity", width=100, anchor="center", stretch=True)
+        self.table.heading("Quantity", text="Quantity")
+
+        self.table.column("Avilable", width=100, anchor="center", stretch=True)
+        self.table.heading("Avilable", text="Avilable")
+
+        self.table.column("Type", width=100, anchor="center", stretch=True)
+        self.table.heading("Type", text="Type")
 
 
 
@@ -635,11 +660,11 @@ def create_table(self):
 
     # Buttons to interact with the selected line of the table
     self.button_acquire = customtkinter.CTkButton(self.right_dashboard, text="Acquire",
-                                                  hover_color='#B20000', command=self.acquire_item)
+                                                command=self.acquire_item)
     self.button_acquire.pack(side=tkinter.LEFT, padx=10, pady=10)
 
     self.button_item_desc = customtkinter.CTkButton(self.right_dashboard, text="Item Description",
-                                                    hover_color='#B20000', command=self.item_description)
+                                                command=self.item_description)
     self.button_item_desc.pack(side=tkinter.LEFT, padx=10, pady=10)
 
 
