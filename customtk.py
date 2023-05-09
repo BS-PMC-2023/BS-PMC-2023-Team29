@@ -157,9 +157,7 @@ class App(customtkinter.CTk):
     #  self.right_dashboard   ----> statement widget
     def profile(self):
         self.clear_frame()
-        # self.bt_from_frame3 = customtkinter.CTkButton(self.right_dashboard, text="Profile",
-        #                                               command=lambda: print("test profile"))
-        # self.bt_from_frame3.grid(row=0, column=0, padx=20, pady=(10, 0))
+        create_table(self, 'supply')
 
         self.name = customtkinter.CTkLabel(master=self.right_dashboard, text="First name: ",
                                            font=('Century Gothic', 18))
@@ -175,8 +173,6 @@ class App(customtkinter.CTk):
                                             font=('Century Gothic', 18))
         self.email_entry = customtkinter.CTkEntry(master=self.right_dashboard, width=220)
         self.email_entry.insert(0, user.email)
-
-
 
         def save_changes_func():
             data = {'email': self.email_entry.get(), 'name': self.name_entry.get(),
@@ -197,13 +193,13 @@ class App(customtkinter.CTk):
                                                 command=save_changes_func,
                                                 corner_radius=6)
 
-        self.name.place(relx=0.3, rely=0.1, anchor=tkinter.CENTER)
-        self.name_entry.place(relx=0.5, rely=0.1, anchor=tkinter.CENTER)
-        self.lastname.place(relx=0.3, rely=0.2, anchor=tkinter.CENTER)
-        self.lastname_entry.place(relx=0.5, rely=0.2, anchor=tkinter.CENTER)
-        self.email.place(relx=0.3, rely=0.3, anchor=tkinter.CENTER)
-        self.email_entry.place(relx=0.5, rely=0.3, anchor=tkinter.CENTER)
-        self.save_BTN.place(relx=0.75, rely=0.3, anchor=tkinter.CENTER)
+        self.name.place(relx=0.3, rely=0.4, anchor=tkinter.CENTER)
+        self.name_entry.place(relx=0.5, rely=0.4, anchor=tkinter.CENTER)
+        self.lastname.place(relx=0.3, rely=0.5, anchor=tkinter.CENTER)
+        self.lastname_entry.place(relx=0.5, rely=0.5, anchor=tkinter.CENTER)
+        self.email.place(relx=0.3, rely=0.6, anchor=tkinter.CENTER)
+        self.email_entry.place(relx=0.5, rely=0.6, anchor=tkinter.CENTER)
+        self.save_BTN.place(relx=0.75, rely=0.6, anchor=tkinter.CENTER)
 
 
     #  self.right_dashboard   ----> categories widget
@@ -608,11 +604,10 @@ def change_password(app, entry1, entry2):
 
 def create_table(self, type):
     # print(supply_lst.list)
+    # Create a simple table
+    self.table = ttk.Treeview(self.right_dashboard)
     if type == 'supply':
-        # Create a simple table
-        self.table = ttk.Treeview(self.right_dashboard)
         self.table.pack(side=tkinter.TOP, fill=tkinter.BOTH, expand=True)
-
         # Define the columns of the table
         self.table["columns"] = ("Item name", "Quantity", "Avilable", "Type")
 
@@ -628,32 +623,7 @@ def create_table(self, type):
 
         self.table.column("Type", width=100, anchor="center", stretch=True)
         self.table.heading("Type", text="Type")
-
-    elif type == 'profile':
-        self.table = ttk.Treeview(self.right_dashboard)
-        self.table.pack(side=tkinter.TOP, fill=tkinter.BOTH, expand=True)
-
-        # Define the columns of the table
-        self.table["columns"] = ("Item name", "Quantity", "Avilable", "Type")
-
-        # Set the headings of the columns
-        self.table.column("Item name", width=100, anchor="center", stretch=True)
-        self.table.heading("Item name", text="Item name")
-
-        self.table.column("Quantity", width=100, anchor="center", stretch=True)
-        self.table.heading("Quantity", text="Quantity")
-
-        self.table.column("Avilable", width=100, anchor="center", stretch=True)
-        self.table.heading("Avilable", text="Avilable")
-
-        self.table.column("Type", width=100, anchor="center", stretch=True)
-        self.table.heading("Type", text="Type")
-
-
-
     # Add some data to the table
-    # self.table.insert("", "end", values=("001", "Laptop", 3, "3 days"))
-    # self.table.insert("", "end", values=("002", "Projector", 1, "1 day"))
     for x in supply_lst.list:
         self.table.insert("", "end", values=(x.name, x.all_units, x.available_units, x.type))
 
