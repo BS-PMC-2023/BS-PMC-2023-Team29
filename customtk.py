@@ -34,8 +34,6 @@ class App(customtkinter.CTk):
                 temp = result['supply']
                 supply_lst.insert_list(temp)
                 print(supply_lst)
-        # --------- bar example --------
-
         # ---------- borrow example ----------
         # num_of_items = 4
         # remain = supply_lst.borrow_item_by_id(1,num_of_items)
@@ -58,11 +56,12 @@ class App(customtkinter.CTk):
         #         print('shpih2')
         # ---------- borrow example ----------
         self.title("Supply Solutions")
-        # remove title bar , page reducer and closing page !!!most have a quit button with app.destroy!!! (this app have a quit button so don't worry about that)
-        self.overrideredirect(True)
-        # make the app as big as the screen (no mater which screen you use)
-        self.geometry("{0}x{1}+0+0".format(self.winfo_screenwidth(), self.winfo_screenheight()))
+        # # remove title bar , page reducer and closing page !!!most have a quit button with app.destroy!!! (this app have a quit button so don't worry about that)
+        # self.overrideredirect(True)
 
+        # make the app as big as the screen (no mater which screen you use)
+        self.geometry("{0}x{1}+0+0".format(self.winfo_screenwidth(), (self.winfo_screenheight() - self.winfo_screenheight()%32)))
+        self.state('zoomed')
         # root!
         self.main_container = customtkinter.CTkFrame(self, corner_radius=10)
         self.main_container.pack(fill=tkinter.BOTH, expand=True, padx=10, pady=10)
@@ -131,8 +130,6 @@ class App(customtkinter.CTk):
         #                                        font=('Century Gothic', 50))
         # self.name.place(relx=0.5, rely=0.1, anchor=tkinter.CENTER)
         # self.lastname.place(relx=0.5, rely=0.3, anchor=tkinter.CENTER)
-
-
 
         def help_func():
             ctypes.windll.user32.MessageBoxW(0,
@@ -296,12 +293,72 @@ class App(customtkinter.CTk):
             widget.destroy()
 
     def acquire_item(self):
-        selected_item = self.table.item(self.table.selection())
-        item_name = selected_item['values'][0]
-        all_units = selected_item['values'][1]
-        available_units = selected_item['values'][2]
-        type = selected_item['values'][3]
-        print(f"Acquiring {item_name} ({available_units}/{all_units}) with a type of {type}.")
+
+        def slider_event2(self):
+                label_item2.configure(text=slider.get())
+        def slider_event3(self):
+                label_item3.configure(text=slider2.get())
+
+        # Check if there's already an active window
+        if hasattr(self, "acquire_item_window") and self.acquire_item_window.winfo_exists():
+            return
+
+        # Create a new window for acquiring items
+        window = customtkinter.CTkToplevel(self)
+        window.title("Acquire Item")
+
+        # Set the window size and disable resizing
+        window.geometry("300x250")
+        window.resizable(False, False)
+
+        # Make the new window appear on top of the parent window
+        window.transient(self)
+
+        # Set focus to the new window
+        window.grab_set()
+
+        # Save a reference to the window so we can check if it's already open
+        self.acquire_item_window = window
+
+        # Create a label for the item selection
+        label_item = customtkinter.CTkLabel(master=window, text="What item would you like to borrow?")
+        label_item.pack()
+
+        # Create a combo box with the available items
+        items = ['Pen', 'Calculator']
+        combo_item = ttk.Combobox(master=window, values=items)
+        combo_item.pack()
+
+        # Create a label for the return time selection
+        label_return = customtkinter.CTkLabel(master=window, text="When will you return it?")
+        label_return.pack()
+        slider = customtkinter.CTkSlider(window, from_=0, to=100, number_of_steps=100, command=slider_event2)
+        slider.pack()
+
+        label_item2 = customtkinter.CTkLabel(master=window, text=slider.get())
+        label_item2.pack()
+
+        label_quantity = customtkinter.CTkLabel(master=window, text="How many would you like to borrow?")
+        label_quantity.pack()
+
+        slider2 = customtkinter.CTkSlider(window, from_=100, to=200, number_of_steps=100, command=slider_event3)
+        slider2.pack()
+        label_item3 = customtkinter.CTkLabel(master=window, text=slider2.get())
+        label_item3.pack()
+
+
+        # Create a button to confirm the acquisition
+        button_confirm = customtkinter.CTkButton(window, text="Confirm",
+                                                 command=lambda: self.confirm_acquisition(combo_item.get(),
+                                                                                          slider.get(),
+                                                                                          slider2.get()))
+        button_confirm.pack()
+
+    def confirm_acquisition(self, item, return_time, quantity):
+        # TODO: Add code to handle the acquisition of the selected item(s)
+        print(f"Acquiring {quantity} of {item} for {return_time} hours")
+        self.acquire_item_window.destroy()
+
 
     def item_description(self):
         selected_item = self.table.item(self.table.selection())
@@ -490,7 +547,7 @@ def forget_password(app):
     return_button.place(x=2, y=2)
 
 
-    img3 = customtkinter.CTkImage(Image.open("samilogo.png").resize((40, 40), Image.ANTIALIAS))
+    img3 = customtkinter.CTkImage(Image.open("samilogo.png").resize((40, 40), Image.LANCZOS))
 
     img3 = customtkinter.CTkButton(master=frame, image=img3, text="Sami Shamoon College of Engineering", width=40,
                                    height=40, compound="left", fg_color='white', text_color='black',
@@ -519,28 +576,6 @@ def change_password(app, entry1, entry2):
     else:
         print('Failed to authenticate user')
 
-class UI_TabTable(ttk.Frame):
-    def __init__(self, main_window, **kw):
-            self.table = tksheet.Sheet(self, font=GUI_FONT_CONTENT, header_font=GUI_FONT_CONTENT,
-                                       popup_menu_font=GUI_FONT_CONTENT, table_bg=GUI_BG_COLOR)
-            self.table.headers(['Timestamp', 'Temperature, °C', 'Humidity, %', 'Annotation'])
-            self.table.column_width(column=0, width=180, only_set_if_too_small=False)
-            self.table.column_width(column=2, width=100, only_set_if_too_small=False)
-            self.table.column_width(column=3, width=180, only_set_if_too_small=False)
-            self.table.pack(expand=True, fill='both')
-            self.table.enable_bindings('all')
-            self.table.disable_bindings(['rc_insert_column', 'rc_delete_column', 'edit_cell', 'delete', 'paste',
-                                         'cut', 'rc_delete_row', 'rc_insert_row'])
-
-    def add(self, timestamp, temperature, humidity, is_tampered, is_bookmark):
-        self.table.insert_row(values=(timestamp, temperature, humidity, is_tampered, is_bookmark),
-                              idx='end', add_columns=False)
-
-    def clear(self):
-        self.table.select_all(redraw=False, run_binding_func=True)
-        rows_number = len(self.table.get_selected_rows(get_cells_as_rows=True))
-        self.table.MT.del_row_positions(idx=0, numrows=rows_number, deselect_all=True)
-
 
 def create_table(self):
     print(supply_lst.list)
@@ -555,7 +590,7 @@ def create_table(self):
     self.table.column("Item name", width=100, anchor="center", stretch=True)
     self.table.heading("Item name", text="Item name")
 
-    self.table.column("Quantity", width=200, anchor="center", stretch=True)
+    self.table.column("Quantity", width=100, anchor="center", stretch=True)
     self.table.heading("Quantity", text="Quantity")
 
     self.table.column("Avilable", width=100, anchor="center", stretch=True)
@@ -563,6 +598,8 @@ def create_table(self):
 
     self.table.column("Type", width=100, anchor="center", stretch=True)
     self.table.heading("Type", text="Type")
+
+
 
     # Add some data to the table
     # self.table.insert("", "end", values=("001", "Laptop", 3, "3 days"))
@@ -572,52 +609,13 @@ def create_table(self):
 
 
     # Buttons to interact with the selected line of the table
-    self.button_acquire = customtkinter.CTkButton(self.right_dashboard, text="Acquire", fg_color='#EA0000',
+    self.button_acquire = customtkinter.CTkButton(self.right_dashboard, text="Acquire",
                                                   hover_color='#B20000', command=self.acquire_item)
     self.button_acquire.pack(side=tkinter.LEFT, padx=10, pady=10)
 
-    self.button_item_desc = customtkinter.CTkButton(self.right_dashboard, text="Item Description", fg_color='#EA0000',
+    self.button_item_desc = customtkinter.CTkButton(self.right_dashboard, text="Item Description",
                                                     hover_color='#B20000', command=self.item_description)
     self.button_item_desc.pack(side=tkinter.LEFT, padx=10, pady=10)
-
-    # # Create the data for the table
-    # data = [
-    #     ["001", "Item 1", "5", "2023-05-08"],
-    #     ["002", "Item 2", "3", "2023-05-09"],
-    #     ["003", "Item 3", "7", "2023-05-10"],
-    #     ["004", "Item 4", "2", "2023-05-11"],
-    #     ["005", "Item 5", "1", "2023-05-12"]
-    # ]
-    #
-    # # Create a new sheet and set its data
-    # sheet = tksheet.Sheet(frame,
-    #                       headers=["Item ID", "Item Name", "Quantity", "Time of Loan"],
-    #                       data=data)
-    #
-    # # Style the sheet
-    # sheet.enable_bindings(("single_select", "row_select", "column_width_resize", "arrowkeys"))
-    # sheet.set_all_cell_sizes_to_text()
-    #
-    # # Get the actual headers list and add some formatting
-    # headers = sheet.headers()
-    # for i, header in enumerate(headers):
-    #     headers[i] = (header, {"font": "Arial 12 bold"})
-    #
-    # # Set the headers back on the sheet
-    # sheet.headers(headers)
-    #
-    # # Set the width of each column
-    # for i in range(sheet.get_column_count()):
-    #     sheet.set_column_width(i, [150, 250, 100, 150][i])
-    #
-    # # Set the height of the rows
-    # sheet.row_height(30)
-    #
-    # # Place the sheet in the frame using pack
-    # sheet.pack(fill="both", expand=True)
-    #
-    # # Return the sheet
-    # return sheet
 
 
 login_page(app)
