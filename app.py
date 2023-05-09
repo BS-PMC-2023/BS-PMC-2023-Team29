@@ -99,5 +99,11 @@ def return_all_items():
     if db.return_all_items(request.form['user_id']):
         return jsonify({'message': 'change successful'})
     return jsonify({'message': 'change not successful'})
+
+@app.route('/returnSomeItem',methods = ['POST'])
+def return_some_items():
+    if db.return_item(request.form['user_id'],request.form['item_id'],request.form['num_of_items']):
+        return jsonify({'message': 'change successful'})
+    return jsonify({'message': 'change not successful'})
 if __name__ == '__main__':
     app.run(debug=True)

@@ -179,16 +179,46 @@ class Db:
         else :
             return False
 
-    def return_item(self):
+    def return_item(self,user_id,item_id,how_much_items):
+        query_find_items = "SELECT id_borrow,num_of_items,borrow_date,return_expacted FROM borrow WHERE id_user =%s AND id_supply = %s AND return_real IS NULL"
+        query_update_borrow = "UPDATE borrow SET return_real=%s ,num_of_items =%s WHERE  id_borrow = %s"
+        query_update_supply = "UPDATE supply SET available_units=available_units+%s WHERE  id = %s"
+        query_add_remain_borrow = "INSERT INTO borrow (id_supply, id_user,num_of_items,borrow_date,return_expacted) VALUES (%s, %s,%s, %s,%s)"
+        query_update_borrow_return_all = "UPDATE borrow SET return_real=%s WHERE id_borrow = %s"
+        now = datetime.now()
+        formatted_date_time = now.strftime("%Y-%m-%d %H:%M:%S")
+        self.cursor.execute(query_find_items, (user_id,item_id))
+        result = self.cursor.fetchall()
+        remain_to_return = result[0][1] - how_much_items
+        # update supply table
+        self.cursor.execute(query_update_supply, (how_much_items, item_id))
+        if remain_to_return ==0:
+            self.cursor.execute(query_update_borrow_return_all, (formatted_date_time, result[0][0]))
+        else :
+            self.cursor.execute(query_update_borrow, (formatted_date_time, how_much_items,result[0][0]))
+            self.cursor.execute(query_add_remain_borrow, (item_id, user_id,remain_to_return,result[0][2],result[0][3]))
+        # result = (id_borrow,num_of_items)
+        self.mydb.commit()
+        return True
 
+    def get_all_my_borrows(self,user_id):
+        query = "SELECT * FROM borrow WHERE id_user = %s"
+        self.cursor.execute(query, [user_id])
+        return self.cursor.fetchall()
 
-
+    def get_items_dosent_return(self,user_id):
+        query = "SELECT * FROM borrow WHERE id_user = %s AND return_real IS NULL"
+        self.cursor.execute(query, [user_id])
+        return self.cursor.fetchall()
 
 
 #-------- test db model ---------------
 db = Db()
 # print(db.return_all_items(6))
+
 # db.borrow_item(6,1,"2023-05-08 18:02:30",9,11)
+a= db.get_items_dosent_return(6)
+for i in a : print(i[0])
 # db.borrow_item(6,2,"2023-05-08 18:02:30",5,165)
 # db.return_all_items(6)
 #
