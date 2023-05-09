@@ -555,16 +555,21 @@ def forget_password(app):
     l2.place(x=50, y=45)
 
     entry1 = customtkinter.CTkEntry(master=frame, width=220, placeholder_text='Username')
-    entry1.place(x=50, y=110)
+    entry1.place(x=50, y=100)
+    b1 = customtkinter.CTkButton(master=frame, text="send new password to this mail", font=('Century Gothic', 12),
+                                 command=lambda: generate_new_password(entry1.get().lower()))
+    b1.place(x=50, y =135)
 
-    entry2 = customtkinter.CTkEntry(master=frame, width=220, placeholder_text='New password', show="*")
+    entry2 = customtkinter.CTkEntry(master=frame, width=220, placeholder_text='password we send to your mail', show="*")
     entry2.place(x=50, y=165)
-    entry3 = customtkinter.CTkEntry(master=frame, width=220, placeholder_text='New password repeat', show="*")
+    entry3 = customtkinter.CTkEntry(master=frame, width=220, placeholder_text='New password', show="*")
     entry3.place(x=50, y=195)
 
     # Create custom button
     login_button = customtkinter.CTkButton(master=frame, width=120, height=40, text="generate new password",
-                                           command=lambda: change_password(app, entry1, entry2), corner_radius=6)
+                                           command=lambda: change_password(app, entry1.get().lower(),
+                                                                           entry2.get().lower(),entry3.get().lower()
+                                                                           ), corner_radius=6)
     login_button.place(x=30, y=235)
 
     return_button = customtkinter.CTkButton(master=frame, width=50, height=25, text="Back",
@@ -582,13 +587,22 @@ def forget_password(app):
     # You can easily integrate authentication system
     app.mainloop()
 
-
-def change_password(app, entry1, entry2):
-    email, password = entry1.get(), entry2.get()
-    print(email, password)
+def generate_new_password(email):
+    print("mail")
+    response =requests.post(url + 'generateTempPassword',data = {'email':email})
+    if response.status_code == 200:
+        result = response.json()
+        if result['message'] == 'change successful':
+            print('cool')
+        else:
+            print('shpih')
+    else:
+        print('Failed to authenticate user')
+def change_password(app, email, temp_password,new_password):
     data = {
         'email': email,
-        'new_password': password
+        'new_password': new_password,
+        'temp_password' :temp_password
     }
 
     response = requests.post(url + 'changePassword', data=data)

@@ -51,8 +51,8 @@ def change_type():
 
 @app.route('/changePassword',methods=['POST'])
 def change_Password():
-    email, new_password = request.form['email'], request.form['new_password']
-    flag = db.change_password(email,new_password)
+    email,temp_password, new_password = request.form['email'],request.form['temp_password'], request.form['new_password']
+    flag = db.change_password(email,temp_password,new_password)
     if flag:
         return jsonify({'message': 'change successful'})
     else:
@@ -106,6 +106,11 @@ def return_some_items():
         return jsonify({'message': 'change successful'})
     return jsonify({'message': 'change not successful'})
 
+@app.route('/generateTempPassword',methods = ['POST'])
+def generate_temp_password():
+    if db.generate_temp_password(request.form['email']):
+        return jsonify({'message': 'change successful'})
+    return jsonify({'message': 'change not successful'})
 
 
 if __name__ == '__main__':

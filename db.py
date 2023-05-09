@@ -127,10 +127,10 @@ class Db:
         self.mydb.commit()
         return True
 
-    def change_password(self, email, newpassword):
+    def change_password(self, email,temp_password, new_password):
         email = email.lower()
-        query = "UPDATE users SET password = %s WHERE email = %s"
-        self.cursor.execute(query, (newpassword, email))
+        query = "UPDATE users SET password = %s WHERE email = %s AND password=%s"
+        self.cursor.execute(query, (new_password, email,temp_password))
         self.mydb.commit()
         return True
 
@@ -276,8 +276,8 @@ class Db:
 
 
 # -------- test db model ---------------
-db = Db()
-db.generate_temp_password('alexsavizky@gmail.com')
+# db = Db()
+# db.generate_temp_password('alexsavizky@gmail.com')
 # # print(db.return_all_items(6))
 # db.add_units_to_supply(4,12)
 # email = "HELLO WORLD@gmaail.Com"
