@@ -40,7 +40,8 @@ class Db:
     # Create a table named Users
     def create_user_table(self):
         self.cursor.execute(
-            "CREATE TABLE Users (id INT AUTO_INCREMENT PRIMARY KEY , email VARCHAR(255) , password VARCHAR(255) , type int(2) , name VARCHAR(255) , lastname VARCHAR(255))")
+            "CREATE TABLE Users (id INT AUTO_INCREMENT PRIMARY KEY , email VARCHAR(255) , password VARCHAR(255) , "
+            "type int(2) , name VARCHAR(255) , lastname VARCHAR(255))")
 
     def insert_user(self, user):
         user.email = user.email.lower()
@@ -162,7 +163,8 @@ class Db:
         return result
 
     def borrow_item(self, user_id, item_id, return_time, num_of_items, num_of_items_remain):
-        query_borrow = "INSERT INTO borrow (id_supply, id_user,num_of_items,borrow_date,return_expacted) VALUES (%s, %s,%s, %s,%s)"
+        query_borrow = "INSERT INTO borrow (id_supply, id_user,num_of_items,borrow_date,return_expacted) " \
+                       "VALUES (%s, %s,%s, %s,%s)"
         query_supply = "UPDATE supply SET available_units=%s WHERE id = %s"
         # update supply table
         self.cursor.execute(query_supply, (num_of_items_remain, item_id))
@@ -194,10 +196,12 @@ class Db:
             return False
 
     def return_item(self, user_id, item_id, how_much_items):
-        query_find_items = "SELECT id_borrow,num_of_items,borrow_date,return_expacted FROM borrow WHERE id_user =%s AND id_supply = %s AND return_real IS NULL"
+        query_find_items = "SELECT id_borrow,num_of_items,borrow_date,return_expacted FROM borrow WHERE id_user =%s" \
+                           " AND id_supply = %s AND return_real IS NULL"
         query_update_borrow = "UPDATE borrow SET return_real=%s ,num_of_items =%s WHERE  id_borrow = %s"
         query_update_supply = "UPDATE supply SET available_units=available_units+%s WHERE  id = %s"
-        query_add_remain_borrow = "INSERT INTO borrow (id_supply, id_user,num_of_items,borrow_date,return_expacted) VALUES (%s, %s,%s, %s,%s)"
+        query_add_remain_borrow = "INSERT INTO borrow (id_supply, id_user,num_of_items,borrow_date,return_expacted) " \
+                                  "VALUES (%s, %s,%s, %s,%s)"
         query_update_borrow_return_all = "UPDATE borrow SET return_real=%s WHERE id_borrow = %s"
         now = datetime.now()
         formatted_date_time = now.strftime("%Y-%m-%d %H:%M:%S")
