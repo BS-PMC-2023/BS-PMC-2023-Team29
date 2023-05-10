@@ -10,16 +10,30 @@ cursor = db.cursor
 #init app
 app = Flask("app")
 
+# Define a route to get data from the database
+
 @app.route('/login',methods=['POST'])
 def login():
     temp = User()
     temp.email, temp.password = request.form['email'],request.form['password']
     if db.login(temp):
         user = db.get_user_by_email(temp.email).totuple()
-        return jsonify({'message': 'Login successful','user': user})
+        if user.is_admin:
+            return jsonify({'message': 'Admin Login successful', 'user': user.totuple()})
+        else:
+            return jsonify({'message': 'User Login successful', 'user': user.totuple()})
     else:
         return jsonify({'message': 'Invalid username or password'})
 
+
+@app.route('/register',methods=['POST'])
+def register():
+    temp = User()
+    temp.insert(request.form['email'],request.form['password'],request.form['firstname'],request.form['Last_name'])
+    if db.insert_user(temp):
+        return jsonify({'message': 'register successful'})
+    else:
+        return jsonify({'message': 'register not successful'})
 
 @app.route('/register',methods=['POST'])
 def register():
@@ -39,6 +53,8 @@ def user():
     else:
         return jsonify({'message': 'register not successful'})
 @app.route('/changeType', methods=['POST'])
+
+@app.route('/changeType',methods =['POST'])
 def change_type():
     email, type = request.form['email'], request.form['type']
     flag = db.change_type_of_user(email, type)
@@ -47,38 +63,37 @@ def change_type():
     else:
         return jsonify({'message': 'change not successful'})
 
-@app.route('/changePassword', methods=['POST'])
+@app.route('/changePassword',methods=['POST'])
 def change_Password():
     email, new_password = request.form['email'], request.form['new_password']
-    flag = db.change_password(email, new_password)
+    flag = db.change_password(email,new_password)
     if flag:
         return jsonify({'message': 'change successful'})
     else:
         return jsonify({'message': 'change not successful'})
 
-@app.route('/getAllUsers', methods=['GET'])
+@app.route('/getAllUsers',methods=['GET'])
 def get_all_users():
     users = db.print_user_table()
-    return jsonify({'message': 'change successful', 'users': users})
+    return jsonify({'message': 'change successful','users':users})
 
-@app.route('/changeInfo', methods=['POST'])
+@app.route('/changeInfo',methods=['POST'])
 def change_info():
-    if db.update_info(request.form['email'], request.form['name'], request.form['lastname']):
+    if db.update_info(request.form['email'],request.form['name'],request.form['lastname']):
         return jsonify({'message': 'change successful'})
     else:
         return jsonify({'message': 'change not successful'})
 
-@app.route('/getUsersTypes', methods=['GET'])
+@app.route('/getUsersTypes',methods=['GET'])
 def get_users_types():
     tupple_lst = db.get_users_types()
     return jsonify({'message': 'change successful', 'users': tupple_lst})
 
-@app.route('/removeUser', methods=['Post'])
+@app.route('/removeUser',methods = ['Post'])
 def delete_user_email():
     if db.delete_user_by_email(request.form['email']):
         return jsonify({'message': 'change successful'})
     else:
         return jsonify({'message': 'change not successful'})
-
 if __name__ == '__main__':
     app.run(debug=True)
