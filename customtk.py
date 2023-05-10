@@ -4,7 +4,7 @@ import tkinter.ttk as ttk
 import customtkinter
 from PIL import ImageTk, Image
 import requests
-from models import User,supllyList
+from models import User, supllyList
 import ctypes
 from datetime import datetime, timedelta
 from CTkMessagebox import CTkMessagebox
@@ -35,18 +35,6 @@ class App(customtkinter.CTk):
                 print(supply_lst)
 
 
-        #--------------return example ------------
-        # data = {
-        #     'user_id' : user.id
-        # }
-        # response = requests.post(url + 'returnAllItems',data =data )
-        # if response.status_code == 200:
-        #     result = response.json()
-        #     if result['message'] == 'change successful':
-        #         print("yay")
-        #     else:
-        #         print('shpih')
-        # --------------return example ------------
         self.title("Supply Solutions")
         # # remove title bar , page reducer and closing page !!!most have a quit button with app.destroy!!! (this app have a quit button so don't worry about that)
         # self.overrideredirect(True)
