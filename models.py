@@ -60,6 +60,10 @@ class Supply:
             return self.available_units
         return False
 
+    def return_item(self, how_much_items):
+        self.available_units += how_much_items
+        return self.available_units
+
     def totuple(self):
         return (self.id, self.name,self.all_units,self.available_units,self.type)
 
@@ -89,6 +93,19 @@ class supllyList:
             return remain
         return False
 
+    def return_item_by_id(self, id, how_much_items):
+        supply = None
+        for i in self.list:
+            if i.id == id:
+                supply = i
+                break
+        if not supply:
+            return False
+        remain = supply.return_item(how_much_items)
+        if remain:
+            return remain
+        return False
+
     def get_avl_item_by_id(self, id):
         for i in self.list:
             if i.id == id:
@@ -101,6 +118,12 @@ class supllyList:
         for i in self.list:
             if i.name == name:
                 return i.id
+        return False
+
+    def get_name_by_id(self,id):
+        for i in self.list:
+            if i.id == id:
+                return i.name
         return False
     def get_supply_avl_by_name(self,name):
         for i in self.list:
