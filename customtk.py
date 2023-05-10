@@ -33,27 +33,7 @@ class App(customtkinter.CTk):
                 temp = result['supply']
                 supply_lst.insert_list(temp)
                 print(supply_lst)
-        # ---------- borrow example ----------
-        # num_of_items = 4
-        # remain = supply_lst.borrow_item_by_id(1,num_of_items)
-        # if remain :
-        #     data = {
-        #         'user_id' : user.id,
-        #         'item_id' : 1,
-        #         'return_time' : "2023-05-08 18:02:30",
-        #         'num_of_items_remain' : remain,
-        #         'num_of_items' : num_of_items
-        #     }
-        #     response = requests.post(url + 'borrowItem', data=data)
-        #     if response.status_code == 200:
-        #         result = response.json()
-        #         if result['message'] == 'change successful':
-        #             print(supply_lst)
-        #         else:
-        #             print('shpih')
-        #     else:
-        #         print('shpih2')
-        # ---------- borrow example ----------
+
 
         #--------------return example ------------
         # data = {
@@ -117,10 +97,10 @@ class App(customtkinter.CTk):
 
         self.bt_profile = customtkinter.CTkButton(self.left_side_panel, text="Profile", command=self.profile)
         self.bt_profile.grid(row=2, column=0, padx=20, pady=10)
-
-        self.bt_categories = customtkinter.CTkButton(self.left_side_panel, text="Manager Options",
-                                                     command=self.manager)
-        self.bt_categories.grid(row=3, column=0, padx=20, pady=10)
+        if user.type == 3:
+            self.bt_categories = customtkinter.CTkButton(self.left_side_panel, text="Manager Options",
+                                                         command=self.manager)
+            self.bt_categories.grid(row=3, column=0, padx=20, pady=10)
 
         # right side panel -> have self.right_dashboard inside it
         self.right_side_panel = customtkinter.CTkFrame(self.main_container, corner_radius=10, fg_color="#000811")
@@ -380,9 +360,35 @@ class App(customtkinter.CTk):
         button_confirm.pack()
 
     def confirm_acquisition(self, item, return_time, quantity):
-        # TODO: Add code to handle the acquisition of the selected item(s)
+        quantity = int(quantity)
+        id = supply_lst.get_id_by_name(item)
+        remain = supply_lst.borrow_item_by_id(id,quantity)
+        hour, minute = map(int, str(return_time).split('.'))
+        if minute == 5:
+            minute = 30
+        now = datetime.now()
+        dt = datetime(now.year, now.month, now.day, hour, minute)
+        if remain :
+            data = {
+                'user_id' : user.id,
+                'item_id' : id,
+                'return_time' : dt,
+                'num_of_items_remain' : remain,
+                'num_of_items' : quantity
+            }
+            response = requests.post(url + 'borrowItem', data=data)
+            if response.status_code == 200:
+                result = response.json()
+                if result['message'] == 'change successful':
+                    print(supply_lst)
+                else:
+                    print('shpih')
+            else:
+                print('shpih2')
+
         print(f"Acquiring {quantity} of {item} for {return_time} hours")
         self.acquire_item_window.destroy()
+        self.homie(user.id)
 
 
     def item_description(self):
@@ -555,16 +561,21 @@ def forget_password(app):
     l2.place(x=50, y=45)
 
     entry1 = customtkinter.CTkEntry(master=frame, width=220, placeholder_text='Username')
-    entry1.place(x=50, y=110)
+    entry1.place(x=50, y=100)
+    b1 = customtkinter.CTkButton(master=frame, text="send new password to this mail", font=('Century Gothic', 12),
+                                 command=lambda: generate_new_password(entry1.get().lower()))
+    b1.place(x=50, y =135)
 
-    entry2 = customtkinter.CTkEntry(master=frame, width=220, placeholder_text='New password', show="*")
+    entry2 = customtkinter.CTkEntry(master=frame, width=220, placeholder_text='password we send to your mail', show="*")
     entry2.place(x=50, y=165)
-    entry3 = customtkinter.CTkEntry(master=frame, width=220, placeholder_text='New password repeat', show="*")
+    entry3 = customtkinter.CTkEntry(master=frame, width=220, placeholder_text='New password', show="*")
     entry3.place(x=50, y=195)
 
     # Create custom button
     login_button = customtkinter.CTkButton(master=frame, width=120, height=40, text="generate new password",
-                                           command=lambda: change_password(app, entry1, entry2), corner_radius=6)
+                                           command=lambda: change_password(app, entry1.get().lower(),
+                                                                           entry2.get().lower(),entry3.get().lower()
+                                                                           ), corner_radius=6)
     login_button.place(x=30, y=235)
 
     return_button = customtkinter.CTkButton(master=frame, width=50, height=25, text="Back",
@@ -582,13 +593,22 @@ def forget_password(app):
     # You can easily integrate authentication system
     app.mainloop()
 
-
-def change_password(app, entry1, entry2):
-    email, password = entry1.get(), entry2.get()
-    print(email, password)
+def generate_new_password(email):
+    print("mail")
+    response =requests.post(url + 'generateTempPassword',data = {'email':email})
+    if response.status_code == 200:
+        result = response.json()
+        if result['message'] == 'change successful':
+            print('cool')
+        else:
+            print('shpih')
+    else:
+        print('Failed to authenticate user')
+def change_password(app, email, temp_password,new_password):
     data = {
         'email': email,
-        'new_password': password
+        'new_password': new_password,
+        'temp_password' :temp_password
     }
 
     response = requests.post(url + 'changePassword', data=data)

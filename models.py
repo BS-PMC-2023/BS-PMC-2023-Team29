@@ -97,7 +97,11 @@ class supllyList:
 
     def get_items_names(self):
         return [x.name for x in self.list]
-
+    def get_id_by_name(self,name):
+        for i in self.list:
+            if i.name == name:
+                return i.id
+        return False
     def get_supply_avl_by_name(self,name):
         for i in self.list:
             if i.name == name:
