@@ -102,7 +102,7 @@ def return_all_items():
 
 @app.route('/returnSomeItem',methods = ['POST'])
 def return_some_items():
-    if db.return_item(request.form['user_id'],request.form['item_id'],request.form['num_of_items']):
+    if db.return_item(request.form['user_id'],request.form['item_id'],int(request.form['num_of_items'])):
         return jsonify({'message': 'change successful'})
     return jsonify({'message': 'change not successful'})
 
@@ -112,6 +112,9 @@ def generate_temp_password():
         return jsonify({'message': 'change successful'})
     return jsonify({'message': 'change not successful'})
 
-
+@app.route('/getBorrowedItems',methods = ['POST'])
+def get_my_borrowd_items():
+    items = db.get_items_dosent_return(request.form['user_id'])
+    return jsonify({'message': 'successful', 'items': items})
 if __name__ == '__main__':
     app.run(debug=True)
