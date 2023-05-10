@@ -32,7 +32,7 @@ class App(customtkinter.CTk):
             if result['message'] == 'successful':
                 temp = result['supply']
                 supply_lst.insert_list(temp)
-                print(supply_lst)
+                print(supply_lst, user.type)
 
 
         self.title("Supply Solutions")
@@ -86,6 +86,7 @@ class App(customtkinter.CTk):
         self.bt_profile = customtkinter.CTkButton(self.left_side_panel, text="Profile", command=lambda : self.profile(user.id))
         self.bt_profile.grid(row=2, column=0, padx=20, pady=10)
         if user.type == 3:
+            print('yes')
             self.bt_categories = customtkinter.CTkButton(self.left_side_panel, text="Manager Options",
                                                          command=self.manager)
             self.bt_categories.grid(row=3, column=0, padx=20, pady=10)
@@ -232,6 +233,80 @@ class App(customtkinter.CTk):
             if email_type.get(key) is not None:
                 combobox2.set(str(value))
 
+        def order_stuff(self):
+
+            def slider_event2(window):
+                label_item2.configure(text=slider.get())
+
+            def combolicious(choice):
+                if choice == "New Item":
+                    textbox.configure(state=tkinter.NORMAL)  # enable textbox
+                    textbox.focus_set()  # set focus to textbox
+                else:
+                    textbox.delete(0, tkinter.END)
+                    textbox.insert(tkinter.END, "")
+                    textbox.configure(state="disabled")  # disable textbox
+
+
+            # Check if there's already an active window
+            if hasattr(self, "order_item_window") and self.order_item_window.winfo_exists():
+                return
+
+            # Create a new window for acquiring items
+            window = customtkinter.CTkToplevel(self)
+            window.title("Order Items")
+
+            # Set the window size and disable resizing
+            window.geometry("300x200")
+            window.resizable(False, False)
+
+            # Make the new window appear on top of the parent window
+            window.transient(self)
+
+            # Set focus to the new window
+            window.grab_set()
+
+            # Save a reference to the window so we can check if it's already open
+            self.order_item_window = window
+
+            # Create a label for the item selection
+            label_item = customtkinter.CTkLabel(master=window, text="What item would you like to order?")
+            label_item.pack()
+
+            # Create a combo box with the available items
+            items = supply_lst.get_items_names()
+            items.append("New Item")
+            combo_item = customtkinter.CTkComboBox(window, values=items, command=combolicious)
+            combo_item.pack()
+            combo_item.bind("<<ComboboxSelected>>", lambda event, window=window: combolicious(event))
+
+            # Create a label for the return time selection
+            label_units = customtkinter.CTkLabel(master=window, text="How many units?")
+            label_units.pack()
+            now = datetime.now()
+            slider = customtkinter.CTkSlider(window, from_=1, to=200, number_of_steps=199,
+                                             command=slider_event2)
+            slider.set(1)
+            slider.pack()
+
+            label_item2 = customtkinter.CTkLabel(master=window, text=slider.get())
+            label_item2.pack()
+
+            # entry4 = customtkinter.CTkEntry(master=frame, width=220, placeholder_text='Password', show="*")
+            textbox = customtkinter.CTkEntry(master=window, width=200, height=10, font=('Century Gothic', 12), placeholder_text="Enter item's name")
+            # textbox.configure(width=200, height=10, font=('Century Gothic', 12), placeholder="Enter item's name")
+            textbox.pack(pady=10)
+            textbox.configure(state='disabled')
+
+
+            # Create a button to confirm the acquisition
+            button_confirm = customtkinter.CTkButton(window, text="Confirm",
+                                                     command=lambda: self.confirm_order_stuff(window))
+            button_confirm.pack()
+
+        def confirm_order_stuff(window):
+            pass
+
         combobox1_var = customtkinter.StringVar(value=list(email_type.keys())[0])
         combobox1 = customtkinter.CTkComboBox(master=self.right_dashboard, values=list(email_type.keys()),
                                               variable=combobox1_var, width=200, height=40,
@@ -253,7 +328,12 @@ class App(customtkinter.CTk):
         delete_button = customtkinter.CTkButton(master=self.right_dashboard, text="Delete User", font=('Arial', 14),
                                                 corner_radius=5,
                                                 hover=True, command=delete_callback)
-        delete_button.pack(pady=10)  #
+        delete_button.pack(pady=10)
+
+        order_button = customtkinter.CTkButton(master=self.right_dashboard, text="Order items", font=('Arial', 14),
+                                                corner_radius=5,
+                                                hover=True, command=lambda: order_stuff(self))
+        order_button.pack(pady=10)  #
 
 
     # Change scaling of all widget 80% to 120%

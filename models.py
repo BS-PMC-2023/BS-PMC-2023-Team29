@@ -11,7 +11,7 @@ class User:
         self.id = None
         self.email = email
         self.password = password
-        self.type = type
+        self.type= int(type)
         self.name = name
         self.lastname = lastname
 
@@ -19,7 +19,7 @@ class User:
         self.id = tupple_insert[0]
         self.email = tupple_insert[1]
         self.password = tupple_insert[2]
-        self.type = tupple_insert[3]
+        self.type= int(tupple_insert[3])
         self.name = tupple_insert[4]
         self.lastname = tupple_insert[5]
 
