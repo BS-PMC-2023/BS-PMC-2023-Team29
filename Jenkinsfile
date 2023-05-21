@@ -5,7 +5,7 @@ pipeline {
         stage('Checkout') {
             steps {
                 // Checkout the source code from your repository
-                git 'https://github.com/your/repository.git'
+                git 'https://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@github.com/BS-PMC-2023/BS-PMC-2023-Team29.git'
             }
         }
         
