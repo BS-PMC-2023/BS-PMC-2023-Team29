@@ -4,8 +4,8 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                // Checkout the source code from your repository
-                git 'https://github.com/BS-PMC-2023/BS-PMC-2023-Team29.git'
+                // Checkout the source code from your Git repository
+                checkout scm
             }
         }
         
