@@ -1,6 +1,11 @@
 pipeline {
-    agent any
-
+    
+    agent {
+            docker {
+                image 'python:3.8.7' // Specify the Python version or any other base image you need
+                args '-u root' // Run Docker container as root user
+            }
+        }
     stages {
         stage('Checkout') {
             steps {
