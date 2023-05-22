@@ -1,5 +1,8 @@
 import unittest
 from models import User, Supply, supllyList
+from status.models import Status
+
+
 
 class TestUser(unittest.TestCase):
     def test_insert(self):
