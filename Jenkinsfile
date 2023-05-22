@@ -37,9 +37,9 @@ pipeline {
                 script {
                     def mysqlHost = 'localhost'
                     def mysqlPort = 3306
-                    def mysqlDatabase = 'your_database_name'
-                    def mysqlUsername = 'your_username'
-                    def mysqlPassword = 'your_password'
+                    def mysqlDatabase = 'supply solutions'
+                    def mysqlUsername = 'root'
+                    def mysqlPassword = 'aalleexx'
 
                     try {
                         def sql = new groovy.sql.Sql(
