@@ -40,18 +40,16 @@ pipeline {
                     def mysqlDatabase = 'supply solutions'
                     def mysqlUsername = 'root'
                     def mysqlPassword = 'aalleexx'
+                    def jdbcDriver = 'com.mysql.cj.jdbc.Driver'
+                    def connectionString = "jdbc:mysql://${mysqlHost}:${mysqlPort}/${mysqlDatabase}?useSSL=false"
+
+                    // Load the JDBC driver
+                    Class.forName(jdbcDriver)
 
                     try {
-                        def sql = new groovy.sql.Sql(
-                            groovy.sql.Sql.newInstance(
-                                "jdbc:mysql://${mysqlHost}:${mysqlPort}/${mysqlDatabase}",
-                                mysqlUsername,
-                                mysqlPassword,
-                                'com.mysql.cj.jdbc.Driver'
-                            )
-                        )
+                        def connection = DriverManager.getConnection(connectionString, mysqlUsername, mysqlPassword)
                         echo "Connected to the local MySQL database successfully!"
-                        sql.close()
+                        connection.close()
                     } catch (Exception e) {
                         echo "Failed to connect to the local MySQL database: ${e.message}"
                         error("Database connection failed")
@@ -63,3 +61,4 @@ pipeline {
         // ... Other stages in your pipeline ...
     }
 }
+
