@@ -22,7 +22,7 @@ pipeline {
         stage('Run tests') {
             steps {
                 // Run your Python unit tests
-                sh 'python -m unittest discover'
+                sh 'python -m unittest discover -s tests'
             }
         }
 
