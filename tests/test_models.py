@@ -1,7 +1,6 @@
 import unittest
-from models import User, Supply, supllyList
-from status.models import Status
 
+from models import User, Supply, supllyList
 
 
 class TestUser(unittest.TestCase):
