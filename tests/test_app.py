@@ -2,7 +2,7 @@
 # from unittest import mock
 # from app import app
 #
-# 
+#
 # class TestApp(unittest.TestCase):
 #
 #     def setUp(self):
