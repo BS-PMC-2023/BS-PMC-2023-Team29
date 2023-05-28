@@ -63,8 +63,8 @@ class App(customtkinter.CTk):
         self.left_side_panel.pack(side=tkinter.LEFT, fill=tkinter.Y, expand=False, padx=5, pady=5)
 
         self.left_side_panel.grid_columnconfigure(0, weight=1)
-        self.left_side_panel.grid_rowconfigure((0, 1, 2, 3), weight=0)
-        self.left_side_panel.grid_rowconfigure((4, 5), weight=1)
+        self.left_side_panel.grid_rowconfigure((0, 1, 2, 3, 4), weight=0)
+        self.left_side_panel.grid_rowconfigure((5, 6), weight=1)
 
         # self.left_side_panel WIDGET
         self.logo_label = customtkinter.CTkLabel(self.left_side_panel, text="Welcome! \n",
@@ -101,7 +101,11 @@ class App(customtkinter.CTk):
             print('yes')
             self.bt_categories = customtkinter.CTkButton(self.left_side_panel, text="Manager Options",
                                                          command=self.manager)
-            self.bt_categories.grid(row=3, column=0, padx=20, pady=10)
+            self.bt_categories.grid(row=4, column=0, padx=20, pady=10)
+
+        self.bt_noti = customtkinter.CTkButton(self.left_side_panel, text="Notifications",
+                                                     command=lambda : self.notification(user.id))
+        self.bt_noti.grid(row=3, column=0, padx=20, pady=10)
 
         # right side panel -> have self.right_dashboard inside it
         self.right_side_panel = customtkinter.CTkFrame(self.main_container, corner_radius=10, fg_color="#000811")
@@ -310,10 +314,12 @@ class App(customtkinter.CTk):
             textbox.pack(pady=10)
             textbox.configure(state='disabled')
 
+            now = datetime.now()
+            
 
             # Create a button to confirm the acquisition
             button_confirm = customtkinter.CTkButton(window, text="Confirm",
-                                                     command=lambda: self.confirm_order_stuff(window))
+                                                     command=lambda: self.confirm_order_stuff(window) if now.hour < 17 else CTkMessagebox(icon='warning', title="Warning", option_1="Ok", message="You can only order items before 5pm").get())
             button_confirm.pack()
 
         def confirm_order_stuff(window):
@@ -346,6 +352,9 @@ class App(customtkinter.CTk):
                                                 corner_radius=5,
                                                 hover=True, command=lambda: order_stuff(self))
         order_button.pack(pady=10)  #
+
+    def notification(self, id):
+        self.clear_frame()
 
 
     # Change scaling of all widget 80% to 120%
@@ -501,7 +510,6 @@ class App(customtkinter.CTk):
         self.acquire_item_window.destroy()
         self.homie(user.id)
 
-
     def item_description(self):
         selected_item = self.table.item(self.table.selection())
         item_name = selected_item['values'][0]
@@ -509,6 +517,20 @@ class App(customtkinter.CTk):
         available_units = selected_item['values'][2]
         type = selected_item['values'][3]
         print(f"Showing description for {item_name} ({available_units}/{all_units}) with a type of {type}.")
+
+    def report_item(self):
+
+        selected_item = self.table.item(self.table.selection())
+        item_name = selected_item['values'][0]
+        all_units = selected_item['values'][1]
+        available_units = selected_item['values'][2]
+        ctypes.windll.user32.MessageBoxW(0,
+                                         f"Reporting: {item_name}\n A report for the item has been sent to the admins.",
+                                         "Help", 0)
+        type = selected_item['values'][3]
+        print(f"Reporting {item_name} ({available_units}/{all_units}) with a type of {type}.")
+
+
 
 
 def register_in_db(w, entry1, entry2, entry3, entry4):
@@ -704,6 +726,7 @@ def forget_password(app):
     # You can easily integrate authentication system
     app.mainloop()
 
+
 def generate_new_password(email):
     print("mail")
     response =requests.post(url + 'generateTempPassword',data = {'email':email})
@@ -715,6 +738,7 @@ def generate_new_password(email):
             print('shpih')
     else:
         print('Failed to authenticate user')
+
 
 def change_password(app, email, temp_password,new_password):
     data = {
@@ -806,6 +830,10 @@ def create_table(self, type):
         self.button_acquire = customtkinter.CTkButton(self.right_dashboard, text="Return Items",
                                                       command=self.return_item)
         self.button_acquire.pack(side=tkinter.LEFT, padx=10, pady=10)
+
+        self.button_item_desc = customtkinter.CTkButton(self.right_dashboard, text="Report Item",
+                                                        command=self.report_item)
+        self.button_item_desc.pack(side=tkinter.LEFT, padx=10, pady=10)
 
     self.button_item_desc = customtkinter.CTkButton(self.right_dashboard, text="Item Description",
                                                 command=self.item_description)
