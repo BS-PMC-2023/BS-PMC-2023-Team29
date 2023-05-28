@@ -90,12 +90,13 @@ pipeline {
 
                     try {
                         // Import necessary libraries
-                        sh 'pip install mysql-connector-python'
+                        @GrabConfig(systemClassLoader = true)
+                        @Grab('mysql:mysql-connector-java:8.0.26')
+                        import com.mysql.jdbc.Driver
 
                         // Connect to the MySQL database
                         def connection = null
                         try {
-                            def mysqlDriver = Class.forName('com.mysql.jdbc.Driver').newInstance()
                             def connectionString = "jdbc:mysql://${mysqlHost}:${mysqlPort}/${mysqlDatabase}"
                             connection = DriverManager.getConnection(connectionString, mysqlUser, mysqlPassword)
 
