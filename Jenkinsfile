@@ -71,7 +71,12 @@
 // }
 //
 pipeline {
-    agent any
+    agent {
+        docker {
+            image 'python:3.8.7'
+            args '-u root'
+        }
+    }
 
     stages {
         stage('Connect to Database') {
