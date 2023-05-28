@@ -79,9 +79,9 @@ pipeline {
                 script {
                     def mysqlHost = 'localhost'
                     def mysqlPort = 3306
-                    def mysqlDatabase = 'your_database_name'
-                    def mysqlUser = 'your_username'
-                    def mysqlPassword = 'your_password'
+                    def mysqlDatabase = 'supply solutions'
+                    def mysqlUser = 'root'
+                    def mysqlPassword = 'aalleexx'
 
                     try {
                         // Import necessary libraries
