@@ -1,16 +1,18 @@
 # importing required modules
 import tkinter
+import tkinter.ttk as ttk
 import customtkinter
 from PIL import ImageTk, Image
 import requests
-from models import User
+from models import User, supllyList
 import ctypes
+from datetime import datetime, timedelta
 from CTkMessagebox import CTkMessagebox
 
 # backend connection
 url = 'http://localhost:5000/'
 user = User()
-
+supply_lst = supllyList()
 customtkinter.set_appearance_mode("System")  # Modes: system (default), light, dark
 customtkinter.set_default_color_theme("green")  # Themes: blue (default), dark-blue, green
 
@@ -23,13 +25,23 @@ class App(customtkinter.CTk):
 
     def __init__(self):
         super().__init__()
+        # --------- bar example --------
+        response = requests.get(url + 'getAllSupply')
+        if response.status_code == 200:
+            result = response.json()
+            if result['message'] == 'successful':
+                temp = result['supply']
+                supply_lst.insert_list(temp)
+                print(supply_lst, user.type)
+
 
         self.title("Supply Solutions")
-        # remove title bar , page reducer and closing page !!!most have a quit button with app.destroy!!! (this app have a quit button so don't worry about that)
-        self.overrideredirect(True)
-        # make the app as big as the screen (no mater wich screen you use)
-        self.geometry("{0}x{1}+0+0".format(self.winfo_screenwidth(), self.winfo_screenheight()))
+        # # remove title bar , page reducer and closing page !!!most have a quit button with app.destroy!!! (this app have a quit button so don't worry about that)
+        # self.overrideredirect(True)
 
+        # make the app as big as the screen (no mater which screen you use)
+        self.geometry("{0}x{1}+0+0".format(self.winfo_screenwidth(), (self.winfo_screenheight() - self.winfo_screenheight()%32)))
+        self.state('zoomed')
         # root!
         self.main_container = customtkinter.CTkFrame(self, corner_radius=10)
         self.main_container.pack(fill=tkinter.BOTH, expand=True, padx=10, pady=10)
@@ -55,22 +67,29 @@ class App(customtkinter.CTk):
                                                                command=self.change_scaling_event)
         self.scaling_optionemenu.grid(row=8, column=0, padx=20, pady=(10, 20), sticky="s")
 
+        self.bt_Logout = customtkinter.CTkButton(self.left_side_panel, text="Logout", fg_color='#EA0000',
+                                               hover_color='#B20000',
+                                               command=lambda: back_to_login_page(self))
+        self.bt_Logout.grid(row=9, column=0, padx=20, pady=10)
+
+
         self.bt_Quit = customtkinter.CTkButton(self.left_side_panel, text="Quit", fg_color='#EA0000',
                                                hover_color='#B20000',
                                                command=self.close_window)
-        self.bt_Quit.grid(row=9, column=0, padx=20, pady=10)
+        self.bt_Quit.grid(row=10, column=0, padx=20, pady=10)
 
         # button to select correct frame IN self.left_side_panel WIDGET
         self.bt_homepage = customtkinter.CTkButton(self.left_side_panel, text="Homepage",
                                                    command=lambda: self.homie(user.id))
         self.bt_homepage.grid(row=1, column=0, padx=20, pady=10)
 
-        self.bt_profile = customtkinter.CTkButton(self.left_side_panel, text="Profile", command=self.profile)
+        self.bt_profile = customtkinter.CTkButton(self.left_side_panel, text="Profile", command=lambda : self.profile(user.id))
         self.bt_profile.grid(row=2, column=0, padx=20, pady=10)
-
-        self.bt_categories = customtkinter.CTkButton(self.left_side_panel, text="Manager Options",
-                                                     command=self.manager)
-        self.bt_categories.grid(row=3, column=0, padx=20, pady=10)
+        if user.type == 3:
+            print('yes')
+            self.bt_categories = customtkinter.CTkButton(self.left_side_panel, text="Manager Options",
+                                                         command=self.manager)
+            self.bt_categories.grid(row=3, column=0, padx=20, pady=10)
 
         self.bt_categories = customtkinter.CTkButton(self.left_side_panel, text="Report",command=self.report)
         self.bt_categories.grid(row=4, column=0, padx=20, pady=10)
@@ -88,16 +107,13 @@ class App(customtkinter.CTk):
     #  self.right_dashboard   ----> dashboard widget
     def homie(self, id):
         self.clear_frame()
-
-        self.name = customtkinter.CTkLabel(master=self.right_dashboard, text=user.name,
-                                           font=('Century Gothic', 50))
-        self.lastname = customtkinter.CTkLabel(master=self.right_dashboard, text=user.lastname,
-                                               font=('Century Gothic', 50))
-        self.name.place(relx=0.5, rely=0.1, anchor=tkinter.CENTER)
-        self.lastname.place(relx=0.5, rely=0.3, anchor=tkinter.CENTER)
-
-        # l1 = customtkinter.CTkLabel(master=w, text="Home Page", font=('Century Gothic', 60))
-        # l1.place(relx=0.5, rely=0.5, anchor=tkinter.CENTER)
+        create_table(self, 'supply')
+        # self.name = customtkinter.CTkLabel(master=self.right_dashboard, text=user.name,
+        #                                    font=('Century Gothic', 50))
+        # self.lastname = customtkinter.CTkLabel(master=self.right_dashboard, text=user.lastname,
+        #                                        font=('Century Gothic', 50))
+        # self.name.place(relx=0.5, rely=0.1, anchor=tkinter.CENTER)
+        # self.lastname.place(relx=0.5, rely=0.3, anchor=tkinter.CENTER)
 
         def help_func():
             ctypes.windll.user32.MessageBoxW(0,
@@ -107,15 +123,13 @@ class App(customtkinter.CTk):
         self.help_BTN = customtkinter.CTkButton(master=self.right_dashboard, width=60, height=20, text="Help",
                                                 command=help_func,
                                                 corner_radius=6)
-        self.help_BTN.place(relx=0.9, rely=0.9, anchor=tkinter.CENTER)
+        self.help_BTN.place(relx=0.95, rely=0.9, anchor=tkinter.CENTER)
 
 
     #  self.right_dashboard   ----> statement widget
-    def profile(self):
+    def profile(self, id):
         self.clear_frame()
-        # self.bt_from_frame3 = customtkinter.CTkButton(self.right_dashboard, text="Profile",
-        #                                               command=lambda: print("test profile"))
-        # self.bt_from_frame3.grid(row=0, column=0, padx=20, pady=(10, 0))
+        create_table(self, 'profile')
 
         self.name = customtkinter.CTkLabel(master=self.right_dashboard, text="First name: ",
                                            font=('Century Gothic', 18))
@@ -151,13 +165,13 @@ class App(customtkinter.CTk):
                                                 command=save_changes_func,
                                                 corner_radius=6)
 
-        self.name.place(relx=0.3, rely=0.1, anchor=tkinter.CENTER)
-        self.name_entry.place(relx=0.5, rely=0.1, anchor=tkinter.CENTER)
-        self.lastname.place(relx=0.3, rely=0.2, anchor=tkinter.CENTER)
-        self.lastname_entry.place(relx=0.5, rely=0.2, anchor=tkinter.CENTER)
-        self.email.place(relx=0.3, rely=0.3, anchor=tkinter.CENTER)
-        self.email_entry.place(relx=0.5, rely=0.3, anchor=tkinter.CENTER)
-        self.save_BTN.place(relx=0.75, rely=0.3, anchor=tkinter.CENTER)
+        self.name.place(relx=0.3, rely=0.4, anchor=tkinter.CENTER)
+        self.name_entry.place(relx=0.5, rely=0.4, anchor=tkinter.CENTER)
+        self.lastname.place(relx=0.3, rely=0.5, anchor=tkinter.CENTER)
+        self.lastname_entry.place(relx=0.5, rely=0.5, anchor=tkinter.CENTER)
+        self.email.place(relx=0.3, rely=0.6, anchor=tkinter.CENTER)
+        self.email_entry.place(relx=0.5, rely=0.6, anchor=tkinter.CENTER)
+        self.save_BTN.place(relx=0.75, rely=0.6, anchor=tkinter.CENTER)
 
     #  self.right_dashboard   ----> categories widget
     def manager(self):
@@ -221,6 +235,80 @@ class App(customtkinter.CTk):
             if email_type.get(key) is not None:
                 combobox2.set(str(value))
 
+        def order_stuff(self):
+
+            def slider_event2(window):
+                label_item2.configure(text=slider.get())
+
+            def combolicious(choice):
+                if choice == "New Item":
+                    textbox.configure(state=tkinter.NORMAL)  # enable textbox
+                    textbox.focus_set()  # set focus to textbox
+                else:
+                    textbox.delete(0, tkinter.END)
+                    textbox.insert(tkinter.END, "")
+                    textbox.configure(state="disabled")  # disable textbox
+
+
+            # Check if there's already an active window
+            if hasattr(self, "order_item_window") and self.order_item_window.winfo_exists():
+                return
+
+            # Create a new window for acquiring items
+            window = customtkinter.CTkToplevel(self)
+            window.title("Order Items")
+
+            # Set the window size and disable resizing
+            window.geometry("300x200")
+            window.resizable(False, False)
+
+            # Make the new window appear on top of the parent window
+            window.transient(self)
+
+            # Set focus to the new window
+            window.grab_set()
+
+            # Save a reference to the window so we can check if it's already open
+            self.order_item_window = window
+
+            # Create a label for the item selection
+            label_item = customtkinter.CTkLabel(master=window, text="What item would you like to order?")
+            label_item.pack()
+
+            # Create a combo box with the available items
+            items = supply_lst.get_items_names()
+            items.append("New Item")
+            combo_item = customtkinter.CTkComboBox(window, values=items, command=combolicious)
+            combo_item.pack()
+            combo_item.bind("<<ComboboxSelected>>", lambda event, window=window: combolicious(event))
+
+            # Create a label for the return time selection
+            label_units = customtkinter.CTkLabel(master=window, text="How many units?")
+            label_units.pack()
+            now = datetime.now()
+            slider = customtkinter.CTkSlider(window, from_=1, to=200, number_of_steps=199,
+                                             command=slider_event2)
+            slider.set(1)
+            slider.pack()
+
+            label_item2 = customtkinter.CTkLabel(master=window, text=slider.get())
+            label_item2.pack()
+
+            # entry4 = customtkinter.CTkEntry(master=frame, width=220, placeholder_text='Password', show="*")
+            textbox = customtkinter.CTkEntry(master=window, width=200, height=10, font=('Century Gothic', 12), placeholder_text="Enter item's name")
+            # textbox.configure(width=200, height=10, font=('Century Gothic', 12), placeholder="Enter item's name")
+            textbox.pack(pady=10)
+            textbox.configure(state='disabled')
+
+
+            # Create a button to confirm the acquisition
+            button_confirm = customtkinter.CTkButton(window, text="Confirm",
+                                                     command=lambda: self.confirm_order_stuff(window))
+            button_confirm.pack()
+
+        def confirm_order_stuff(window):
+            pass
+
         combobox1_var = customtkinter.StringVar(value=list(email_type.keys())[0])
         combobox1 = customtkinter.CTkComboBox(master=self.right_dashboard, values=list(email_type.keys()),
                                               variable=combobox1_var, width=200, height=40,
@@ -242,7 +330,12 @@ class App(customtkinter.CTk):
         delete_button = customtkinter.CTkButton(master=self.right_dashboard, text="Delete User", font=('Arial', 14),
                                                 corner_radius=5,
                                                 hover=True, command=delete_callback)
-        delete_button.pack(pady=10)  #
+        delete_button.pack(pady=10)
+
+        order_button = customtkinter.CTkButton(master=self.right_dashboard, text="Order items", font=('Arial', 14),
+                                                corner_radius=5,
+                                                hover=True, command=lambda: order_stuff(self))
+        order_button.pack(pady=10)  #
 
     def report(self):
         self.clear_frame()
@@ -267,6 +360,154 @@ class App(customtkinter.CTk):
     def clear_frame(self):
         for widget in self.right_dashboard.winfo_children():
             widget.destroy()
+
+    def return_item(self):
+
+        selected_item = self.table.item(self.table.selection())
+        if selected_item is None:
+            # No item is currently selected
+            return
+
+        name = selected_item['values'][0]
+        units = selected_item['values'][1]
+
+        id = supply_lst.get_id_by_name(name)
+        now = datetime.now()
+        dt = datetime(now.year, now.month, now.day, now.hour, now.minute)
+        data = {
+            'user_id': user.id,
+            'item_id': id,
+            'num_of_items': int(units),
+        }
+
+        response = requests.post(url + 'returnSomeItem', data=data)
+        if response.status_code == 200:
+            result = response.json()
+            if result['message'] == 'change successful':
+                supply_lst.return_item_by_id(id, units)
+                self.profile(user.id)
+            else:
+                print('err')
+        else:
+            print('err2')
+
+    def acquire_item(self):
+
+        def slider_event2(window):
+                label_item2.configure(text=slider.get())
+        def slider_event3(window):
+                label_item3.configure(text=slider2.get())
+        def combolicious(choice):
+            slider2.configure(number_of_steps=supply_lst.get_supply_avl_by_name(choice), to=supply_lst.get_supply_avl_by_name(choice))
+            slider2.set(0)
+            label_item3.configure(text="0")
+
+        # Check if there's already an active window
+        if hasattr(self, "acquire_item_window") and self.acquire_item_window.winfo_exists():
+            return
+
+        # Create a new window for acquiring items
+        window = customtkinter.CTkToplevel(self)
+        window.title("Acquire Item")
+
+        # Set the window size and disable resizing
+        window.geometry("300x250")
+        window.resizable(False, False)
+
+        # Make the new window appear on top of the parent window
+        window.transient(self)
+
+        # Set focus to the new window
+        window.grab_set()
+
+        # Save a reference to the window so we can check if it's already open
+        self.acquire_item_window = window
+
+        # Create a label for the item selection
+        label_item = customtkinter.CTkLabel(master=window, text="What item would you like to borrow?")
+        label_item.pack()
+
+        # Create a combo box with the available items
+        items = supply_lst.get_items_names()
+        combo_item = customtkinter.CTkComboBox(window, values=items, command=combolicious)
+        combo_item.pack()
+        combo_item.bind("<<ComboboxSelected>>", lambda event, window=window: combolicious(event))
+
+        # Create a label for the return time selection
+        label_return = customtkinter.CTkLabel(master=window, text="When will you return it?")
+        label_return.pack()
+        now = datetime.now()
+        rounded_hour = (now + timedelta(hours=1)).replace(minute=0, second=0, microsecond=0)
+        rounded_hour = rounded_hour.hour
+
+        slider = customtkinter.CTkSlider(window, from_=rounded_hour, to=22, number_of_steps=(22-rounded_hour)*2, command=slider_event2)
+        slider.pack()
+
+        label_item2 = customtkinter.CTkLabel(master=window, text=slider.get())
+        label_item2.pack()
+
+        label_quantity = customtkinter.CTkLabel(master=window, text="How many would you like to borrow?")
+        label_quantity.pack()
+
+        slider2 = customtkinter.CTkSlider(window, from_=0, to=supply_lst.get_supply_avl_by_name(combo_item.get()),
+                                          number_of_steps=supply_lst.get_supply_avl_by_name(combo_item.get()), command=slider_event3)
+        slider2.set(0)
+        slider2.pack()
+
+        # slider2 = customtkinter.CTkSlider(window, from_=100, to=200, number_of_steps=100, command=slider_event3)
+        # slider2.pack()
+
+        label_item3 = customtkinter.CTkLabel(master=window, text=slider2.get())
+        label_item3.pack()
+
+
+        # Create a button to confirm the acquisition
+        button_confirm = customtkinter.CTkButton(window, text="Confirm",
+                                                 command=lambda: self.confirm_acquisition(combo_item.get(),
+                                                                                          slider.get(),
+                                                                                          slider2.get()))
+        button_confirm.pack()
+
+    def confirm_acquisition(self, item, return_time, quantity):
+        quantity = int(quantity)
+        id = supply_lst.get_id_by_name(item)
+        remain = supply_lst.borrow_item_by_id(id,quantity)
+        hour, minute = map(int, str(return_time).split('.'))
+        if minute == 5:
+            minute = 30
+        now = datetime.now()
+        dt = datetime(now.year, now.month, now.day, hour, minute)
+        if remain :
+            data = {
+                'user_id' : user.id,
+                'item_id' : id,
+                'return_time' : dt,
+                'num_of_items_remain' : remain,
+                'num_of_items' : quantity
+            }
+
+            response = requests.post(url + 'borrowItem', data=data)
+            if response.status_code == 200:
+                result = response.json()
+                if result['message'] == 'change successful':
+                    print(supply_lst)
+                else:
+                    print('shpih')
+            else:
+                print('shpih2')
+
+        print(f"Acquiring {quantity} of {item} for {return_time} hours")
+        self.acquire_item_window.destroy()
+        self.homie(user.id)
+
+
+    def item_description(self):
+        selected_item = self.table.item(self.table.selection())
+        item_name = selected_item['values'][0]
+        all_units = selected_item['values'][1]
+        available_units = selected_item['values'][2]
+        type = selected_item['values'][3]
+        print(f"Showing description for {item_name} ({available_units}/{all_units}) with a type of {type}.")
 
 
 
@@ -321,6 +562,10 @@ def register_function(app):
                                               command=lambda: register_in_db(w, entry1, entry2, entry3, entry4),
                                               corner_radius=6)
     register_button.place(x=105, y=325)
+
+    return_button = customtkinter.CTkButton(master=frame, width=50, height=25, text="Back",
+                                           command=lambda: back_to_login_page(w), corner_radius=6)
+    return_button.place(x=2, y=2)
 
     w.mainloop()
 
@@ -384,7 +629,7 @@ def login_page(app):
                                               command=lambda: register_function(app), corner_radius=6)
     register_button.place(x=170, y=235)
 
-    img3 = customtkinter.CTkImage(Image.open("samilogo.png").resize((40, 40), Image.ANTIALIAS))
+    img3 = customtkinter.CTkImage(Image.open("samilogo.png").resize((40, 40)))
 
     img3 = customtkinter.CTkButton(master=frame, image=img3, text="Sami Shamoon College of Engineering", width=40,
                                    height=40, compound="left", fg_color='white', text_color='black',
@@ -402,6 +647,10 @@ def login_page(app):
     app.mainloop()
 
 
+def back_to_login_page(app):
+    app.destroy()
+    app = customtkinter.CTk()  # creating custom tkinter window
+    login_page(app)
 
 
 def forget_password(app):
@@ -424,19 +673,29 @@ def forget_password(app):
     l2.place(x=50, y=45)
 
     entry1 = customtkinter.CTkEntry(master=frame, width=220, placeholder_text='Username')
-    entry1.place(x=50, y=110)
+    entry1.place(x=50, y=100)
+    b1 = customtkinter.CTkButton(master=frame, text="send new password to this mail", font=('Century Gothic', 12),
+                                 command=lambda: generate_new_password(entry1.get().lower()))
+    b1.place(x=50, y =135)
 
-    entry2 = customtkinter.CTkEntry(master=frame, width=220, placeholder_text='new Password', show="*")
+    entry2 = customtkinter.CTkEntry(master=frame, width=220, placeholder_text='password we send to your mail', show="*")
     entry2.place(x=50, y=165)
-    entry3 = customtkinter.CTkEntry(master=frame, width=220, placeholder_text='new Password repit', show="*")
+    entry3 = customtkinter.CTkEntry(master=frame, width=220, placeholder_text='New password', show="*")
     entry3.place(x=50, y=195)
 
     # Create custom button
     login_button = customtkinter.CTkButton(master=frame, width=120, height=40, text="generate new password",
-                                           command=lambda: change_password(app, entry1, entry2), corner_radius=6)
+                                           command=lambda: change_password(app, entry1.get().lower(),
+                                                                           entry2.get().lower(),entry3.get().lower()
+                                                                           ), corner_radius=6)
     login_button.place(x=30, y=235)
 
-    img3 = customtkinter.CTkImage(Image.open("samilogo.png").resize((40, 40), Image.ANTIALIAS))
+    return_button = customtkinter.CTkButton(master=frame, width=50, height=25, text="Back",
+                                           command=lambda: back_to_login_page(app), corner_radius=6)
+    return_button.place(x=2, y=2)
+
+
+    img3 = customtkinter.CTkImage(Image.open("samilogo.png").resize((40, 40), Image.LANCZOS))
 
     img3 = customtkinter.CTkButton(master=frame, image=img3, text="Sami Shamoon College of Engineering", width=40,
                                    height=40, compound="left", fg_color='white', text_color='black',
@@ -446,13 +705,23 @@ def forget_password(app):
     # You can easily integrate authentication system
     app.mainloop()
 
+def generate_new_password(email):
+    print("mail")
+    response =requests.post(url + 'generateTempPassword',data = {'email':email})
+    if response.status_code == 200:
+        result = response.json()
+        if result['message'] == 'change successful':
+            print('cool')
+        else:
+            print('shpih')
+    else:
+        print('Failed to authenticate user')
 
-def change_password(app, entry1, entry2):
-    email, password = entry1.get(), entry2.get()
-    print(email, password)
+def change_password(app, email, temp_password,new_password):
     data = {
         'email': email,
-        'new_password': password
+        'new_password': new_password,
+        'temp_password' :temp_password
     }
 
     response = requests.post(url + 'changePassword', data=data)
@@ -465,6 +734,83 @@ def change_password(app, entry1, entry2):
     else:
         print('Failed to authenticate user')
 
+
+def create_table(self, type):
+    # Create a simple table
+    self.table = ttk.Treeview(self.right_dashboard)
+    if type == 'supply':
+        self.table.pack(side=tkinter.TOP, fill=tkinter.BOTH, expand=True)
+        # Define the columns of the table
+        self.table["columns"] = ("Item name", "Quantity", "Avilable", "Type")
+
+        # Set the headings of the columns
+        self.table.column("Item name", width=100, anchor="center", stretch=True)
+        self.table.heading("Item name", text="Item name")
+
+        self.table.column("Quantity", width=100, anchor="center", stretch=True)
+        self.table.heading("Quantity", text="Quantity")
+
+        self.table.column("Avilable", width=100, anchor="center", stretch=True)
+        self.table.heading("Avilable", text="Avilable")
+
+        self.table.column("Type", width=100, anchor="center", stretch=True)
+        self.table.heading("Type", text="Type")
+        # Add some data to the table
+        for x in supply_lst.list:
+            self.table.insert("", "end", values=(x.name, x.all_units, x.available_units, x.type))
+
+        # Buttons to interact with the selected line of the table
+        self.button_acquire = customtkinter.CTkButton(self.right_dashboard, text="Acquire",
+                                                      command=self.acquire_item)
+        self.button_acquire.pack(side=tkinter.LEFT, padx=10, pady=10)
+
+    elif type == 'profile':
+        self.table.pack(side=tkinter.TOP, fill=tkinter.BOTH, expand=True)
+        # Define the columns of the table
+        self.table["columns"] = ("Item name", "Quantity", "Borrow date", "Expected return date")
+
+        # Set the headings of the columns
+        self.table.column("Item name", width=100, anchor="center", stretch=True)
+        self.table.heading("Item name", text="Item name")
+
+        self.table.column("Quantity", width=100, anchor="center", stretch=True)
+        self.table.heading("Quantity", text="Quantity")
+
+        self.table.column("Borrow date", width=100, anchor="center", stretch=True)
+        self.table.heading("Borrow date", text="Borrow date")
+
+        self.table.column("Expected return date", width=100, anchor="center", stretch=True)
+        self.table.heading("Expected return date", text="Expected return date")
+
+        response = requests.post(url + 'getBorrowedItems',data = {'user_id':user.id})
+        items = []
+        return_time = []
+        take_time = []
+        quantity = []
+        if response.status_code == 200:
+            result = response.json()
+            if result['message'] == 'successful':
+                temp = result['items']
+                for i in temp:
+                    items.append(supply_lst.get_name_by_id(i[1]))
+                    return_time.append(i[5])
+                    take_time.append(i[4])
+                    quantity.append(i[3])
+                print(temp)
+
+        # Add some data to the table
+        for i in range(0, len(items)):
+            self.table.insert("", "end", values=(items[i], quantity[i], take_time[i], return_time[i]))
+
+
+        # Buttons to interact with the selected line of the table
+        self.button_acquire = customtkinter.CTkButton(self.right_dashboard, text="Return Items",
+                                                      command=self.return_item)
+        self.button_acquire.pack(side=tkinter.LEFT, padx=10, pady=10)
+
+    self.button_item_desc = customtkinter.CTkButton(self.right_dashboard, text="Item Description",
+                                                command=self.item_description)
+    self.button_item_desc.pack(side=tkinter.LEFT, padx=10, pady=10)
 
 
 login_page(app)
