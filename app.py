@@ -113,8 +113,15 @@ def generate_temp_password():
     return jsonify({'message': 'change not successful'})
 
 @app.route('/getBorrowedItems',methods = ['POST'])
-def get_my_borrowd_items():
+def get_my_borrowed_items():
     items = db.get_items_dosent_return(request.form['user_id'])
     return jsonify({'message': 'successful', 'items': items})
+
+@app.route('/addItemToSupply',methods = ['POST'])
+def add_item_to_supply():
+    item_id = db.add_item_to_supply(request.form['name'],request.form['units'],request.form['type'],request.form['description'])
+    if item_id:
+        return jsonify({'message': 'change successful','id':item_id})
+    return jsonify({'message': 'change not successful'})
 if __name__ == '__main__':
     app.run(debug=True)

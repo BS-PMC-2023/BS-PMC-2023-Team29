@@ -239,7 +239,25 @@ class App(customtkinter.CTk):
 
         def order_stuff(self):
 
-            def confirm_order_stuff(window):
+            def confirm_order_stuff(window,name,units,type,description):
+                data = {
+                    'name': name,
+                    'units': int(units),
+                    'type': type,
+                    'description': description,
+                }
+                response = requests.post(url + 'addItemToSupply', data=data)
+                if response.status_code == 200:
+                    result = response.json()
+                    if result['message'] == 'change successful':
+                        item_id = result['id']
+                        supply_lst.insert_item(item_id[0][0],type,name,int(units))
+                        print('add item')
+                    else:
+                        print('err')
+                else:
+                    print('err2')
+
                 window.destroy()
 
             def slider_event2(window):
@@ -322,7 +340,7 @@ class App(customtkinter.CTk):
 
             # Create a button to confirm the acquisition
             button_confirm = customtkinter.CTkButton(window, text="Confirm",
-                                                     command=lambda: confirm_order_stuff(window) if now.hour < 22 and now.hour > 6 else CTkMessagebox(icon='warning', title="Warning", option_1="Ok", message="You can only order items before 5pm").get())
+                                                     command=lambda: confirm_order_stuff(window,textbox.get(),slider.get(),textbox2.get(),textbox3.get()) if now.hour < 22 and now.hour > 6 else CTkMessagebox(icon='warning', title="Warning", option_1="Ok", message="You can only order items before 5pm").get())
             button_confirm.pack()
 
 

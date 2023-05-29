@@ -135,8 +135,10 @@ class supllyList:
                 return i.name
         return False
     
-
-
+    def insert_item(self,id, type, name, all_units):
+        temp = Supply()
+        temp.insert(id, type, name, all_units,all_units)
+        self.list.append(temp)
 
     def __str__(self):
         string = ''.join([str(i) for i in self.list])
