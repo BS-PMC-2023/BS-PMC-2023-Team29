@@ -251,6 +251,9 @@ class App(customtkinter.CTk):
 
         def order_stuff(self):
 
+            def confirm_order_stuff(window):
+                window.destroy()
+
             def slider_event2(window):
                 label_item2.configure(text=slider.get())
 
@@ -258,10 +261,15 @@ class App(customtkinter.CTk):
                 if choice == "New Item":
                     textbox.configure(state=tkinter.NORMAL)  # enable textbox
                     textbox.focus_set()  # set focus to textbox
+                    textbox2.configure(state=tkinter.NORMAL)  # enable textbox
+                    textbox2.focus_set()  # set focus to textbox
                 else:
                     textbox.delete(0, tkinter.END)
                     textbox.insert(tkinter.END, "")
                     textbox.configure(state="disabled")  # disable textbox
+                    textbox2.delete(0, tkinter.END)
+                    textbox2.insert(tkinter.END, "")
+                    textbox2.configure(state="disabled")  # disable textbox
 
 
             # Check if there's already an active window
@@ -273,7 +281,7 @@ class App(customtkinter.CTk):
             window.title("Order Items")
 
             # Set the window size and disable resizing
-            window.geometry("300x200")
+            window.geometry("300x270")
             window.resizable(False, False)
 
             # Make the new window appear on top of the parent window
@@ -308,22 +316,22 @@ class App(customtkinter.CTk):
             label_item2 = customtkinter.CTkLabel(master=window, text=slider.get())
             label_item2.pack()
 
-            # entry4 = customtkinter.CTkEntry(master=frame, width=220, placeholder_text='Password', show="*")
             textbox = customtkinter.CTkEntry(master=window, width=200, height=10, font=('Century Gothic', 12), placeholder_text="Enter item's name")
-            # textbox.configure(width=200, height=10, font=('Century Gothic', 12), placeholder="Enter item's name")
             textbox.pack(pady=10)
             textbox.configure(state='disabled')
+            textbox2 = customtkinter.CTkEntry(master=window, width=200, height=40, font=('Century Gothic', 12), placeholder_text="Enter item's description")
+            textbox2.pack(pady=10)
+            textbox2.configure(state='disabled')
 
             now = datetime.now()
-            
+
 
             # Create a button to confirm the acquisition
             button_confirm = customtkinter.CTkButton(window, text="Confirm",
-                                                     command=lambda: self.confirm_order_stuff(window) if now.hour < 17 else CTkMessagebox(icon='warning', title="Warning", option_1="Ok", message="You can only order items before 5pm").get())
+                                                     command=lambda: confirm_order_stuff(window) if now.hour < 22 and now.hour > 6 else CTkMessagebox(icon='warning', title="Warning", option_1="Ok", message="You can only order items before 5pm").get())
             button_confirm.pack()
 
-        def confirm_order_stuff(window):
-            pass
+
 
         combobox1_var = customtkinter.StringVar(value=list(email_type.keys())[0])
         combobox1 = customtkinter.CTkComboBox(master=self.right_dashboard, values=list(email_type.keys()),
