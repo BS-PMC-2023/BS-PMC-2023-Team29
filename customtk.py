@@ -260,9 +260,9 @@ class App(customtkinter.CTk):
             def combolicious(choice):
                 if choice == "New Item":
                     textbox.configure(state=tkinter.NORMAL)  # enable textbox
-                    textbox.focus_set()  # set focus to textbox
                     textbox2.configure(state=tkinter.NORMAL)  # enable textbox
-                    textbox2.focus_set()  # set focus to textbox
+                    textbox3.configure(state=tkinter.NORMAL)  # enable textbox
+                    textbox.focus_set()  # set focus to textbox
                 else:
                     textbox.delete(0, tkinter.END)
                     textbox.insert(tkinter.END, "")
@@ -270,6 +270,9 @@ class App(customtkinter.CTk):
                     textbox2.delete(0, tkinter.END)
                     textbox2.insert(tkinter.END, "")
                     textbox2.configure(state="disabled")  # disable textbox
+                    textbox3.delete(0, tkinter.END)
+                    textbox3.insert(tkinter.END, "")
+                    textbox3.configure(state="disabled")  # disable textbox
 
 
             # Check if there's already an active window
@@ -281,7 +284,7 @@ class App(customtkinter.CTk):
             window.title("Order Items")
 
             # Set the window size and disable resizing
-            window.geometry("300x270")
+            window.geometry("300x330")
             window.resizable(False, False)
 
             # Make the new window appear on top of the parent window
@@ -319,9 +322,12 @@ class App(customtkinter.CTk):
             textbox = customtkinter.CTkEntry(master=window, width=200, height=10, font=('Century Gothic', 12), placeholder_text="Enter item's name")
             textbox.pack(pady=10)
             textbox.configure(state='disabled')
-            textbox2 = customtkinter.CTkEntry(master=window, width=200, height=40, font=('Century Gothic', 12), placeholder_text="Enter item's description")
+            textbox2 = customtkinter.CTkEntry(master=window, width=100, height=10, font=('Century Gothic', 12), placeholder_text="Type")
             textbox2.pack(pady=10)
             textbox2.configure(state='disabled')
+            textbox3 = customtkinter.CTkEntry(master=window, width=200, height=40, font=('Century Gothic', 12), placeholder_text="Enter item's description")
+            textbox3.pack(pady=10)
+            textbox3.configure(state='disabled')
 
             now = datetime.now()
 
