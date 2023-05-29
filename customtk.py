@@ -340,8 +340,8 @@ class App(customtkinter.CTk):
 
             # Create a button to confirm the acquisition
             button_confirm = customtkinter.CTkButton(window, text="Confirm",
-                                                     command=lambda: confirm_order_stuff(window,textbox.get(),slider.get(),textbox2.get(),textbox3.get()) if now.hour < 22 and now.hour > 6 else CTkMessagebox(icon='warning', title="Warning", option_1="Ok", message="You can only order items before 5pm").get())
-            button_confirm.pack()
+                                                     command=lambda: confirm_order_stuff(window) if now.hour < 22 and now.hour > 6 else CTkMessagebox(icon='warning', title="Warning", option_1="Ok", message="You can only order items before 5pm").get())
+            button_confirm.pack(pady=10)
 
 
 
@@ -539,16 +539,74 @@ class App(customtkinter.CTk):
         print(f"Showing description for {item_name} ({available_units}/{all_units}) with a type of {type}.")
 
     def report_item(self):
-
         selected_item = self.table.item(self.table.selection())
+        if selected_item['values'][0] == '':
+            return
+
+        def confirm_order_stuff(window):
+            window.destroy()
+
+        def slider_event2(window):
+            label_item2.configure(text=slider.get())
+
+        # Check if there's already an active window
+        if hasattr(self, "report_item_window") and self.report_item_window.winfo_exists():
+            return
+
+        # Create a new window for acquiring items
+        window = customtkinter.CTkToplevel(self)
+        window.title("Report Item")
+
+        # Set the window size and disable resizing
+        window.geometry("300x300")
+        window.resizable(False, False)
+
+        # Make the new window appear on top of the parent window
+        window.transient(self)
+
+        # Set focus to the new window
+        window.grab_set()
+
+        # Save a reference to the window so we can check if it's already open
+        self.report_item_window = window
+
         item_name = selected_item['values'][0]
         all_units = selected_item['values'][1]
-        available_units = selected_item['values'][2]
-        ctypes.windll.user32.MessageBoxW(0,
-                                         f"Reporting: {item_name}\n A report for the item has been sent to the admins.",
-                                         "Help", 0)
-        type = selected_item['values'][3]
-        print(f"Reporting {item_name} ({available_units}/{all_units}) with a type of {type}.")
+
+        # Create a label for the item selection
+        label_item = customtkinter.CTkLabel(master=window, text="How many items would you like to report?")
+        label_item.pack(pady=10)
+        slider = customtkinter.CTkSlider(window, from_=1, to=all_units, number_of_steps=all_units-1,
+                                         command=slider_event2)
+        slider.set(1)
+        slider.pack(pady=10)
+        label_item2 = customtkinter.CTkLabel(master=window, text=slider.get())
+        label_item2.pack(pady=10)
+
+        label_item3 = customtkinter.CTkLabel(master=window, text=f"What is the problem with the {item_name}?")
+        label_item3.pack(pady=10)
+        textbox = customtkinter.CTkEntry(master=window, width=200, height=30, font=('Century Gothic', 12),
+                                         placeholder_text="Enter problem here")
+        textbox.pack(pady=10)
+
+        # Create a button to confirm the acquisition
+        button_confirm = customtkinter.CTkButton(window, text="Confirm",
+                                                 command=lambda: confirm_order_stuff(
+                                                     window) if textbox.get()!= '' else CTkMessagebox(
+                                                     icon='warning', title="Warning", option_1="Ok",
+                                                     message="Please describe the problem").get())
+        button_confirm.pack(pady=10)
+
+
+        # selected_item = self.table.item(self.table.selection())
+        # item_name = selected_item['values'][0]
+        # all_units = selected_item['values'][1]
+        # available_units = selected_item['values'][2]
+        # ctypes.windll.user32.MessageBoxW(0,
+        #                                  f"Reporting: {item_name}\n A report for the item has been sent to the admins.",
+        #                                  "Help", 0)
+        # type = selected_item['values'][3]
+        # print(f"Reporting {item_name} ({available_units}/{all_units}) with a type of {type}.")
 
 
 
@@ -779,6 +837,14 @@ def change_password(app, email, temp_password,new_password):
 
 
 def create_table(self, type):
+    # response = requests.get(url + 'getAllBorrows')
+    # if response.status_code == 200:
+    #     result = response.json()
+    #     if result['message'] == 'successful':
+    #         temp = result['borrows']
+    #         print(temp)
+
+
     # Create a simple table
     self.table = ttk.Treeview(self.right_dashboard)
     if type == 'supply':

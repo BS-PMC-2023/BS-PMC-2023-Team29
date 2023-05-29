@@ -255,6 +255,11 @@ class Db:
         return True
 
 
+    def get_all_borrows(self):
+        query = "SELECT id_supply, id_user, num_of_items FROM borrow"
+        self.cursor.execute(query)
+        return self.cursor.fetchall()
+
     def send_mail(self,new_password,user_mail):
         load_dotenv()
         smtp_server, smtp_port, smtp_username, smtp_password = os.getenv('smtp_server'), os.getenv('smtp_port'),\
@@ -277,6 +282,10 @@ class Db:
             server.login(smtp_username, smtp_password)
             server.sendmail(smtp_username, msg['To'], msg.as_string())
 
+    # def get_items_dosent_return_by_item(self, item_id,user_id):
+    #     query = "SELECT num_of_items FROM borrow WHERE id_user = %s AND id_supply = %s "
+    #     self.cursor.execute(query, (user_id,item_id))
+    #     return self.cursor.fetchall()
 
     def plot_borrow(self):
         query = 'SELECT borrow_date, num_of_items From borrow'
@@ -306,6 +315,3 @@ class Db:
         plt.xlim(7.5,23.5)
         plt.grid(True)
         return plt
-
-db = Db()
-db.test().show()
