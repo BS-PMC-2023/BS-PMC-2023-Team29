@@ -249,6 +249,11 @@ class Db:
         return True
 
 
+    def get_all_borrows(self):
+        query = "SELECT id_supply, id_user, num_of_items FROM borrow"
+        self.cursor.execute(query)
+        return self.cursor.fetchall()
+
     def send_mail(self,new_password,user_mail):
         load_dotenv()
         smtp_server, smtp_port, smtp_username, smtp_password = os.getenv('smtp_server'), os.getenv('smtp_port'),\
@@ -326,3 +331,4 @@ class Db:
 # now = datetime.now()
 # formatted_date_time = now.strftime("%Y-%m-%d %H:%M:%S")
 # print(formatted_date_time)
+

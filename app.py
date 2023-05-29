@@ -87,6 +87,11 @@ def get_all_supply():
     supply = db.get_all_supply()
     return jsonify({'message': 'successful', 'supply': supply})
 
+@app.route('/getAllBorrows',methods = ['GET'])
+def get_all_borrows():
+    borrows = db.get_all_borrows()
+    return jsonify({'message': 'successful', 'borrows': borrows})
+
 @app.route('/borrowItem',methods = ['POST'])
 def borrow_item():
     if db.borrow_item(request.form['user_id'], request.form['item_id'],
@@ -116,5 +121,8 @@ def generate_temp_password():
 def get_my_borrowd_items():
     items = db.get_items_dosent_return(request.form['user_id'])
     return jsonify({'message': 'successful', 'items': items})
+
+
+
 if __name__ == '__main__':
     app.run(debug=True)

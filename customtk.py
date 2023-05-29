@@ -773,6 +773,14 @@ def change_password(app, email, temp_password,new_password):
 
 
 def create_table(self, type):
+    response = requests.get(url + 'getAllBorrows')
+    if response.status_code == 200:
+        result = response.json()
+        if result['message'] == 'successful':
+            temp = result['borrows']
+            print(temp)
+
+
     # Create a simple table
     self.table = ttk.Treeview(self.right_dashboard)
     if type == 'supply':
