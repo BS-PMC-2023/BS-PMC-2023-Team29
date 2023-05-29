@@ -335,7 +335,7 @@ class App(customtkinter.CTk):
             # Create a button to confirm the acquisition
             button_confirm = customtkinter.CTkButton(window, text="Confirm",
                                                      command=lambda: confirm_order_stuff(window) if now.hour < 22 and now.hour > 6 else CTkMessagebox(icon='warning', title="Warning", option_1="Ok", message="You can only order items before 5pm").get())
-            button_confirm.pack()
+            button_confirm.pack(pady=10)
 
 
 
