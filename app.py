@@ -122,7 +122,10 @@ def get_my_borrowd_items():
     items = db.get_items_dosent_return(request.form['user_id'])
     return jsonify({'message': 'successful', 'items': items})
 
-
+# @app.route('/getBorrowedItem',methods = ['GET'])
+# def get_borrowed_item():
+#     units = db.get_items_dosent_return_by_item(request.form['user_id'],request.form['item_id'])
+#     return jsonify({'message': 'successful', 'units': units})
 
 if __name__ == '__main__':
     app.run(debug=True)
