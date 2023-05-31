@@ -21,31 +21,25 @@ pipeline {
                 sh 'python -m unittest discover -s tests'
             }
         }
-        stage('Metrics 1 - Coverage') {
+        stage('Metrics - Coverage') {
             steps {
-                sh 'docker run --rm creativestorage coverage run manage.py test'
-                //sh 'docker run --rm creativestorage coverage report'
-
-
+                sh 'coverage run -m unittest discover -s tests'
+                sh 'coverage report'
             }
         }
-
-
-        stage('Metrics 2 - Radon') {
+        stage('Metrics - Radon') {
             steps {
-                sh 'docker run --rm creativestorage radon cc --show-complexity --total-average main/tests.py'
+                sh 'radon cc --show-complexity --total-average tests'
             }
         }
-
-        stage('Metrics 3 - Bandit') {
+        stage('Metrics - Bandit') {
             steps {
-                sh 'docker run --rm creativestorage bandit -r manage.py test'
+                sh 'bandit -r tests'
             }
         }
-
-        stage('Metrics 4 - Pylint') {
+        stage('Metrics - Pylint') {
             steps {
-                sh 'docker run --rm creativestorage pylint main/tests.py'
+                sh 'pylint tests'
             }
         }
         stage('Post Actions') {
@@ -64,4 +58,3 @@ pipeline {
         }
     }
 }
-
