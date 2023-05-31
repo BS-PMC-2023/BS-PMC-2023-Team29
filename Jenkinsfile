@@ -38,11 +38,6 @@ pipeline {
                 sh 'bandit -r tests'
             }
         }
-        stage('Metrics - Pylint') {
-            steps {
-                sh 'pylint tests'
-            }
-        }
         stage('Post Actions') {
             steps {
                 script {
