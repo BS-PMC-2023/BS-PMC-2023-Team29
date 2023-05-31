@@ -169,13 +169,13 @@ class App(customtkinter.CTk):
                                                 command=save_changes_func,
                                                 corner_radius=6)
 
-        self.name.place(relx=0.3, rely=0.4, anchor=tkinter.CENTER)
-        self.name_entry.place(relx=0.5, rely=0.4, anchor=tkinter.CENTER)
-        self.lastname.place(relx=0.3, rely=0.5, anchor=tkinter.CENTER)
-        self.lastname_entry.place(relx=0.5, rely=0.5, anchor=tkinter.CENTER)
-        self.email.place(relx=0.3, rely=0.6, anchor=tkinter.CENTER)
-        self.email_entry.place(relx=0.5, rely=0.6, anchor=tkinter.CENTER)
-        self.save_BTN.place(relx=0.75, rely=0.6, anchor=tkinter.CENTER)
+        self.name.place(relx=0.3, rely=0.6, anchor=tkinter.CENTER)
+        self.name_entry.place(relx=0.5, rely=0.6, anchor=tkinter.CENTER)
+        self.lastname.place(relx=0.3, rely=0.7, anchor=tkinter.CENTER)
+        self.lastname_entry.place(relx=0.5, rely=0.7, anchor=tkinter.CENTER)
+        self.email.place(relx=0.3, rely=0.8, anchor=tkinter.CENTER)
+        self.email_entry.place(relx=0.5, rely=0.8, anchor=tkinter.CENTER)
+        self.save_BTN.place(relx=0.75, rely=0.8, anchor=tkinter.CENTER)
 
 
     #  self.right_dashboard   ----> categories widget
@@ -438,37 +438,7 @@ class App(customtkinter.CTk):
 
     def notification(self, id):
         self.clear_frame()
-        # response = requests.get(url + 'plot_borrow')
-        # result = response.json()
-        # borrow_data = result['borrow_data']
-        # num_of_items = result['num_of_items']
-        # borrow_data = [datetime.strptime(date_str, '%a, %d %b %Y %H:%M:%S %Z') for date_str in borrow_data]
-        # # Extract the hour from borrow_data
-        # hours = [date.hour for date in borrow_data]
-        # # Calculate the sum of num_of_items in each hour
-        # hourly_counts = {}
-        # for hour, count in zip(hours, num_of_items):
-        #     hourly_counts[hour] = hourly_counts.get(hour, 0) + count
-        # # Sort the hourly counts by hour
-        # sorted_hourly_counts = sorted(hourly_counts.items())
-        # # Separate the hour and count values
-        # sorted_hours, sorted_counts = zip(*sorted_hourly_counts)
-        #
-        # # Create a figure and plot the graph
-        # fig = plt.figure(figsize=(8, 6))
-        # ax = fig.add_subplot(111)
-        # ax.bar(sorted_hours, sorted_counts)
-        # ax.set_xlabel('Hour of the Day')
-        # ax.set_ylabel('Number of Borrowed Items')
-        # ax.set_title('Borrowed Items by Hour')
-        # ax.set_xticks(range(8, 24))
-        # ax.set_xlim(7.5, 23.5)
-        # ax.grid(True)
-        #
-        # # Embed the figure in a tkinter canvas
-        # canvas = FigureCanvasTkAgg(fig, master=self.right_dashboard)
-        # canvas.draw()
-        # canvas.get_tk_widget().pack()
+        create_table(self, 'noti')
 
 
 
@@ -633,6 +603,9 @@ class App(customtkinter.CTk):
         type = selected_item['values'][3]
         print(f"Showing description for {item_name} ({available_units}/{all_units}) with a type of {type}.")
 
+    def fix_item(self):
+        pass
+
     def report_item(self):
         selected_item = self.table.item(self.table.selection())
         if selected_item['values'][0] == '':
@@ -694,19 +667,6 @@ class App(customtkinter.CTk):
                                                      icon='warning', title="Warning", option_1="Ok",
                                                      message="Please describe the problem").get())
         button_confirm.pack(pady=10)
-
-
-        # selected_item = self.table.item(self.table.selection())
-        # item_name = selected_item['values'][0]
-        # all_units = selected_item['values'][1]
-        # available_units = selected_item['values'][2]
-        # ctypes.windll.user32.MessageBoxW(0,
-        #                                  f"Reporting: {item_name}\n A report for the item has been sent to the admins.",
-        #                                  "Help", 0)
-        # type = selected_item['values'][3]
-        # print(f"Reporting {item_name} ({available_units}/{all_units}) with a type of {type}.")
-
-
 
 
 def register_in_db(w, entry1, entry2, entry3, entry4):
@@ -1018,6 +978,32 @@ def create_table(self, type):
         self.button_item_desc = customtkinter.CTkButton(self.right_dashboard, text="Report Item",
                                                         command=self.report_item)
         self.button_item_desc.pack(side=tkinter.LEFT, padx=10, pady=10)
+
+    elif type == 'noti':
+        self.table.pack(side=tkinter.TOP, fill=tkinter.BOTH, expand=True)
+        # Define the columns of the table
+        self.table["columns"] = ("Report number", "Item name", "Issue", "Description")
+
+        # Set the headings of the columns
+        self.table.column("Report number", width=100, anchor="center", stretch=True)
+        self.table.heading("Report number", text="Report number")
+
+        self.table.column("Item name", width=100, anchor="center", stretch=True)
+        self.table.heading("Item name", text="Item name")
+
+        self.table.column("Issue", width=100, anchor="center", stretch=True)
+        self.table.heading("Issue", text="Issue")
+
+        self.table.column("Description", width=100, anchor="center", stretch=True)
+        self.table.heading("Description", text="Description")
+        # Add some data to the table
+        for x in supply_lst.list:
+            self.table.insert("", "end", values=(x.name, x.all_units, x.available_units, x.type))
+
+        # Buttons to interact with the selected line of the table
+        self.button_fix = customtkinter.CTkButton(self.right_dashboard, text="Take care of report",
+                                                      command=self.fix_item)
+        self.button_fix.pack(side=tkinter.LEFT, padx=10, pady=10)
 
     self.button_item_desc = customtkinter.CTkButton(self.right_dashboard, text="Item Description",
                                                 command=self.item_description)
