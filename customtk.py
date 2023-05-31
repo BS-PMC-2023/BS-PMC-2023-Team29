@@ -169,13 +169,13 @@ class App(customtkinter.CTk):
                                                 command=save_changes_func,
                                                 corner_radius=6)
 
-        self.name.place(relx=0.3, rely=0.4, anchor=tkinter.CENTER)
-        self.name_entry.place(relx=0.5, rely=0.4, anchor=tkinter.CENTER)
-        self.lastname.place(relx=0.3, rely=0.5, anchor=tkinter.CENTER)
-        self.lastname_entry.place(relx=0.5, rely=0.5, anchor=tkinter.CENTER)
-        self.email.place(relx=0.3, rely=0.6, anchor=tkinter.CENTER)
-        self.email_entry.place(relx=0.5, rely=0.6, anchor=tkinter.CENTER)
-        self.save_BTN.place(relx=0.75, rely=0.6, anchor=tkinter.CENTER)
+        self.name.place(relx=0.3, rely=0.6, anchor=tkinter.CENTER)
+        self.name_entry.place(relx=0.5, rely=0.6, anchor=tkinter.CENTER)
+        self.lastname.place(relx=0.3, rely=0.7, anchor=tkinter.CENTER)
+        self.lastname_entry.place(relx=0.5, rely=0.7, anchor=tkinter.CENTER)
+        self.email.place(relx=0.3, rely=0.8, anchor=tkinter.CENTER)
+        self.email_entry.place(relx=0.5, rely=0.8, anchor=tkinter.CENTER)
+        self.save_BTN.place(relx=0.75, rely=0.8, anchor=tkinter.CENTER)
 
 
     #  self.right_dashboard   ----> categories widget
@@ -239,6 +239,62 @@ class App(customtkinter.CTk):
             value = add_definition(email_type.get(key))
             if email_type.get(key) is not None:
                 combobox2.set(str(value))
+
+        def item_stat(self):
+            # Check if there's already an active window
+            if hasattr(self, "stat_window") and self.stat_window.winfo_exists():
+                return
+
+            # Create a new window for acquiring items
+            window = customtkinter.CTkToplevel(self)
+            window.title("Item Statistics")
+
+            # Set the window size and disable resizing
+            window.geometry("600x400")
+            window.resizable(False, False)
+
+            # Make the new window appear on top of the parent window
+            window.transient(self)
+
+            # Set focus to the new window
+            window.grab_set()
+
+            # Save a reference to the window so we can check if it's already open
+            self.stat_window = window
+
+            response = requests.get(url + 'plot_borrow')
+            result = response.json()
+            borrow_data = result['borrow_data']
+            num_of_items = result['num_of_items']
+            borrow_data = [datetime.strptime(date_str, '%a, %d %b %Y %H:%M:%S %Z') for date_str in borrow_data]
+            # Extract the hour from borrow_data
+            hours = [date.hour for date in borrow_data]
+            # Calculate the sum of num_of_items in each hour
+            hourly_counts = {}
+            for hour, count in zip(hours, num_of_items):
+                hourly_counts[hour] = hourly_counts.get(hour, 0) + count
+            # Sort the hourly counts by hour
+            sorted_hourly_counts = sorted(hourly_counts.items())
+            # Separate the hour and count values
+            sorted_hours, sorted_counts = zip(*sorted_hourly_counts)
+
+            # Create a figure and plot the graph
+            fig = plt.figure(figsize=(8, 6))
+            ax = fig.add_subplot(111)
+            ax.bar(sorted_hours, sorted_counts)
+            ax.set_xlabel('Hour of the Day')
+            ax.set_ylabel('Number of Borrowed Items')
+            ax.set_title('Borrowed Items by Hour')
+            ax.set_xticks(range(8, 24))
+            ax.set_xlim(7.5, 23.5)
+            ax.grid(True)
+
+            # Embed the figure in a tkinter canvas
+            canvas = FigureCanvasTkAgg(fig, master=window)
+            canvas.draw()
+            canvas.get_tk_widget().pack()
+
+
 
         def order_stuff(self):
 
@@ -375,40 +431,14 @@ class App(customtkinter.CTk):
                                                 corner_radius=5,
                                                 hover=True, command=lambda: order_stuff(self))
         order_button.pack(pady=10)  #
+        order_button = customtkinter.CTkButton(master=self.right_dashboard, text="Item Statistics", font=('Arial', 14),
+                                                corner_radius=5,
+                                                hover=True, command=lambda: item_stat(self))
+        order_button.pack(pady=10)  #
 
     def notification(self, id):
         self.clear_frame()
-        response = requests.get(url + 'plot_borrow')
-        result = response.json()
-        borrow_data = result['borrow_data']
-        num_of_items = result['num_of_items']
-        borrow_data = [datetime.strptime(date_str, '%a, %d %b %Y %H:%M:%S %Z') for date_str in borrow_data]
-        # Extract the hour from borrow_data
-        hours = [date.hour for date in borrow_data]
-        # Calculate the sum of num_of_items in each hour
-        hourly_counts = {}
-        for hour, count in zip(hours, num_of_items):
-            hourly_counts[hour] = hourly_counts.get(hour, 0) + count
-        # Sort the hourly counts by hour
-        sorted_hourly_counts = sorted(hourly_counts.items())
-        # Separate the hour and count values
-        sorted_hours, sorted_counts = zip(*sorted_hourly_counts)
-
-        # Create a figure and plot the graph
-        fig = plt.figure(figsize=(8, 6))
-        ax = fig.add_subplot(111)
-        ax.bar(sorted_hours, sorted_counts)
-        ax.set_xlabel('Hour of the Day')
-        ax.set_ylabel('Number of Borrowed Items')
-        ax.set_title('Borrowed Items by Hour')
-        ax.set_xticks(range(8, 24))
-        ax.set_xlim(7.5, 23.5)
-        ax.grid(True)
-
-        # Embed the figure in a tkinter canvas
-        canvas = FigureCanvasTkAgg(fig, master=self.right_dashboard)
-        canvas.draw()
-        canvas.get_tk_widget().pack()
+        create_table(self, 'noti')
 
 
 
@@ -573,6 +603,9 @@ class App(customtkinter.CTk):
         type = selected_item['values'][3]
         print(f"Showing description for {item_name} ({available_units}/{all_units}) with a type of {type}.")
 
+    def fix_item(self):
+        pass
+
     def report_item(self):
         selected_item = self.table.item(self.table.selection())
         if selected_item['values'][0] == '':
@@ -651,19 +684,6 @@ class App(customtkinter.CTk):
                                                      icon='warning', title="Warning", option_1="Ok",
                                                      message="Please describe the problem").get())
         button_confirm.pack(pady=10)
-
-
-        # selected_item = self.table.item(self.table.selection())
-        # item_name = selected_item['values'][0]
-        # all_units = selected_item['values'][1]
-        # available_units = selected_item['values'][2]
-        # ctypes.windll.user32.MessageBoxW(0,
-        #                                  f"Reporting: {item_name}\n A report for the item has been sent to the admins.",
-        #                                  "Help", 0)
-        # type = selected_item['values'][3]
-        # print(f"Reporting {item_name} ({available_units}/{all_units}) with a type of {type}.")
-
-
 
 
 def register_in_db(w, entry1, entry2, entry3, entry4):
@@ -951,21 +971,34 @@ def create_table(self, type):
         return_time = []
         take_time = []
         quantity = []
+        lst = []
         if response.status_code == 200:
             result = response.json()
             if result['message'] == 'successful':
                 temp = result['items']
+                t = 1
+                datez = datetime.now()
                 for i in temp:
                     items.append(supply_lst.get_name_by_id(i[1]))
                     return_time.append(i[5])
                     take_time.append(i[4])
                     quantity.append(i[3])
+                    given_date = datetime.strptime(i[5], '%a, %d %b %Y %H:%M:%S %Z')
+
+                    # if the user is late so the item will be marked in red
+                    if given_date < datez:
+                        lst.append(t)
+                    t += 1
                 print(temp)
 
         # Add some data to the table
         for i in range(0, len(items)):
-            self.table.insert("", "end", values=(items[i], quantity[i], take_time[i], return_time[i]))
+            row_values = (items[i], quantity[i], take_time[i], return_time[i])
+            tags = () if (i + 1) not in lst else ('red',)  # Add 'red' tag if the row is late
+            self.table.insert("", "end", values=row_values, tags=tags)
 
+        # Configure the 'red' tag to set the row background color to red
+        self.table.tag_configure('red', background='red')
 
         # Buttons to interact with the selected line of the table
         self.button_acquire = customtkinter.CTkButton(self.right_dashboard, text="Return Items",
@@ -975,6 +1008,33 @@ def create_table(self, type):
         self.button_item_desc = customtkinter.CTkButton(self.right_dashboard, text="Report Item",
                                                         command=self.report_item)
         self.button_item_desc.pack(side=tkinter.LEFT, padx=10, pady=10)
+
+
+    elif type == 'noti':
+        self.table.pack(side=tkinter.TOP, fill=tkinter.BOTH, expand=True)
+        # Define the columns of the table
+        self.table["columns"] = ("Report number", "Item name", "Issue", "Description")
+
+        # Set the headings of the columns
+        self.table.column("Report number", width=100, anchor="center", stretch=True)
+        self.table.heading("Report number", text="Report number")
+
+        self.table.column("Item name", width=100, anchor="center", stretch=True)
+        self.table.heading("Item name", text="Item name")
+
+        self.table.column("Issue", width=100, anchor="center", stretch=True)
+        self.table.heading("Issue", text="Issue")
+
+        self.table.column("Description", width=100, anchor="center", stretch=True)
+        self.table.heading("Description", text="Description")
+        # Add some data to the table
+        for x in supply_lst.list:
+            self.table.insert("", "end", values=(x.name, x.all_units, x.available_units, x.type))
+
+        # Buttons to interact with the selected line of the table
+        self.button_fix = customtkinter.CTkButton(self.right_dashboard, text="Take care of report",
+                                                      command=self.fix_item)
+        self.button_fix.pack(side=tkinter.LEFT, padx=10, pady=10)
 
     self.button_item_desc = customtkinter.CTkButton(self.right_dashboard, text="Item Description",
                                                 command=lambda:item_desc(self))
