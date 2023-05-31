@@ -254,7 +254,7 @@ class App(customtkinter.CTk):
                     result = response.json()
                     if result['message'] == 'change successful':
                         item_id = result['id']
-                        supply_lst.insert_item(item_id[0][0],type,name,int(units))
+                        supply_lst.insert_item(item_id[0][0],type,name,int(units),description,0)
                         print('add item')
                     else:
                         print('err')
@@ -343,7 +343,7 @@ class App(customtkinter.CTk):
 
             # Create a button to confirm the acquisition
             button_confirm = customtkinter.CTkButton(window, text="Confirm",
-                                                     command=lambda: confirm_order_stuff(window) if now.hour < 22 and now.hour > 6 else CTkMessagebox(icon='warning', title="Warning", option_1="Ok", message="You can only order items before 5pm").get())
+                                                     command=lambda: confirm_order_stuff(window, textbox.get(),slider.get(),textbox2.get(),textbox3.get()) if now.hour < 22 and now.hour > 6 else CTkMessagebox(icon='warning', title="Warning", option_1="Ok", message="You can only order items before 5pm").get())
             button_confirm.pack(pady=10)
 
 
@@ -578,14 +578,29 @@ class App(customtkinter.CTk):
         if selected_item['values'][0] == '':
             return
 
-        def confirm_order_stuff(window):
+        def report_stuff(self, window):
+            data = {
+                'user_id' : user.id,
+                'id' :supply_lst.get_id_by_name(self.namez),
+                'des' :self.textbox.get(),
+                'units' :int(self.slider.get())
+            }
+            response = requests.post(url + 'reportItem',data=data)
+            if response.status_code == 200 :
+                result = response.json()
+                if result['message'] == 'change successful':
+                    supply_lst.report_item(self.namez,data['units'])
+                else:
+                    print('not good')
+            else:
+                print(f'bad response {response.status_code}')
             window.destroy()
             ctypes.windll.user32.MessageBoxW(0,
-                                             "Reporting: {item_name}\n A report for the item has been sent to the admins.",
+                                             f"Reporting: {self.namez}\n A report for the item has been sent to the admins.",
                                              "Help", 0)
 
         def slider_event2(window):
-            label_item2.configure(text=slider.get())
+            label_item2.configure(text=self.slider.get())
 
         # Check if there's already an active window
         if hasattr(self, "report_item_window") and self.report_item_window.winfo_exists():
@@ -611,26 +626,28 @@ class App(customtkinter.CTk):
         item_name = selected_item['values'][0]
         all_units = selected_item['values'][1]
 
+        self.namez = item_name
+
         # Create a label for the item selection
         label_item = customtkinter.CTkLabel(master=window, text="How many items would you like to report?")
         label_item.pack(pady=10)
-        slider = customtkinter.CTkSlider(window, from_=1, to=all_units, number_of_steps=all_units-1,
+        self.slider = customtkinter.CTkSlider(window, from_=1, to=all_units, number_of_steps=all_units-1,
                                          command=slider_event2)
-        slider.set(1)
-        slider.pack(pady=10)
-        label_item2 = customtkinter.CTkLabel(master=window, text=slider.get())
+        self.slider.set(1)
+        self.slider.pack(pady=10)
+        label_item2 = customtkinter.CTkLabel(master=window, text=self.slider.get())
         label_item2.pack(pady=10)
 
         label_item3 = customtkinter.CTkLabel(master=window, text=f"What is the problem with the {item_name}?")
         label_item3.pack(pady=10)
-        textbox = customtkinter.CTkEntry(master=window, width=200, height=30, font=('Century Gothic', 12),
+        self.textbox = customtkinter.CTkEntry(master=window, width=200, height=30, font=('Century Gothic', 12),
                                          placeholder_text="Enter problem here")
-        textbox.pack(pady=10)
+        self.textbox.pack(pady=10)
 
         # Create a button to confirm the acquisition
         button_confirm = customtkinter.CTkButton(window, text="Confirm",
-                                                 command=lambda: confirm_order_stuff(
-                                                     window) if textbox.get()!= '' else CTkMessagebox(
+                                                 command=lambda: report_stuff(self,
+                                                     window) if self.textbox.get()!= '' else CTkMessagebox(
                                                      icon='warning', title="Warning", option_1="Ok",
                                                      message="Please describe the problem").get())
         button_confirm.pack(pady=10)
@@ -960,8 +977,16 @@ def create_table(self, type):
         self.button_item_desc.pack(side=tkinter.LEFT, padx=10, pady=10)
 
     self.button_item_desc = customtkinter.CTkButton(self.right_dashboard, text="Item Description",
-                                                command=self.item_description)
+                                                command=lambda:item_desc(self))
     self.button_item_desc.pack(side=tkinter.LEFT, padx=10, pady=10)
 
-
+    def item_desc(self):
+        selected_item = self.table.item(self.table.selection())
+        if selected_item is None:
+            # No item is currently selected
+            return
+        des = supply_lst.get_des_by_name(selected_item['values'][0])
+        ctypes.windll.user32.MessageBoxW(0,
+                                         f"description: {des}\n ",
+                                         "Description", 0)
 login_page(app)

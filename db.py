@@ -207,7 +207,7 @@ class Db:
         formatted_date_time = now.strftime("%Y-%m-%d %H:%M:%S")
         self.cursor.execute(query_find_items, (user_id, item_id))
         result = self.cursor.fetchall()
-        remain_to_return = result[0][1] - how_much_items
+        remain_to_return = int(result[0][1]) - int(how_much_items)
         # update supply table
         self.cursor.execute(query_update_supply, (how_much_items, item_id))
         if remain_to_return == 0:
@@ -291,6 +291,46 @@ class Db:
         num_of_items=[i[1] for i in data]
         return borrow_data,num_of_items
 
+    def report_problem_item(self,user_id,id_item,des,units):
+        self.return_item(user_id,id_item,units)
+        query_prob = 'INSERT INTO problems(item_id,description,units) VALUES (%s,%s,%s)'
+        query_supply = "UPDATE supply SET available_units=available_units - %s, broken_units = broken_units+ %s WHERE id = %s"
+        self.cursor.execute(query_prob,(id_item,des,units))
+        self.cursor.execute(query_supply, (units,units,id_item))
+        self.mydb.commit()
+        return True
 
+
+# db = Db()
+# db.add_item_to_supply("Sketchbooks", 50, "Stationery", "Blank paper for sketching and drawing.")
+# db.add_item_to_supply("Colored Pencils", 100, "Art Supplies", "Assorted colors for coloring and shading.")
+# db.add_item_to_supply("Watercolor Set", 20, "Art Supplies", "A set of watercolor paints for painting.")
+# db.add_item_to_supply("Acrylic Paint Set", 30, "Art Supplies", "A set of acrylic paints for painting.")
+# db.add_item_to_supply("Brush Set", 50, "Art Supplies", "A collection of different brushes for painting.")
+# db.add_item_to_supply("Graphite Pencils", 100, "Art Supplies", "Various grades for sketching and shading.")
+# db.add_item_to_supply("Charcoal Sticks", 50, "Art Supplies", "Used for creating rich and dark drawings.")
+# db.add_item_to_supply("Drawing Pens", 100, "Art Supplies", "Fine-tipped pens for detailed illustrations.")
+# db.add_item_to_supply("Canvas Rolls", 20, "Art Supplies", "Large rolls of canvas for painting.")
+# db.add_item_to_supply("Easels", 10, "Art Supplies", "Sturdy stands for holding canvases while painting.")
+# db.add_item_to_supply("Lightboxes", 5, "Design Tools", "Used for tracing and transferring drawings.")
+# db.add_item_to_supply("Pantone Color Guides", 10, "Design Tools", "Reference guides for color matching.")
+# db.add_item_to_supply("X-Acto Knives", 50, "Cutting Tools", "Precise cutting and trimming of materials.")
+# db.add_item_to_supply("Cutting Mats", 20, "Cutting Tools", "Self-healing mats for protecting work surfaces.")
+# db.add_item_to_supply("T-Squares", 30, "Measuring Tools", "Straightedges for precise measurements.")
+# db.add_item_to_supply("Rulers", 100, "Measuring Tools", "Measuring and drawing straight lines.")
+# db.add_item_to_supply("Protractors", 20, "Measuring Tools", "For measuring and drawing angles.")
+# db.add_item_to_supply("Scalpel Blades", 100, "Cutting Tools", "Sharp blades for precise cutting.")
+# db.add_item_to_supply("Glue Guns", 10, "Adhesives", "For quick and strong adhesion.")
+# db.add_item_to_supply("Spray Adhesive", 20, "Adhesives", "Even coating for mounting artwork.")
+# db.add_item_to_supply("Masking Tape", 50, "Adhesives", "Temporary fixing and masking.")
+# db.add_item_to_supply("Drafting Tables", 5, "Furniture", "Adjustable tables for drawing and designing.")
+# db.add_item_to_supply("Studio Chairs", 20, "Furniture", "Comfortable chairs for working long hours.")
+# db.add_item_to_supply("Storage Cabinets", 10, "Furniture", "Organizing and storing art supplies.")
+# db.add_item_to_supply("Projectors", 5, "Design Tools", "Enlarging and projecting images.")
+# db.add_item_to_supply("Markers", 100, "Art Supplies", "Assorted markers for illustration and design.")
+# db.add_item_to_supply("Foam Boards", 50, "Display Materials", "Lightweight boards for mounting artwork.")
+# db.add_item_to_supply("Stencils", 50, "Design Tools", "Pre-cut templates for repetitive designs.")
+# db.add_item_to_supply("Adhesive Vinyl", 20, "Design Materials", "Self-adhesive vinyl for signage and decals.")
+# db.add_item_to_supply("Glitter", 50, "Art Supplies", "Shimmery flakes for adding sparkle to artwork.")
 
 

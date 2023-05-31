@@ -135,6 +135,11 @@ def plot_borrow():
     print(num_of_items)
     return jsonify({'borrow_data':borrow_data,'num_of_items':num_of_items})
 
+@app.route('/reportItem',methods = ['POST'])
+def report_item():
+    if db.report_problem_item(request.form['user_id'],request.form['id'],request.form['des'],request.form['units']):
+        return jsonify({'message': 'change successful'})
+    return jsonify({'message': 'change not successful'})
 
 if __name__ == '__main__':
     app.run(debug=True)

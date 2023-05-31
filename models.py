@@ -142,11 +142,21 @@ class supllyList:
                 return i.name
         return False
     
-    def insert_item(self,id, type, name, all_units):
+    def insert_item(self,id, type, name, all_units,des,broken):
         temp = Supply()
-        temp.insert(id, type, name, all_units,all_units)
+        temp.insert(id, type, name, all_units,all_units,des,broken)
         self.list.append(temp)
 
+    def get_des_by_name(self,name):
+        for i in self.list:
+            if i.name == name:
+                return i.description
+        return False
+
+    def report_item(self,name,units):
+        for i in self.list:
+            if i.name ==name :
+                i.broken_units += units
     def __str__(self):
         string = ''.join([str(i) for i in self.list])
         return string
