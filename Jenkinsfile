@@ -1,35 +1,3 @@
-// pipeline {
-//
-//     agent {
-//             docker {
-//                 image 'python:3.8.7' // Specify the Python version or any other base image you need
-//                 args '-u root' // Run Docker container as root user
-//             }
-//         }
-//     stages {
-//         stage('Checkout') {
-//             steps {
-//                 checkout scm
-//             }
-//         }
-//         stage('Install dependencies') {
-//             steps {
-//                 // Install required dependencies
-//                 sh 'pip install -r requirements.txt'
-//             }
-//         }
-//
-//         stage('Run tests') {
-//             steps {
-//                 // Run your Python unit tests
-//                 sh 'python -m unittest discover -s tests'
-//             }
-//         }
-//
-//     }
-// }
-
-
 pipeline {
     agent {
         docker {
@@ -51,6 +19,33 @@ pipeline {
         stage('Run tests') {
             steps {
                 sh 'python -m unittest discover -s tests'
+            }
+        }
+        stage('Metrics 1 - Coverage') {
+            steps {
+                sh 'docker run --rm creativestorage coverage run manage.py test'
+                //sh 'docker run --rm creativestorage coverage report'
+
+
+            }
+        }
+
+
+        stage('Metrics 2 - Radon') {
+            steps {
+                sh 'docker run --rm creativestorage radon cc --show-complexity --total-average main/tests.py'
+            }
+        }
+
+        stage('Metrics 3 - Bandit') {
+            steps {
+                sh 'docker run --rm creativestorage bandit -r manage.py test'
+            }
+        }
+
+        stage('Metrics 4 - Pylint') {
+            steps {
+                sh 'docker run --rm creativestorage pylint main/tests.py'
             }
         }
         stage('Post Actions') {
