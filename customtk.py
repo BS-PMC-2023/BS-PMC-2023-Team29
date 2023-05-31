@@ -240,6 +240,62 @@ class App(customtkinter.CTk):
             if email_type.get(key) is not None:
                 combobox2.set(str(value))
 
+        def item_stat(self):
+            # Check if there's already an active window
+            if hasattr(self, "stat_window") and self.stat_window.winfo_exists():
+                return
+
+            # Create a new window for acquiring items
+            window = customtkinter.CTkToplevel(self)
+            window.title("Item Statistics")
+
+            # Set the window size and disable resizing
+            window.geometry("600x400")
+            window.resizable(False, False)
+
+            # Make the new window appear on top of the parent window
+            window.transient(self)
+
+            # Set focus to the new window
+            window.grab_set()
+
+            # Save a reference to the window so we can check if it's already open
+            self.stat_window = window
+
+            response = requests.get(url + 'plot_borrow')
+            result = response.json()
+            borrow_data = result['borrow_data']
+            num_of_items = result['num_of_items']
+            borrow_data = [datetime.strptime(date_str, '%a, %d %b %Y %H:%M:%S %Z') for date_str in borrow_data]
+            # Extract the hour from borrow_data
+            hours = [date.hour for date in borrow_data]
+            # Calculate the sum of num_of_items in each hour
+            hourly_counts = {}
+            for hour, count in zip(hours, num_of_items):
+                hourly_counts[hour] = hourly_counts.get(hour, 0) + count
+            # Sort the hourly counts by hour
+            sorted_hourly_counts = sorted(hourly_counts.items())
+            # Separate the hour and count values
+            sorted_hours, sorted_counts = zip(*sorted_hourly_counts)
+
+            # Create a figure and plot the graph
+            fig = plt.figure(figsize=(8, 6))
+            ax = fig.add_subplot(111)
+            ax.bar(sorted_hours, sorted_counts)
+            ax.set_xlabel('Hour of the Day')
+            ax.set_ylabel('Number of Borrowed Items')
+            ax.set_title('Borrowed Items by Hour')
+            ax.set_xticks(range(8, 24))
+            ax.set_xlim(7.5, 23.5)
+            ax.grid(True)
+
+            # Embed the figure in a tkinter canvas
+            canvas = FigureCanvasTkAgg(fig, master=window)
+            canvas.draw()
+            canvas.get_tk_widget().pack()
+
+
+
         def order_stuff(self):
 
             def confirm_order_stuff(window,name,units,type,description):
@@ -375,40 +431,44 @@ class App(customtkinter.CTk):
                                                 corner_radius=5,
                                                 hover=True, command=lambda: order_stuff(self))
         order_button.pack(pady=10)  #
+        order_button = customtkinter.CTkButton(master=self.right_dashboard, text="Item Statistics", font=('Arial', 14),
+                                                corner_radius=5,
+                                                hover=True, command=lambda: item_stat(self))
+        order_button.pack(pady=10)  #
 
     def notification(self, id):
         self.clear_frame()
-        response = requests.get(url + 'plot_borrow')
-        result = response.json()
-        borrow_data = result['borrow_data']
-        num_of_items = result['num_of_items']
-        borrow_data = [datetime.strptime(date_str, '%a, %d %b %Y %H:%M:%S %Z') for date_str in borrow_data]
-        # Extract the hour from borrow_data
-        hours = [date.hour for date in borrow_data]
-        # Calculate the sum of num_of_items in each hour
-        hourly_counts = {}
-        for hour, count in zip(hours, num_of_items):
-            hourly_counts[hour] = hourly_counts.get(hour, 0) + count
-        # Sort the hourly counts by hour
-        sorted_hourly_counts = sorted(hourly_counts.items())
-        # Separate the hour and count values
-        sorted_hours, sorted_counts = zip(*sorted_hourly_counts)
-
-        # Create a figure and plot the graph
-        fig = plt.figure(figsize=(8, 6))
-        ax = fig.add_subplot(111)
-        ax.bar(sorted_hours, sorted_counts)
-        ax.set_xlabel('Hour of the Day')
-        ax.set_ylabel('Number of Borrowed Items')
-        ax.set_title('Borrowed Items by Hour')
-        ax.set_xticks(range(8, 24))
-        ax.set_xlim(7.5, 23.5)
-        ax.grid(True)
-
-        # Embed the figure in a tkinter canvas
-        canvas = FigureCanvasTkAgg(fig, master=self.right_dashboard)
-        canvas.draw()
-        canvas.get_tk_widget().pack()
+        # response = requests.get(url + 'plot_borrow')
+        # result = response.json()
+        # borrow_data = result['borrow_data']
+        # num_of_items = result['num_of_items']
+        # borrow_data = [datetime.strptime(date_str, '%a, %d %b %Y %H:%M:%S %Z') for date_str in borrow_data]
+        # # Extract the hour from borrow_data
+        # hours = [date.hour for date in borrow_data]
+        # # Calculate the sum of num_of_items in each hour
+        # hourly_counts = {}
+        # for hour, count in zip(hours, num_of_items):
+        #     hourly_counts[hour] = hourly_counts.get(hour, 0) + count
+        # # Sort the hourly counts by hour
+        # sorted_hourly_counts = sorted(hourly_counts.items())
+        # # Separate the hour and count values
+        # sorted_hours, sorted_counts = zip(*sorted_hourly_counts)
+        #
+        # # Create a figure and plot the graph
+        # fig = plt.figure(figsize=(8, 6))
+        # ax = fig.add_subplot(111)
+        # ax.bar(sorted_hours, sorted_counts)
+        # ax.set_xlabel('Hour of the Day')
+        # ax.set_ylabel('Number of Borrowed Items')
+        # ax.set_title('Borrowed Items by Hour')
+        # ax.set_xticks(range(8, 24))
+        # ax.set_xlim(7.5, 23.5)
+        # ax.grid(True)
+        #
+        # # Embed the figure in a tkinter canvas
+        # canvas = FigureCanvasTkAgg(fig, master=self.right_dashboard)
+        # canvas.draw()
+        # canvas.get_tk_widget().pack()
 
 
 
