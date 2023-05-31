@@ -4,7 +4,7 @@ import tkinter.ttk as ttk
 import customtkinter
 from PIL import ImageTk, Image
 import requests
-from models import User, supllyList
+from models import User, SupplyList
 import ctypes
 from datetime import datetime, timedelta
 from CTkMessagebox import CTkMessagebox
@@ -14,7 +14,7 @@ from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg)
 # backend connection
 url = 'http://localhost:5000/'
 user = User()
-supply_lst = supllyList()
+supply_lst = SupplyList()
 customtkinter.set_appearance_mode("System")  # Modes: system (default), light, dark
 customtkinter.set_default_color_theme("green")  # Themes: blue (default), dark-blue, green
 
