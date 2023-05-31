@@ -40,13 +40,17 @@ class Supply:
         self.name = None
         self.all_units = None
         self.available_units = None
+        self.description = None
+        self.broken_units = None
 
-    def insert(self, id, type, name, all_units, available_units):
+    def insert(self, id, type, name, all_units, available_units,description,broken_units):
         self.id = id
         self.type = type
         self.name = name
         self.all_units = all_units
         self.available_units = available_units
+        self.description = description
+        self.broken_units = broken_units
 
     def tupple_insert(self, tupple_insert):
         self.id = tupple_insert[0]
@@ -54,6 +58,8 @@ class Supply:
         self.all_units = tupple_insert[2]
         self.available_units = tupple_insert[3]
         self.type = tupple_insert[4]
+        self.description = tupple_insert[5]
+        self.broken_units= tupple_insert[6]
 
     def borrow(self, how_much_items):
         if self.available_units - how_much_items >= 0:
@@ -61,12 +67,13 @@ class Supply:
             return self.available_units
         return False
 
+
     def return_item(self, how_much_items):
         self.available_units += how_much_items
         return self.available_units
 
     def totuple(self):
-        return (self.id, self.name, self.all_units, self.available_units, self.type)
+        return (self.id, self.name, self.all_units, self.available_units, self.type,self.description,self.broken_units)
 
     def __str__(self):
         return str(self.totuple())

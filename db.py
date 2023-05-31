@@ -282,10 +282,6 @@ class Db:
             server.login(smtp_username, smtp_password)
             server.sendmail(smtp_username, msg['To'], msg.as_string())
 
-    # def get_items_dosent_return_by_item(self, item_id,user_id):
-    #     query = "SELECT num_of_items FROM borrow WHERE id_user = %s AND id_supply = %s "
-    #     self.cursor.execute(query, (user_id,item_id))
-    #     return self.cursor.fetchall()
 
     def plot_borrow(self):
         query = 'SELECT borrow_date, num_of_items From borrow'
