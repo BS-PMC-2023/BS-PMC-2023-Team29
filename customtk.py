@@ -580,6 +580,9 @@ class App(customtkinter.CTk):
 
         def confirm_order_stuff(window):
             window.destroy()
+            ctypes.windll.user32.MessageBoxW(0,
+                                             "Reporting: {item_name}\n A report for the item has been sent to the admins.",
+                                             "Help", 0)
 
         def slider_event2(window):
             label_item2.configure(text=slider.get())
