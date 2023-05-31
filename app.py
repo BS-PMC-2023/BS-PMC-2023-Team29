@@ -128,6 +128,12 @@ def add_item_to_supply():
     if item_id:
         return jsonify({'message': 'change successful','id':item_id})
     return jsonify({'message': 'change not successful'})
+@app.route('/plot_borrow',methods = ['GET'])
+def plot_borrow():
+    borrow_data, num_of_items = db.plot_borrow()
+    print(borrow_data)
+    print(num_of_items)
+    return jsonify({'borrow_data':borrow_data,'num_of_items':num_of_items})
 
 
 if __name__ == '__main__':
