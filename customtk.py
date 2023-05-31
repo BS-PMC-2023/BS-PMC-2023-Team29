@@ -8,6 +8,9 @@ from models import User, supllyList
 import ctypes
 from datetime import datetime, timedelta
 from CTkMessagebox import CTkMessagebox
+import matplotlib.pyplot as plt
+from matplotlib.figure import Figure
+from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg, NavigationToolbar2Tk)
 
 # backend connection
 url = 'http://localhost:5000/'
@@ -375,6 +378,38 @@ class App(customtkinter.CTk):
 
     def notification(self, id):
         self.clear_frame()
+        response = requests.get(url + 'plot_borrow')
+        result = response.json()
+        borrow_data = result['borrow_data']
+        num_of_items = result['num_of_items']
+        borrow_data = [datetime.strptime(date_str, '%a, %d %b %Y %H:%M:%S %Z') for date_str in borrow_data]
+        # Extract the hour from borrow_data
+        hours = [date.hour for date in borrow_data]
+        # Calculate the sum of num_of_items in each hour
+        hourly_counts = {}
+        for hour, count in zip(hours, num_of_items):
+            hourly_counts[hour] = hourly_counts.get(hour, 0) + count
+        # Sort the hourly counts by hour
+        sorted_hourly_counts = sorted(hourly_counts.items())
+        # Separate the hour and count values
+        sorted_hours, sorted_counts = zip(*sorted_hourly_counts)
+
+        # Create a figure and plot the graph
+        fig = plt.figure(figsize=(8, 6))
+        ax = fig.add_subplot(111)
+        ax.bar(sorted_hours, sorted_counts)
+        ax.set_xlabel('Hour of the Day')
+        ax.set_ylabel('Number of Borrowed Items')
+        ax.set_title('Borrowed Items by Hour')
+        ax.set_xticks(range(8, 24))
+        ax.set_xlim(7.5, 23.5)
+        ax.grid(True)
+
+        # Embed the figure in a tkinter canvas
+        canvas = FigureCanvasTkAgg(fig, master=self.right_dashboard)
+        canvas.draw()
+        canvas.get_tk_widget().pack()
+
 
 
     # Change scaling of all widget 80% to 120%

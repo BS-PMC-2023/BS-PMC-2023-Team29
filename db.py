@@ -10,7 +10,7 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 import random
 import string
-import matplotlib.pyplot as plt
+
 
 class Db:
     def __init__(self):
@@ -293,25 +293,8 @@ class Db:
         data = self.cursor.fetchall()
         borrow_data= [i[0] for i in data]
         num_of_items=[i[1] for i in data]
+        return borrow_data,num_of_items
 
 
-        # extract the hour from borrow_data
-        hours = [date.hour for date in borrow_data]
 
-        # calculate the sum of num_of_items in each hour
-        hourly_counts = {}
-        for hour, count in zip(hours, num_of_items):
-            hourly_counts[hour] = hourly_counts.get(hour, 0) + count
-        # sort the hourly counts by hour
-        sorted_hourly_counts = sorted(hourly_counts.items())
-        # separate the hour and count values
-        sorted_hours, sorted_counts = zip(*sorted_hourly_counts)
-        # plotting the graph
-        plt.bar(sorted_hours, sorted_counts)
-        plt.xlabel('Hour of the Day')
-        plt.ylabel('Number of Borrowed Items')
-        plt.title('Borrowed Items by Hour')
-        plt.xticks(range(8,24))
-        plt.xlim(7.5,23.5)
-        plt.grid(True)
-        return plt
+
