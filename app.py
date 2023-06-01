@@ -1,9 +1,9 @@
-from db import UserDb
+from db import Db
 from flask import Flask, jsonify, request
 from models import User
 
 
-db = UserDb()
+db = Db()
 # Create a cursor object to execute SQL queries
 cursor = db.cursor
 
@@ -65,8 +65,8 @@ def change_type():
 
 @app.route('/changePassword',methods=['POST'])
 def change_Password():
-    email, new_password = request.form['email'], request.form['new_password']
-    flag = db.change_password(email,new_password)
+    email,temp_password, new_password = request.form['email'],request.form['temp_password'], request.form['new_password']
+    flag = db.change_password(email,temp_password,new_password)
     if flag:
         return jsonify({'message': 'change successful'})
     else:
@@ -89,11 +89,71 @@ def get_users_types():
     tupple_lst = db.get_users_types()
     return jsonify({'message': 'change successful', 'users': tupple_lst})
 
-@app.route('/removeUser',methods = ['Post'])
+@app.route('/removeUser',methods = ['POST'])
 def delete_user_email():
     if db.delete_user_by_email(request.form['email']):
         return jsonify({'message': 'change successful'})
     else:
         return jsonify({'message': 'change not successful'})
+
+@app.route('/getAllSupply',methods = ['GET'])
+def get_all_supply():
+    supply = db.get_all_supply()
+    return jsonify({'message': 'successful', 'supply': supply})
+
+@app.route('/getAllBorrows',methods = ['GET'])
+def get_all_borrows():
+    borrows = db.get_all_borrows()
+    return jsonify({'message': 'successful', 'borrows': borrows})
+
+@app.route('/borrowItem',methods = ['POST'])
+def borrow_item():
+    if db.borrow_item(request.form['user_id'], request.form['item_id'],
+                      request.form['return_time'], request.form['num_of_items'], request.form['num_of_items_remain']):
+        return jsonify({'message': 'change successful'})
+    return jsonify({'message': 'change not successful'})
+
+@app.route('/returnAllItems',methods = ['POST'])
+def return_all_items():
+    if db.return_all_items(request.form['user_id']):
+        return jsonify({'message': 'change successful'})
+    return jsonify({'message': 'change not successful'})
+
+@app.route('/returnSomeItem',methods = ['POST'])
+def return_some_items():
+    if db.return_item(request.form['user_id'],request.form['item_id'],int(request.form['num_of_items'])):
+        return jsonify({'message': 'change successful'})
+    return jsonify({'message': 'change not successful'})
+
+@app.route('/generateTempPassword',methods = ['POST'])
+def generate_temp_password():
+    if db.generate_temp_password(request.form['email']):
+        return jsonify({'message': 'change successful'})
+    return jsonify({'message': 'change not successful'})
+
+@app.route('/getBorrowedItems',methods = ['POST'])
+def get_my_borrowed_items():
+    items = db.get_items_dosent_return(request.form['user_id'])
+    return jsonify({'message': 'successful', 'items': items})
+
+@app.route('/addItemToSupply',methods = ['POST'])
+def add_item_to_supply():
+    item_id = db.add_item_to_supply(request.form['name'],request.form['units'],request.form['type'],request.form['description'])
+    if item_id:
+        return jsonify({'message': 'change successful','id':item_id})
+    return jsonify({'message': 'change not successful'})
+@app.route('/plot_borrow',methods = ['GET'])
+def plot_borrow():
+    borrow_data, num_of_items = db.plot_borrow()
+    print(borrow_data)
+    print(num_of_items)
+    return jsonify({'borrow_data':borrow_data,'num_of_items':num_of_items})
+
+@app.route('/reportItem',methods = ['POST'])
+def report_item():
+    if db.report_problem_item(request.form['user_id'],request.form['id'],request.form['des'],request.form['units']):
+        return jsonify({'message': 'change successful'})
+    return jsonify({'message': 'change not successful'})
+
 if __name__ == '__main__':
     app.run(debug=True)
