@@ -253,66 +253,29 @@ class Db:
         return True
 
     def insert_order(user_id, equipment_name, approved):
-        connection = create_connection()
-        cursor = connection.cursor()
-
-        try:
-            query = f"INSERT INTO orders (user_id, equipment_name, approved) VALUES ({user_id}, '{equipment_name}', {approved})"
-            cursor.execute(query)
-            connection.commit()
-            return cursor.lastrowid
-        except Error as e:
-            print(e)
-        finally:
-            cursor.close()
-            connection.close()
+        query = f"INSERT INTO orders (user_id, equipment_name, approved) VALUES ({user_id}, '{equipment_name}', {approved})"
+        cursor.execute(query)
+        connection.commit()
+        return cursor.lastrowid
 
     def approve_order(order_id):
-        connection = create_connection()
-        cursor = connection.cursor()
-
-        try:
-            query = f"UPDATE orders SET approved = 1 WHERE id = {order_id}"
-            cursor.execute(query)
-            connection.commit()
-            return True
-        except Error as e:
-            print(e)
-            return False
-        finally:
-            cursor.close()
-            connection.close()
+        query = f"UPDATE orders SET approved = 1 WHERE id = {order_id}"
+        cursor.execute(query)
+        connection.commit()
+        return True
 
     def disapprove_order(order_id):
-        connection = create_connection()
-        cursor = connection.cursor()
-
-        try:
-            query = f"UPDATE orders SET approved = 0 WHERE id = {order_id}"
-            cursor.execute(query)
-            connection.commit()
-            return True
-        except Error as e:
-            print(e)
-            return False
-        finally:
-            cursor.close()
-            connection.close()
+        query = f"UPDATE orders SET approved = 0 WHERE id = {order_id}"
+        cursor.execute(query)
+        connection.commit()
+        return True
 
     def is_admin(user_id):
-        connection = create_connection()
-        cursor = connection.cursor()
+        query = f"SELECT role FROM users WHERE id = {user_id}"
+        cursor.execute(query)
+        result = cursor.fetchone()
+        return result and result[0] == 'admin'
 
-        try:
-            query = f"SELECT role FROM users WHERE id = {user_id}"
-            cursor.execute(query)
-            result = cursor.fetchone()
-            return result and result[0] == 'admin'
-        except Error as e:
-            print(e)
-        finally:
-            cursor.close()
-            connection.close()
     def send_mail(self,new_password,user_mail):
         load_dotenv()
         smtp_server, smtp_port, smtp_username, smtp_password = os.getenv('smtp_server'), os.getenv('smtp_port'),\
