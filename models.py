@@ -6,7 +6,23 @@ class User:
         self.type = 1
         self.name = None
         self.lastname = None
+        self.notification = None
 
+    def set_notification(self, notification):
+        self.notification = notification
+
+    def clear_notification(self):
+        self.notification = None
+
+    def to_dict(self):
+        return {
+            'email': self.email,
+            'password': self.password,
+            'firstname': self.firstname,
+            'lastname': self.lastname,
+            'is_admin': self.is_admin,
+            'notification': self.notification
+        }
     def insert(self, email, password, name, lastname, type=1):
         self.id = None
         self.email = email
@@ -160,7 +176,7 @@ class SupplyList:
     def __str__(self):
         string = ''.join([str(i) for i in self.list])
         return string
-class RepairOrder:
+class Repair:
     def __init__(self, repair_id, item_id, manager_id, description, status):
         self.repair_id = repair_id
         self.item_id = item_id

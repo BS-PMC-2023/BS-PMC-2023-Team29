@@ -1,6 +1,7 @@
 from db import Db
 from flask import Flask, jsonify, request
 from models import User
+from models import User, Repair
 
 
 db = Db()
@@ -156,11 +157,6 @@ def report_item():
     return jsonify({'message': 'change not successful'})
 
 
-from models import User, Repair
-
-
-# ...
-
 @app.route('/orderRepair', methods=['POST'])
 def order_repair():
     repair = Repair()
@@ -203,5 +199,17 @@ def get_repairs_by_manager():
 
     # Retrieve repair orders for the specified manager from the database
     repair = Repair
+
+@app.route('/sendNotification', methods=['POST'])
+def send_notification():
+    recipient_email = request.form['recipient_email']
+    subject = request.form['subject']
+    message = request.form['message']
+
+    # Send the notification
+    if db.send_notification(recipient_email, subject, message):
+        return jsonify({'message': 'Notification sent successfully'})
+    else:
+        return jsonify({'message': 'Failed to send notification'})
 if __name__ == '__main__':
     app.run(debug=True)

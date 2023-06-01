@@ -300,6 +300,13 @@ class Db:
         self.mydb.commit()
         return True
 
+    def send_notification(self, recipient_email, subject, message):
+        sql = "INSERT INTO notifications (recipient_email, subject, message) VALUES (%s, %s, %s)"
+        values = (recipient_email, subject, message)
+        self.cursor.execute(sql, values)
+        self.connection.commit()
+        return True
+
 
 # db = Db()
 # db.add_item_to_supply("Sketchbooks", 50, "Stationery", "Blank paper for sketching and drawing.")
