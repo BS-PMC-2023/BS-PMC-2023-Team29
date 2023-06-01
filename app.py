@@ -1,7 +1,10 @@
 from db import Db
 from flask import Flask, jsonify, request
 from models import User
-from models import User, Repair
+from models import User, Repair, Interface
+from models import Interface
+
+
 
 
 db = Db()
@@ -10,6 +13,7 @@ cursor = db.cursor
 
 #init app
 app = Flask("app")
+submitted_interfaces = []
 
 # Define a route to get data from the database
 
@@ -211,5 +215,36 @@ def send_notification():
         return jsonify({'message': 'Notification sent successfully'})
     else:
         return jsonify({'message': 'Failed to send notification'})
+
+@app.route('/submitInterface', methods=['POST'])
+def submit_interface():
+    name = request.form['name']
+    description = request.form['description']
+
+    interface = Interface(name, description)
+    if interface.submit_interface():
+        submitted_interfaces.append(interface)
+        return jsonify({'message': 'Interface submitted successfully'})
+    else:
+        return jsonify({'message': 'Failed to submit interface'})
+
+@app.route('/getSubmittedInterfaces', methods=['GET'])
+def get_submitted_interfaces():
+    interfaces = [interface.to_dict() for interface in submitted_interfaces]
+    return jsonify({'interfaces': interfaces})
+
+@app.route('/approveInterface', methods=['POST'])
+def approve_interface():
+    interface_name = request.form['name']
+
+    for interface in submitted_interfaces:
+        if interface.name == interface_name:
+            if interface.approve_interface():
+                return jsonify({'message': 'Interface approved successfully'})
+            else:
+                return jsonify({'message': 'Failed to approve interface'})
+
+    return jsonify({'message': 'Interface not found'})
+
 if __name__ == '__main__':
     app.run(debug=True)

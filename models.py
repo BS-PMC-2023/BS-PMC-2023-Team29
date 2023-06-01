@@ -191,4 +191,29 @@ class Repair:
             'manager_id': self.manager_id,
             'description': self.description,
             'status': self.status
+
+        }
+
+class Interface:
+    def __init__(self, name, description):
+        self.name = name
+        self.description = description
+        self.approved = False
+
+    def submit_interface(self):
+        # Perform necessary actions to submit the interface
+        # ...
+        return True
+
+    def approve_interface(self):
+        # Perform necessary actions to approve the interface
+        # ...
+        self.approved = True
+        return True
+
+    def to_dict(self):
+        return {
+            'name': self.name,
+            'description': self.description,
+            'approved': self.approved
         }
