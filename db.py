@@ -298,4 +298,18 @@ class Db:
             server.login(smtp_username, smtp_password)
             server.sendmail(smtp_username, msg['To'], msg.as_string())
 
+    def check_delayed_return(order_id, label):
+        query = f"SELECT committed_time, returned_time FROM orders WHERE id = {order_id}"
+        cursor.execute(query)
+        result = cursor.fetchone()
+
+        if result:
+            committed_time, returned_time = result
+            if return_time > committ_time:
+                label.config(text='Equipment return delayed', fg='red')
+            else:
+                label.config(text='Equipment returned on time', fg='green')
+        else:
+            messagebox.showerror('Error', 'Order not found')
+
 
