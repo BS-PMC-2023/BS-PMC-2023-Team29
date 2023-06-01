@@ -161,6 +161,6 @@ def disapprove_order():
             return jsonify({'error': f'Failed to disapprove order (ID: {order_id})'})
     else:
         return jsonify({'error': 'You are not authorized to disapprove orders'})
-    
+
 if __name__ == '__main__':
     app.run(debug=True)
