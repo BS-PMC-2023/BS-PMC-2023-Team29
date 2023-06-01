@@ -116,5 +116,51 @@ def generate_temp_password():
 def get_my_borrowd_items():
     items = db.get_items_dosent_return(request.form['user_id'])
     return jsonify({'message': 'successful', 'items': items})
+
+@app.route('/order', methods=['POST'])
+def order_equipment():
+    user_id = request.form.get('user_id')
+    equipment_name = request.form.get('equipment_name')
+
+    if not user_id or not equipment_name:
+        return jsonify({'error': 'Please provide user ID and equipment name'})
+
+    if is_admin(user_id):
+        order_id = insert_order(user_id, equipment_name, 1)
+        return jsonify({'message': f'Equipment order (ID: {order_id}) placed and approved'})
+    else:
+        order_id = insert_order(user_id, equipment_name, 0)
+        return jsonify({'message': f'Equipment order (ID: {order_id}) placed and pending approval'})
+
+@app.route('/approve', methods=['POST'])
+def approve_order():
+    order_id = request.form.get('order_id')
+
+    if not order_id:
+        return jsonify({'error': 'Please provide order ID'})
+
+    if is_admin(current_user_id):
+        if approve_order(order_id):
+            return jsonify({'message': f'Order (ID: {order_id}) approved'})
+        else:
+            return jsonify({'error': f'Failed to approve order (ID: {order_id})'})
+    else:
+        return jsonify({'error': 'You are not authorized to approve orders'})
+
+@app.route('/disapprove', methods=['POST'])
+def disapprove_order():
+    order_id = request.form.get('order_id')
+
+    if not order_id:
+        return jsonify({'error': 'Please provide order ID'})
+
+    if is_admin(current_user_id):
+        if disapprove_order(order_id):
+            return jsonify({'message': f'Order (ID: {order_id}) disapproved'})
+        else:
+            return jsonify({'error': f'Failed to disapprove order (ID: {order_id})'})
+    else:
+        return jsonify({'error': 'You are not authorized to disapprove orders'})
+    
 if __name__ == '__main__':
     app.run(debug=True)
