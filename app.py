@@ -155,5 +155,53 @@ def report_item():
         return jsonify({'message': 'change successful'})
     return jsonify({'message': 'change not successful'})
 
+
+from models import User, Repair
+
+
+# ...
+
+@app.route('/orderRepair', methods=['POST'])
+def order_repair():
+    repair = Repair()
+    repair.item_id = request.form['item_id']
+    repair.manager_id = request.form['manager_id']
+    repair.description = request.form['description']
+
+    # Insert the repair order into the database
+    repair.insert(repair.item_id, repair.manager_id, repair.description)
+
+    return jsonify({'message': 'Repair order placed successfully'})
+
+
+@app.route('/updateRepairStatus', methods=['POST'])
+def update_repair_status():
+    repair_id = request.form['repair_id']
+    status = request.form['status']
+
+    # Update the status of the repair order in the database
+    repair = Repair()
+    repair.update_status(repair_id, status)
+
+    return jsonify({'message': 'Repair status updated successfully'})
+
+
+@app.route('/getRepairsByItem', methods=['POST'])
+def get_repairs_by_item():
+    item_id = request.form['item_id']
+
+    # Retrieve repair orders for the specified item from the database
+    repair = Repair()
+    repairs = repair.get_repairs_by_item(item_id)
+
+    return jsonify({'repairs': repairs})
+
+
+@app.route('/getRepairsByManager', methods=['POST'])
+def get_repairs_by_manager():
+    manager_id = request.form['manager_id']
+
+    # Retrieve repair orders for the specified manager from the database
+    repair = Repair
 if __name__ == '__main__':
     app.run(debug=True)

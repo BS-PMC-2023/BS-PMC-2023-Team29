@@ -160,3 +160,19 @@ class SupplyList:
     def __str__(self):
         string = ''.join([str(i) for i in self.list])
         return string
+class RepairOrder:
+    def __init__(self, repair_id, item_id, manager_id, description, status):
+        self.repair_id = repair_id
+        self.item_id = item_id
+        self.manager_id = manager_id
+        self.description = description
+        self.status = status
+
+    def to_dict(self):
+        return {
+            'repair_id': self.repair_id,
+            'item_id': self.item_id,
+            'manager_id': self.manager_id,
+            'description': self.description,
+            'status': self.status
+        }
