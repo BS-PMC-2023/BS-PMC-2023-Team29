@@ -1131,5 +1131,33 @@ class ManagerDashboard:
             button.pack()
 
         self.app.mainloop()
+
+class ManagerDashboard:
+    def __init__(self):
+        self.add_button_action("Approve Interface", self.approve_interface)
+
+    def approve_interface(self):
+        # Get the selected interface from the user interface
+        selected_interface = self.get_selected_interface()
+        if selected_interface:
+            # Call the API to approve the interface
+            response = requests.post('/approveInterface', data={'name': selected_interface['name']})
+            if response.status_code == 200:
+                messagebox.showinfo("Interface Approved", "Interface approved successfully.")
+            else:
+                messagebox.showerror("Error", "Failed to approve interface.")
+        else:
+            messagebox.showerror("Error", "No interface selected.")
+
+    def get_submitted_interfaces(self):
+        # Call the API to get the submitted interfaces
+        response = requests.get('/getSubmittedInterfaces')
+        if response.status_code == 200:
+            interfaces = response.json().get('interfaces', [])
+            self.interface_listbox.delete(0, tk.END)
+            for interface in interfaces:
+                self.interface_listbox.insert(tk.END, interface['name'])
+        else:
+            messagebox.showerror("Error", "Failed to fetch submitted interfaces.")
 if __name__ == '__main__':
     login_page(app)
