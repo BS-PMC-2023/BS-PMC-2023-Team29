@@ -1,5 +1,6 @@
 # importing required modules
 import tkinter
+import tkinter as tk
 import tkinter.ttk as ttk
 import customtkinter
 from PIL import ImageTk, Image
@@ -1041,5 +1042,74 @@ def create_table(self, type):
                                          "Description", 0)
 
 
+
+
+    def order_repair():
+        order_repair_window = tk.Toplevel(app)
+        order_repair_window.title("Order Repair")
+
+        item_label = tk.Label(order_repair_window, text="Item ID:")
+        item_label.pack()
+        item_entry = tk.Entry(order_repair_window)
+        item_entry.pack()
+
+        manager_label = tk.Label(order_repair_window, text="Manager ID:")
+        manager_label.pack()
+        manager_entry = tk.Entry(order_repair_window)
+        manager_entry.pack()
+
+        description_label = tk.Label(order_repair_window, text="Description:")
+        description_label.pack()
+        description_entry = tk.Entry(order_repair_window)
+        description_entry.pack()
+
+        def submit_order():
+            item_id = item_entry.get()
+            manager_id = manager_entry.get()
+            description = description_entry.get()
+
+            # Perform the necessary actions to submit the repair order
+            # You can call the relevant backend functions here
+
+            messagebox.showinfo("Order Submitted", "Repair order submitted successfully.")
+            order_repair_window.destroy()
+
+        submit_button = tk.Button(order_repair_window, text="Submit", command=submit_order)
+        submit_button.pack()
+
+    def view_repairs_by_item():
+        view_repairs_window = tk.Toplevel(app)
+        view_repairs_window.title("Repairs by Item")
+
+        item_label = tk.Label(view_repairs_window, text="Item ID:")
+        item_label.pack()
+        item_entry = tk.Entry(view_repairs_window)
+        item_entry.pack()
+
+        def fetch_repairs():
+            item_id = item_entry.get()
+
+            # Perform the necessary actions to fetch repairs for the specified item
+            # You can call the relevant backend functions here
+
+            # Display the repairs in a listbox or any other suitable widget
+            repairs_listbox = tk.Listbox(view_repairs_window)
+            repairs_listbox.pack()
+
+            # Add the fetched repairs to the listbox
+            repairs = []  # Replace with the actual fetched repairs
+            for repair in repairs:
+                repairs_listbox.insert(tk.END, repair)
+
+        fetch_button = tk.Button(view_repairs_window, text="Fetch Repairs", command=fetch_repairs)
+        fetch_button.pack()
+
+    # Create buttons for the manager functionality
+
+    order_repair_button = tk.Button(app, text="Order Repair", command=order_repair)
+    order_repair_button.pack()
+
+    view_repairs_button = tk.Button(app, text="View Repairs by Item", command=view_repairs_by_item)
+    view_repairs_button.pack()
 if __name__ == '__main__':
     login_page(app)
