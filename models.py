@@ -1,3 +1,6 @@
+import db
+
+
 class User:
     def __init__(self):
         self.id = None
@@ -201,15 +204,17 @@ class Interface:
         self.approved = False
 
     def submit_interface(self):
-        # Perform necessary actions to submit the interface
-        # ...
-        return True
+        if db.submit_interface(self):
+            return True
+        else:
+            return False
 
     def approve_interface(self):
-        # Perform necessary actions to approve the interface
-        # ...
-        self.approved = True
-        return True
+        if db.approve_interface(self.name):
+            self.approved = True
+            return True
+        else:
+            return False
 
     def to_dict(self):
         return {

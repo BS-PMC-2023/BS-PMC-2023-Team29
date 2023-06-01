@@ -1,6 +1,6 @@
 import mysql.connector
 import re
-from models import User
+from models import User, Interface
 from dotenv import load_dotenv
 import os
 import logging as lg
@@ -306,6 +306,36 @@ class Db:
         self.cursor.execute(sql, values)
         self.connection.commit()
         return True
+
+    def submit_interface(self, interface):
+            # Prepare the SQL statement
+            sql = "INSERT INTO interfaces (name, description, approved) VALUES (?, ?, ?)"
+            values = (interface.name, interface.description, 0)
+            self.cursor.execute(sql, values)
+            self.connection.commit()
+            return True
+
+
+    def approve_interface(self, interface_name):
+            # Prepare the SQL statement
+            sql = "UPDATE interfaces SET approved = 1 WHERE name = ?"
+            values = (interface_name,)
+            self.cursor.execute(sql, values)
+            self.connection.commit()
+            return True
+
+
+    def get_submitted_interfaces(self):
+            sql = "SELECT name, description, approved FROM interfaces WHERE approved = 0"
+
+            self.cursor.execute(sql)
+            rows = self.cursor.fetchall()
+
+            interfaces = []
+            for row in rows:
+                interface = Interface(row[0], row[1])
+                interfaces.append(interface)
+            return interfaces
 
 
 # db = Db()
