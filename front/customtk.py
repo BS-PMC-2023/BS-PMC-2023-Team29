@@ -1,6 +1,7 @@
 # importing required modules
 import tkinter
 import tkinter.ttk as ttk
+import tkinter as tk
 import customtkinter
 from PIL import ImageTk, Image
 import requests
@@ -97,6 +98,9 @@ class App(customtkinter.CTk):
                                                      command=lambda : self.notification(user.id))
         self.bt_noti.grid(row=3, column=0, padx=20, pady=10)
 
+        self.bt_categories = customtkinter.CTkButton(self.left_side_panel, text="Report",command=self.report)
+        self.bt_categories.grid(row=4, column=0, padx=20, pady=10)
+
         # right side panel -> have self.right_dashboard inside it
         self.right_side_panel = customtkinter.CTkFrame(self.main_container, corner_radius=10, fg_color="#000811")
         self.right_side_panel.pack(side=tkinter.LEFT, fill=tkinter.BOTH, expand=True, padx=5, pady=5)
@@ -168,7 +172,6 @@ class App(customtkinter.CTk):
         self.email.place(relx=0.3, rely=0.8, anchor=tkinter.CENTER)
         self.email_entry.place(relx=0.5, rely=0.8, anchor=tkinter.CENTER)
         self.save_BTN.place(relx=0.75, rely=0.8, anchor=tkinter.CENTER)
-
 
     #  self.right_dashboard   ----> categories widget
     def manager(self):
@@ -433,6 +436,28 @@ class App(customtkinter.CTk):
         create_table(self, 'noti')
 
 
+    def report(self):
+        self.clear_frame()
+        self.name = customtkinter.CTkLabel(master=self.right_dashboard, text="The report: ",font=('Century Gothic', 18))
+        self.name_entry = customtkinter.CTkEntry(master=self.right_dashboard, width=220)
+        self.name.place(relx=0.3, rely=0.1, anchor=tkinter.CENTER)
+        self.name_entry.place(relx=0.5, rely=0.1, anchor=tkinter.CENTER)
+        self.save_BTN = customtkinter.CTkButton(master=self.right_dashboard, width=60, height=20, text="Sent")
+        self.save_BTN.place(relx=0.75, rely=0.3, anchor=tkinter.CENTER)
+
+    def submit_form(self):
+        order_id = entry.get()
+        check_delayed_return(order_id, label)
+    root = tk.Tk()
+    root.title('Equipment Delay Management')
+    label = tk.Label(root, text='Enter Order ID:')
+    label.pack()
+    entry = tk.Entry(root)
+    entry.pack()
+    button = tk.Button(root, text='Check Delay', command=submit_form)
+    button.pack()
+    result_label = tk.Label(root, text='')
+    result_label.pack()
 
     # Change scaling of all widget 80% to 120%
     def change_scaling_event(self, new_scaling: str):
@@ -676,6 +701,8 @@ class App(customtkinter.CTk):
                                                      icon='warning', title="Warning", option_1="Ok",
                                                      message="Please describe the problem").get())
         button_confirm.pack(pady=10)
+
+
 
 
 def register_in_db(w, entry1, entry2, entry3, entry4):
