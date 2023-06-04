@@ -831,7 +831,7 @@ def forget_password(app):
         app.destroy()
 
     app = customtkinter.CTk()  # creating custom tkinter window
-    app.geometry("600x440")
+    app.geometry("600x540")
     app.title('Login')
 
     img1 = ImageTk.PhotoImage(Image.open("pattern.png"))
@@ -844,28 +844,38 @@ def forget_password(app):
 
     l2 = customtkinter.CTkLabel(master=frame, text="Forget password", font=('Century Gothic', 20))
     l2.place(x=50, y=45)
+    l2.pack(pady=10)
 
     entry1 = customtkinter.CTkEntry(master=frame, width=220, placeholder_text='Username')
     entry1.place(x=50, y=100)
+    entry1.pack(pady=10)
+
     b1 = customtkinter.CTkButton(master=frame, text="send new password to this mail", font=('Century Gothic', 12),
                                  command=lambda: generate_new_password(entry1.get().lower()))
     b1.place(x=50, y =135)
+    b1.pack(pady=10)
+
 
     entry2 = customtkinter.CTkEntry(master=frame, width=220, placeholder_text='password we send to your mail', show="*")
     entry2.place(x=50, y=165)
+    entry2.pack(pady=10)
+
     entry3 = customtkinter.CTkEntry(master=frame, width=220, placeholder_text='New password', show="*")
     entry3.place(x=50, y=195)
+    entry3.pack(pady=10)
+
 
     # Create custom button
-    login_button = customtkinter.CTkButton(master=frame, width=120, height=40, text="generate new password",
+    login_button = customtkinter.CTkButton(master=frame, width=120, height=40, text="Generate new password",
                                            command=lambda: change_password(app, entry1.get().lower(),
                                                                            entry2.get().lower(),entry3.get().lower()
                                                                            ), corner_radius=6)
     login_button.place(x=30, y=235)
+    login_button.pack(pady=10)
 
     return_button = customtkinter.CTkButton(master=frame, width=50, height=25, text="Back",
                                            command=lambda: back_to_login_page(app), corner_radius=6)
-    return_button.place(x=2, y=2)
+    return_button.pack(pady=10)
 
 
     img3 = customtkinter.CTkImage(Image.open("samilogo.png").resize((40, 40), Image.LANCZOS))
@@ -874,6 +884,7 @@ def forget_password(app):
                                    height=40, compound="left", fg_color='white', text_color='black',
                                    hover_color='#AFAFAF')
     img3.place(x=160, y=320, anchor=tkinter.CENTER)
+    img3.pack(pady=10, padx=10)
 
     # You can easily integrate authentication system
     app.mainloop()
