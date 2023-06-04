@@ -254,6 +254,29 @@ class Db:
         self.mydb.commit()
         return True
 
+    def insert_order(user_id, equipment_name, approved):
+        query = f"INSERT INTO orders (user_id, equipment_name, approved) VALUES ({user_id}, '{equipment_name}', {approved})"
+        cursor.execute(query)
+        connection.commit()
+        return cursor.lastrowid
+
+    def approve_order(order_id):
+        query = f"UPDATE orders SET approved = 1 WHERE id = {order_id}"
+        cursor.execute(query)
+        connection.commit()
+        return True
+
+    def disapprove_order(order_id):
+        query = f"UPDATE orders SET approved = 0 WHERE id = {order_id}"
+        cursor.execute(query)
+        connection.commit()
+        return True
+
+    def is_admin(user_id):
+        query = f"SELECT role FROM users WHERE id = {user_id}"
+        cursor.execute(query)
+        result = cursor.fetchone()
+        return result and result[0] == 'admin'
 
     def get_all_borrows(self):
         query = "SELECT id_supply, id_user, num_of_items FROM borrow"
@@ -281,6 +304,20 @@ class Db:
             server.starttls()
             server.login(smtp_username, smtp_password)
             server.sendmail(smtp_username, msg['To'], msg.as_string())
+
+    def check_delayed_return(order_id, label):
+        query = f"SELECT committed_time, returned_time FROM orders WHERE id = {order_id}"
+        cursor.execute(query)
+        result = cursor.fetchone()
+
+        if result:
+            committed_time, returned_time = result
+            if return_time > committ_time:
+                label.config(text='Equipment return delayed', fg='red')
+            else:
+                label.config(text='Equipment returned on time', fg='green')
+        else:
+            messagebox.showerror('Error', 'Order not found')
 
 
     def plot_borrow(self):

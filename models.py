@@ -79,7 +79,7 @@ class Supply:
         return str(self.totuple())
 
 
-class supllyList:
+class SupplyList:
     def __init__(self):
         self.list = []
 

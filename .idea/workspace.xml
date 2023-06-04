@@ -88,9 +88,9 @@
       <envs>
         <env name="PYTHONUNBUFFERED" value="1" />
       </envs>
-      <option name="SDK_HOME" value="" />
+      <option name="SDK_HOME" value="C:\Users\bimbe\OneDrive\מסמכים\GitHub\BS-PMC-2023-Team29\venv\Scripts\python.exe" />
       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
-      <option name="IS_MODULE_SDK" value="true" />
+      <option name="IS_MODULE_SDK" value="false" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
@@ -155,11 +155,20 @@
       <option name="_new_targetType" value="&quot;PATH&quot;" />
       <method v="2" />
     </configuration>
+    <list>
+      <item itemvalue="Python.Unnamed (1)" />
+      <item itemvalue="Python.Unnamed" />
+      <item itemvalue="Python.app" />
+      <item itemvalue="Python.customtk" />
+      <item itemvalue="Python.db" />
+      <item itemvalue="Python tests.Python tests for test_models.TestSupplyList.test_get_name_by_id" />
+      <item itemvalue="Python tests.Python tests in test_models.py" />
+    </list>
     <recent_temporary>
       <list>
         <item itemvalue="Python.customtk" />
-        <item itemvalue="Python.db" />
         <item itemvalue="Python.app" />
+        <item itemvalue="Python.db" />
         <item itemvalue="Python tests.Python tests in test_models.py" />
         <item itemvalue="Python tests.Python tests for test_models.TestSupplyList.test_get_name_by_id" />
       </list>
