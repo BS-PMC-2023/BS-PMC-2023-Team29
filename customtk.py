@@ -929,34 +929,42 @@ def create_table(self, type):
     #         temp = result['borrows']
     #         print(temp)
 
-
     # Create a simple table
-    self.table = ttk.Treeview(self.right_dashboard)
+    style = ttk.Style()
+    style.configure("Treeview", font=("TkDefaultFont", 18))  # Adjust the size as per your requirement
+    style.configure("Treeview.Heading",
+                    font=("TkDefaultFont", 18, "bold"))  # Adjust the size as per your requirement for column headings
+    style.configure("Custom.Treeview", rowheight=40)  # Adjust the row height as per your requirement
+
+    self.table = ttk.Treeview(self.right_dashboard, style="Custom.Treeview")
     if type == 'supply':
         self.table.pack(side=tkinter.TOP, fill=tkinter.BOTH, expand=True)
         # Define the columns of the table
-        self.table["columns"] = ("Item name", "Quantity", "Avilable", "Type")
+        self.table["columns"] = ("Item name", "Quantity", "Available", "Type")
 
         # Set the headings of the columns
-        self.table.column("Item name", width=100, anchor="center", stretch=True)
+        self.table.column("Item name", width=150, anchor="center", stretch=True)
         self.table.heading("Item name", text="Item name")
 
-        self.table.column("Quantity", width=100, anchor="center", stretch=True)
+        self.table.column("Quantity", width=150, anchor="center", stretch=True)
         self.table.heading("Quantity", text="Quantity")
 
-        self.table.column("Avilable", width=100, anchor="center", stretch=True)
-        self.table.heading("Avilable", text="Avilable")
+        self.table.column("Available", width=150, anchor="center", stretch=True)
+        self.table.heading("Available", text="Available")
 
-        self.table.column("Type", width=100, anchor="center", stretch=True)
+        self.table.column("Type", width=150, anchor="center", stretch=True)
         self.table.heading("Type", text="Type")
+
         # Add some data to the table
-        for x in supply_lst.list:
-            self.table.insert("", "end", values=(x.name, x.all_units, x.available_units, x.type))
+        for index, x in enumerate(supply_lst.list):
+            self.table.insert("", "end", values=(x.name, x.all_units, x.available_units, x.type), iid=index)
 
         # Buttons to interact with the selected line of the table
         self.button_acquire = customtkinter.CTkButton(self.right_dashboard, text="Acquire",
                                                       command=self.acquire_item)
         self.button_acquire.pack(side=tkinter.LEFT, padx=10, pady=10)
+
+
 
     elif type == 'profile':
         self.table.pack(side=tkinter.TOP, fill=tkinter.BOTH, expand=True)
