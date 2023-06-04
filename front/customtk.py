@@ -1,7 +1,6 @@
 # importing required modules
 import tkinter
 import tkinter.ttk as ttk
-import tkinter as tk
 import customtkinter
 from PIL import ImageTk, Image
 import requests
@@ -10,8 +9,7 @@ import ctypes
 from datetime import datetime, timedelta
 from CTkMessagebox import CTkMessagebox
 import matplotlib.pyplot as plt
-from matplotlib.figure import Figure
-from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg, NavigationToolbar2Tk)
+from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg)
 
 # backend connection
 url = 'http://localhost:5000/'
@@ -29,15 +27,12 @@ class App(customtkinter.CTk):
 
     def __init__(self):
         super().__init__()
-        # --------- bar example --------
         response = requests.get(url + 'getAllSupply')
         if response.status_code == 200:
             result = response.json()
             if result['message'] == 'successful':
                 temp = result['supply']
-                if len(supply_lst.list):
-                    supply_lst.insert_list(temp)
-
+                supply_lst.insert_list(temp)
 
 
         self.title("Supply Solutions")
@@ -100,9 +95,6 @@ class App(customtkinter.CTk):
                                                      command=lambda : self.notification(user.id))
         self.bt_noti.grid(row=3, column=0, padx=20, pady=10)
 
-        self.bt_categories = customtkinter.CTkButton(self.left_side_panel, text="Report",command=self.report)
-        self.bt_categories.grid(row=4, column=0, padx=20, pady=10)
-
         # right side panel -> have self.right_dashboard inside it
         self.right_side_panel = customtkinter.CTkFrame(self.main_container, corner_radius=10, fg_color="#000811")
         self.right_side_panel.pack(side=tkinter.LEFT, fill=tkinter.BOTH, expand=True, padx=5, pady=5)
@@ -117,13 +109,6 @@ class App(customtkinter.CTk):
     def homie(self, id):
         self.clear_frame()
         create_table(self, 'supply')
-        # self.name = customtkinter.CTkLabel(master=self.right_dashboard, text=user.name,
-        #                                    font=('Century Gothic', 50))
-        # self.lastname = customtkinter.CTkLabel(master=self.right_dashboard, text=user.lastname,
-        #                                        font=('Century Gothic', 50))
-        # self.name.place(relx=0.5, rely=0.1, anchor=tkinter.CENTER)
-        # self.lastname.place(relx=0.5, rely=0.3, anchor=tkinter.CENTER)
-
         def help_func():
             ctypes.windll.user32.MessageBoxW(0,
                                              "Here are the app instructions:\n\n1. asd\n2. sdfs\n3. sdfgsdg\n4. hrth",
@@ -181,6 +166,7 @@ class App(customtkinter.CTk):
         self.email.place(relx=0.3, rely=0.8, anchor=tkinter.CENTER)
         self.email_entry.place(relx=0.5, rely=0.8, anchor=tkinter.CENTER)
         self.save_BTN.place(relx=0.75, rely=0.8, anchor=tkinter.CENTER)
+
 
     #  self.right_dashboard   ----> categories widget
     def manager(self):
@@ -445,28 +431,6 @@ class App(customtkinter.CTk):
         create_table(self, 'noti')
 
 
-    def report(self):
-        self.clear_frame()
-        self.name = customtkinter.CTkLabel(master=self.right_dashboard, text="The report: ",font=('Century Gothic', 18))
-        self.name_entry = customtkinter.CTkEntry(master=self.right_dashboard, width=220)
-        self.name.place(relx=0.3, rely=0.1, anchor=tkinter.CENTER)
-        self.name_entry.place(relx=0.5, rely=0.1, anchor=tkinter.CENTER)
-        self.save_BTN = customtkinter.CTkButton(master=self.right_dashboard, width=60, height=20, text="Sent")
-        self.save_BTN.place(relx=0.75, rely=0.3, anchor=tkinter.CENTER)
-
-    def submit_form(self):
-        order_id = entry.get()
-        check_delayed_return(order_id, label)
-    root = tk.Tk()
-    root.title('Equipment Delay Management')
-    label = tk.Label(root, text='Enter Order ID:')
-    label.pack()
-    entry = tk.Entry(root)
-    entry.pack()
-    button = tk.Button(root, text='Check Delay', command=submit_form)
-    button.pack()
-    result_label = tk.Label(root, text='')
-    result_label.pack()
 
     # Change scaling of all widget 80% to 120%
     def change_scaling_event(self, new_scaling: str):
@@ -712,14 +676,12 @@ class App(customtkinter.CTk):
         button_confirm.pack(pady=10)
 
 
-
-
 def register_in_db(w, entry1, entry2, entry3, entry4):
     data = {
         'email': entry1.get(),
         'password': entry4.get(),
         'firstname': entry2.get(),
-        'Last_name': entry3.get(),
+        'Last name': entry3.get(),
     }
     response = requests.post(url + 'register', data=data)
     if response.status_code == 200:
@@ -741,7 +703,7 @@ def register_function(app):
     w = customtkinter.CTk()
     w.geometry("600x440")
     w.title('Register')
-    img1 = ImageTk.PhotoImage(Image.open("pattern.png"))
+    img1 = ImageTk.PhotoImage(Image.open("../pattern.png"))
     l1 = customtkinter.CTkLabel(master=w, image=img1)
     l1.pack()
 
@@ -802,7 +764,7 @@ def login_page(app):
     app.geometry("600x480")
     app.title('Login')
 
-    img1 = ImageTk.PhotoImage(Image.open("pattern.png"))
+    img1 = ImageTk.PhotoImage(Image.open("../pattern.png"))
     l1 = customtkinter.CTkLabel(master=app, image=img1)
     l1.pack()
 
@@ -831,7 +793,7 @@ def login_page(app):
                                               command=lambda: register_function(app), corner_radius=6)
     register_button.place(x=170, y=235)
 
-    img3 = customtkinter.CTkImage(Image.open("samilogo.png").resize((40, 40)))
+    img3 = customtkinter.CTkImage(Image.open("../samilogo.png").resize((40, 40)))
 
     img3 = customtkinter.CTkButton(master=frame, image=img3, text="Sami Shamoon College of Engineering", width=40,
                                    height=40, compound="left", fg_color='white', text_color='black',
@@ -863,7 +825,7 @@ def forget_password(app):
     app.geometry("600x440")
     app.title('Login')
 
-    img1 = ImageTk.PhotoImage(Image.open("pattern.png"))
+    img1 = ImageTk.PhotoImage(Image.open("../pattern.png"))
     l1 = customtkinter.CTkLabel(master=app, image=img1)
     l1.pack()
 
@@ -897,7 +859,7 @@ def forget_password(app):
     return_button.place(x=2, y=2)
 
 
-    img3 = customtkinter.CTkImage(Image.open("samilogo.png").resize((40, 40), Image.LANCZOS))
+    img3 = customtkinter.CTkImage(Image.open("../samilogo.png").resize((40, 40), Image.LANCZOS))
 
     img3 = customtkinter.CTkButton(master=frame, image=img3, text="Sami Shamoon College of Engineering", width=40,
                                    height=40, compound="left", fg_color='white', text_color='black',
@@ -999,21 +961,34 @@ def create_table(self, type):
         return_time = []
         take_time = []
         quantity = []
+        lst = []
         if response.status_code == 200:
             result = response.json()
             if result['message'] == 'successful':
                 temp = result['items']
+                t = 1
+                datez = datetime.now()
                 for i in temp:
                     items.append(supply_lst.get_name_by_id(i[1]))
                     return_time.append(i[5])
                     take_time.append(i[4])
                     quantity.append(i[3])
+                    given_date = datetime.strptime(i[5], '%a, %d %b %Y %H:%M:%S %Z')
+
+                    # if the user is late so the item will be marked in red
+                    if given_date < datez:
+                        lst.append(t)
+                    t += 1
                 print(temp)
 
         # Add some data to the table
         for i in range(0, len(items)):
-            self.table.insert("", "end", values=(items[i], quantity[i], take_time[i], return_time[i]))
+            row_values = (items[i], quantity[i], take_time[i], return_time[i])
+            tags = () if (i + 1) not in lst else ('red',)  # Add 'red' tag if the row is late
+            self.table.insert("", "end", values=row_values, tags=tags)
 
+        # Configure the 'red' tag to set the row background color to red
+        self.table.tag_configure('red', background='red')
 
         # Buttons to interact with the selected line of the table
         self.button_acquire = customtkinter.CTkButton(self.right_dashboard, text="Return Items",
@@ -1023,6 +998,7 @@ def create_table(self, type):
         self.button_item_desc = customtkinter.CTkButton(self.right_dashboard, text="Report Item",
                                                         command=self.report_item)
         self.button_item_desc.pack(side=tkinter.LEFT, padx=10, pady=10)
+
 
     elif type == 'noti':
         self.table.pack(side=tkinter.TOP, fill=tkinter.BOTH, expand=True)
@@ -1063,4 +1039,7 @@ def create_table(self, type):
         ctypes.windll.user32.MessageBoxW(0,
                                          f"description: {des}\n ",
                                          "Description", 0)
-login_page(app)
+
+
+if __name__ == '__main__':
+    login_page(app)

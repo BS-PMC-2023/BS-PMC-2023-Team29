@@ -1,35 +1,3 @@
-// pipeline {
-//
-//     agent {
-//             docker {
-//                 image 'python:3.8.7' // Specify the Python version or any other base image you need
-//                 args '-u root' // Run Docker container as root user
-//             }
-//         }
-//     stages {
-//         stage('Checkout') {
-//             steps {
-//                 checkout scm
-//             }
-//         }
-//         stage('Install dependencies') {
-//             steps {
-//                 // Install required dependencies
-//                 sh 'pip install -r requirements.txt'
-//             }
-//         }
-//
-//         stage('Run tests') {
-//             steps {
-//                 // Run your Python unit tests
-//                 sh 'python -m unittest discover -s tests'
-//             }
-//         }
-//
-//     }
-// }
-
-
 pipeline {
     agent {
         docker {
@@ -46,11 +14,28 @@ pipeline {
         stage('Install dependencies') {
             steps {
                 sh 'pip install -r requirements.txt'
+                sh 'pip install radon'
             }
         }
         stage('Run tests') {
             steps {
                 sh 'python -m unittest discover -s tests'
+            }
+        }
+        stage('Metrics - Coverage') {
+            steps {
+                sh 'coverage run -m unittest discover -s tests'
+                sh 'coverage report'
+            }
+        }
+        stage('Metrics - Radon') {
+            steps {
+                sh 'radon cc --show-complexity --total-average tests'
+            }
+        }
+        stage('Metrics - Bandit') {
+            steps {
+                sh 'bandit -r tests'
             }
         }
         stage('Post Actions') {
@@ -69,4 +54,3 @@ pipeline {
         }
     }
 }
-
