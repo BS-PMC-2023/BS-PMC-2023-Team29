@@ -75,6 +75,9 @@ def get_users_types():
     tupple_lst = db.get_users_types()
     return jsonify({'message': 'change successful', 'users': tupple_lst})
 
+@app.route('/hi',methods=['GET'])
+def hi():
+    return jsonify(({'message':'hi'}))
 @app.route('/removeUser',methods = ['POST'])
 def delete_user_email():
     if db.delete_user_by_email(request.form['email']):
