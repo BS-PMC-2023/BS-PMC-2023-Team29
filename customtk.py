@@ -9,7 +9,8 @@ import ctypes
 from datetime import datetime, timedelta
 from CTkMessagebox import CTkMessagebox
 import matplotlib.pyplot as plt
-from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg)
+from matplotlib.figure import Figure
+from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg, NavigationToolbar2Tk)
 
 # backend connection
 url = 'http://localhost:5000/'
@@ -27,12 +28,14 @@ class App(customtkinter.CTk):
 
     def __init__(self):
         super().__init__()
+        # --------- bar example --------
         response = requests.get(url + 'getAllSupply')
         if response.status_code == 200:
             result = response.json()
             if result['message'] == 'successful':
                 temp = result['supply']
                 supply_lst.insert_list(temp)
+                print(supply_lst, user.type)
 
 
         self.title("Supply Solutions")
@@ -109,6 +112,13 @@ class App(customtkinter.CTk):
     def homie(self, id):
         self.clear_frame()
         create_table(self, 'supply')
+        # self.name = customtkinter.CTkLabel(master=self.right_dashboard, text=user.name,
+        #                                    font=('Century Gothic', 50))
+        # self.lastname = customtkinter.CTkLabel(master=self.right_dashboard, text=user.lastname,
+        #                                        font=('Century Gothic', 50))
+        # self.name.place(relx=0.5, rely=0.1, anchor=tkinter.CENTER)
+        # self.lastname.place(relx=0.5, rely=0.3, anchor=tkinter.CENTER)
+
         def help_func():
             ctypes.windll.user32.MessageBoxW(0,
                                              "Here are the app instructions:\n\n1. asd\n2. sdfs\n3. sdfgsdg\n4. hrth",
@@ -703,7 +713,7 @@ def register_function(app):
     w = customtkinter.CTk()
     w.geometry("600x440")
     w.title('Register')
-    img1 = ImageTk.PhotoImage(Image.open("../pattern.png"))
+    img1 = ImageTk.PhotoImage(Image.open("pattern.png"))
     l1 = customtkinter.CTkLabel(master=w, image=img1)
     l1.pack()
 
@@ -764,7 +774,7 @@ def login_page(app):
     app.geometry("600x480")
     app.title('Login')
 
-    img1 = ImageTk.PhotoImage(Image.open("../pattern.png"))
+    img1 = ImageTk.PhotoImage(Image.open("pattern.png"))
     l1 = customtkinter.CTkLabel(master=app, image=img1)
     l1.pack()
 
@@ -793,7 +803,7 @@ def login_page(app):
                                               command=lambda: register_function(app), corner_radius=6)
     register_button.place(x=170, y=235)
 
-    img3 = customtkinter.CTkImage(Image.open("../samilogo.png").resize((40, 40)))
+    img3 = customtkinter.CTkImage(Image.open("samilogo.png").resize((40, 40)))
 
     img3 = customtkinter.CTkButton(master=frame, image=img3, text="Sami Shamoon College of Engineering", width=40,
                                    height=40, compound="left", fg_color='white', text_color='black',
@@ -825,7 +835,7 @@ def forget_password(app):
     app.geometry("600x440")
     app.title('Login')
 
-    img1 = ImageTk.PhotoImage(Image.open("../pattern.png"))
+    img1 = ImageTk.PhotoImage(Image.open("pattern.png"))
     l1 = customtkinter.CTkLabel(master=app, image=img1)
     l1.pack()
 
@@ -859,7 +869,7 @@ def forget_password(app):
     return_button.place(x=2, y=2)
 
 
-    img3 = customtkinter.CTkImage(Image.open("../samilogo.png").resize((40, 40), Image.LANCZOS))
+    img3 = customtkinter.CTkImage(Image.open("samilogo.png").resize((40, 40), Image.LANCZOS))
 
     img3 = customtkinter.CTkButton(master=frame, image=img3, text="Sami Shamoon College of Engineering", width=40,
                                    height=40, compound="left", fg_color='white', text_color='black',
@@ -1039,7 +1049,4 @@ def create_table(self, type):
         ctypes.windll.user32.MessageBoxW(0,
                                          f"description: {des}\n ",
                                          "Description", 0)
-
-
-if __name__ == '__main__':
-    login_page(app)
+login_page(app)
