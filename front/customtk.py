@@ -32,7 +32,9 @@ class App(customtkinter.CTk):
             result = response.json()
             if result['message'] == 'successful':
                 temp = result['supply']
-                supply_lst.insert_list(temp)
+                if len(supply_lst.list):
+                    supply_lst.insert_list(temp)
+
 
 
         self.title("Supply Solutions")
@@ -681,7 +683,7 @@ def register_in_db(w, entry1, entry2, entry3, entry4):
         'email': entry1.get(),
         'password': entry4.get(),
         'firstname': entry2.get(),
-        'Last name': entry3.get(),
+        'Last_name': entry3.get(),
     }
     response = requests.post(url + 'register', data=data)
     if response.status_code == 200:
