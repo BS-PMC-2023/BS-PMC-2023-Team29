@@ -4,7 +4,7 @@ import tkinter.ttk as ttk
 import customtkinter
 from PIL import ImageTk, Image
 import requests
-from models import User, supllyList
+from models import User, SupplyList
 import ctypes
 from datetime import datetime, timedelta
 from CTkMessagebox import CTkMessagebox
@@ -14,7 +14,7 @@ from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg)
 # backend connection
 url = 'http://localhost:5000/'
 user = User()
-supply_lst = supllyList()
+supply_lst = SupplyList()
 customtkinter.set_appearance_mode("System")  # Modes: system (default), light, dark
 customtkinter.set_default_color_theme("green")  # Themes: blue (default), dark-blue, green
 
@@ -961,21 +961,34 @@ def create_table(self, type):
         return_time = []
         take_time = []
         quantity = []
+        lst = []
         if response.status_code == 200:
             result = response.json()
             if result['message'] == 'successful':
                 temp = result['items']
+                t = 1
+                datez = datetime.now()
                 for i in temp:
                     items.append(supply_lst.get_name_by_id(i[1]))
                     return_time.append(i[5])
                     take_time.append(i[4])
                     quantity.append(i[3])
+                    given_date = datetime.strptime(i[5], '%a, %d %b %Y %H:%M:%S %Z')
+
+                    # if the user is late so the item will be marked in red
+                    if given_date < datez:
+                        lst.append(t)
+                    t += 1
                 print(temp)
 
         # Add some data to the table
         for i in range(0, len(items)):
-            self.table.insert("", "end", values=(items[i], quantity[i], take_time[i], return_time[i]))
+            row_values = (items[i], quantity[i], take_time[i], return_time[i])
+            tags = () if (i + 1) not in lst else ('red',)  # Add 'red' tag if the row is late
+            self.table.insert("", "end", values=row_values, tags=tags)
 
+        # Configure the 'red' tag to set the row background color to red
+        self.table.tag_configure('red', background='red')
 
         # Buttons to interact with the selected line of the table
         self.button_acquire = customtkinter.CTkButton(self.right_dashboard, text="Return Items",
@@ -985,6 +998,7 @@ def create_table(self, type):
         self.button_item_desc = customtkinter.CTkButton(self.right_dashboard, text="Report Item",
                                                         command=self.report_item)
         self.button_item_desc.pack(side=tkinter.LEFT, padx=10, pady=10)
+
 
     elif type == 'noti':
         self.table.pack(side=tkinter.TOP, fill=tkinter.BOTH, expand=True)
