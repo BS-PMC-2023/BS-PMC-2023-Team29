@@ -703,7 +703,7 @@ def register_function(app):
     w = customtkinter.CTk()
     w.geometry("600x440")
     w.title('Register')
-    img1 = ImageTk.PhotoImage(Image.open("../pattern.png"))
+    img1 = ImageTk.PhotoImage(Image.open("pattern.png"))
     l1 = customtkinter.CTkLabel(master=w, image=img1)
     l1.pack()
 
@@ -764,7 +764,7 @@ def login_page(app):
     app.geometry("600x480")
     app.title('Login')
 
-    img1 = ImageTk.PhotoImage(Image.open("../pattern.png"))
+    img1 = ImageTk.PhotoImage(Image.open("pattern.png"))
     l1 = customtkinter.CTkLabel(master=app, image=img1)
     l1.pack()
 
@@ -793,7 +793,7 @@ def login_page(app):
                                               command=lambda: register_function(app), corner_radius=6)
     register_button.place(x=170, y=235)
 
-    img3 = customtkinter.CTkImage(Image.open("../samilogo.png").resize((40, 40)))
+    img3 = customtkinter.CTkImage(Image.open("samilogo.png").resize((40, 40)))
 
     img3 = customtkinter.CTkButton(master=frame, image=img3, text="Sami Shamoon College of Engineering", width=40,
                                    height=40, compound="left", fg_color='white', text_color='black',
@@ -825,7 +825,7 @@ def forget_password(app):
     app.geometry("600x440")
     app.title('Login')
 
-    img1 = ImageTk.PhotoImage(Image.open("../pattern.png"))
+    img1 = ImageTk.PhotoImage(Image.open("pattern.png"))
     l1 = customtkinter.CTkLabel(master=app, image=img1)
     l1.pack()
 
@@ -859,7 +859,7 @@ def forget_password(app):
     return_button.place(x=2, y=2)
 
 
-    img3 = customtkinter.CTkImage(Image.open("../samilogo.png").resize((40, 40), Image.LANCZOS))
+    img3 = customtkinter.CTkImage(Image.open("samilogo.png").resize((40, 40), Image.LANCZOS))
 
     img3 = customtkinter.CTkButton(master=frame, image=img3, text="Sami Shamoon College of Engineering", width=40,
                                    height=40, compound="left", fg_color='white', text_color='black',
