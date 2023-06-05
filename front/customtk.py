@@ -916,16 +916,16 @@ def create_table(self, type):
         self.table["columns"] = ("Item name", "Quantity", "Avilable", "Type")
 
         # Set the headings of the columns
-        self.table.column("Item name", width=100, anchor="center", stretch=True)
+        self.table.column("Item name", width=120, anchor="center", stretch=True)
         self.table.heading("Item name", text="Item name")
 
-        self.table.column("Quantity", width=100, anchor="center", stretch=True)
+        self.table.column("Quantity", width=120, anchor="center", stretch=True)
         self.table.heading("Quantity", text="Quantity")
 
-        self.table.column("Avilable", width=100, anchor="center", stretch=True)
+        self.table.column("Avilable", width=120, anchor="center", stretch=True)
         self.table.heading("Avilable", text="Avilable")
 
-        self.table.column("Type", width=100, anchor="center", stretch=True)
+        self.table.column("Type", width=120, anchor="center", stretch=True)
         self.table.heading("Type", text="Type")
         # Add some data to the table
         for x in supply_lst.list:
