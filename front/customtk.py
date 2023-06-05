@@ -701,7 +701,7 @@ def register_in_db(w, entry1, entry2, entry3, entry4):
 def register_function(app):
     app.destroy()  # destroy current window and creating new one
     w = customtkinter.CTk()
-    w.geometry("600x440")
+    w.geometry("600x640")
     w.title('Register')
     img1 = ImageTk.PhotoImage(Image.open("../pattern.png"))
     l1 = customtkinter.CTkLabel(master=w, image=img1)
@@ -816,7 +816,6 @@ def back_to_login_page(app):
     app = customtkinter.CTk()  # creating custom tkinter window
     login_page(app)
 
-
 def forget_password(app):
     if app:
         app.destroy()
@@ -840,7 +839,7 @@ def forget_password(app):
     entry1.place(x=50, y=100)
     b1 = customtkinter.CTkButton(master=frame, text="send new password to this mail", font=('Century Gothic', 12),
                                  command=lambda: generate_new_password(entry1.get().lower()))
-    b1.place(x=50, y =135)
+    b1.place(x=50, y=135)
 
     entry2 = customtkinter.CTkEntry(master=frame, width=220, placeholder_text='password we send to your mail', show="*")
     entry2.place(x=50, y=165)
@@ -848,11 +847,11 @@ def forget_password(app):
     entry3.place(x=50, y=195)
 
     # Create custom button
-    login_button = customtkinter.CTkButton(master=frame, width=120, height=40, text="generate new password",
+    login_button = customtkinter.CTkButton(master=frame, width=220, height=40, text="generate new password",
                                            command=lambda: change_password(app, entry1.get().lower(),
                                                                            entry2.get().lower(),entry3.get().lower()
                                                                            ), corner_radius=6)
-    login_button.place(x=30, y=235)
+    login_button.place(x=50, y=235)
 
     return_button = customtkinter.CTkButton(master=frame, width=50, height=25, text="Back",
                                            command=lambda: back_to_login_page(app), corner_radius=6)
@@ -866,10 +865,8 @@ def forget_password(app):
                                    hover_color='#AFAFAF')
     img3.place(x=160, y=320, anchor=tkinter.CENTER)
 
-    # You can easily integrate authentication system
+    # You can easily integrate the authentication system
     app.mainloop()
-
-
 def generate_new_password(email):
     print("mail")
     response =requests.post(url + 'generateTempPassword',data = {'email':email})
