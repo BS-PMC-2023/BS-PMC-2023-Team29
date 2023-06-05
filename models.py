@@ -11,7 +11,7 @@ class User:
         self.id = None
         self.email = email
         self.password = password
-        self.type= int(type)
+        self.type = int(type)
         self.name = name
         self.lastname = lastname
 
@@ -19,7 +19,7 @@ class User:
         self.id = tupple_insert[0]
         self.email = tupple_insert[1]
         self.password = tupple_insert[2]
-        self.type= int(tupple_insert[3])
+        self.type = int(tupple_insert[3])
         self.name = tupple_insert[4]
         self.lastname = tupple_insert[5]
 
@@ -40,13 +40,17 @@ class Supply:
         self.name = None
         self.all_units = None
         self.available_units = None
+        self.description = None
+        self.broken_units = None
 
-    def insert(self, id, type, name, all_units, available_units):
+    def insert(self, id, type, name, all_units, available_units, description, broken_units):
         self.id = id
         self.type = type
         self.name = name
         self.all_units = all_units
         self.available_units = available_units
+        self.description = description
+        self.broken_units = broken_units
 
     def tupple_insert(self, tupple_insert):
         self.id = tupple_insert[0]
@@ -54,6 +58,8 @@ class Supply:
         self.all_units = tupple_insert[2]
         self.available_units = tupple_insert[3]
         self.type = tupple_insert[4]
+        self.description = tupple_insert[5]
+        self.broken_units = tupple_insert[6]
 
     def borrow(self, how_much_items):
         if self.available_units - how_much_items >= 0:
@@ -66,13 +72,14 @@ class Supply:
         return self.available_units
 
     def totuple(self):
-        return (self.id, self.name, self.all_units, self.available_units, self.type)
+        return (
+        self.id, self.name, self.all_units, self.available_units, self.type, self.description, self.broken_units)
 
     def __str__(self):
         return str(self.totuple())
 
 
-class supllyList:
+class SupplyList:
     def __init__(self):
         self.list = []
 
@@ -123,20 +130,32 @@ class supllyList:
                 return i.id
         return False
 
-
     def get_supply_avl_by_name(self, name):
         for i in self.list:
             if i.name == name:
                 return i.available_units
 
-    def get_name_by_id(self,id):
+    def get_name_by_id(self, id):
         for i in self.list:
             if i.id == id:
                 return i.name
         return False
-    
 
+    def insert_item(self, id, type, name, all_units, des, broken):
+        temp = Supply()
+        temp.insert(id, type, name, all_units, all_units, des, broken)
+        self.list.append(temp)
 
+    def get_des_by_name(self, name):
+        for i in self.list:
+            if i.name == name:
+                return i.description
+        return False
+
+    def report_item(self, name, units):
+        for i in self.list:
+            if i.name == name:
+                i.broken_units += units
 
     def __str__(self):
         string = ''.join([str(i) for i in self.list])
