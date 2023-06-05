@@ -109,15 +109,7 @@ class App(customtkinter.CTk):
     def homie(self, id):
         self.clear_frame()
         create_table(self, 'supply')
-        def help_func():
-            ctypes.windll.user32.MessageBoxW(0,
-                                             "Here are the app instructions:\n\n1. asd\n2. sdfs\n3. sdfgsdg\n4. hrth",
-                                             "Help", 0)
 
-        self.help_BTN = customtkinter.CTkButton(master=self.right_dashboard, width=60, height=20, text="Help",
-                                                command=help_func,
-                                                corner_radius=6)
-        self.help_BTN.place(relx=0.95, rely=0.9, anchor=tkinter.CENTER)
 
 
     #  self.right_dashboard   ----> statement widget
@@ -812,7 +804,7 @@ def login_page(app):
                                    height=40, compound="left", fg_color='white', text_color='black',
                                    hover_color='#AFAFAF')
     img3.place(x=160, y=320, anchor=tkinter.CENTER)
-    img3.pack(pady=10)
+    img3.pack(pady=10, padx=10)
 
     def about_func():
         ctypes.windll.user32.MessageBoxW(0, "Made with love by:\n\nAlex, Bar, Aden and Basel", "About Us", 0)
@@ -935,6 +927,10 @@ def create_table(self, type):
     #         temp = result['borrows']
     #         print(temp)
 
+    self.title = customtkinter.CTkLabel(self.right_dashboard, text="Supply Solutions - Homepage \n",
+                                             font=customtkinter.CTkFont(size=20, weight="bold"))
+    self.title.pack(pady=10)
+
     # Create a simple table
     style = ttk.Style()
     style.configure("Treeview", font=("TkDefaultFont", 18))  # Adjust the size as per your requirement
@@ -969,6 +965,16 @@ def create_table(self, type):
         self.button_acquire = customtkinter.CTkButton(self.right_dashboard, text="Acquire",
                                                       command=self.acquire_item)
         self.button_acquire.pack(side=tkinter.LEFT, padx=10, pady=10)
+
+        def help_func():
+            ctypes.windll.user32.MessageBoxW(0,
+                                             "Here are the app instructions:\n\n1. asd\n2. sdfs\n3. sdfgsdg\n4. hrth",
+                                             "Help", 0)
+
+        self.help_BTN = customtkinter.CTkButton(master=self.right_dashboard, text="Help",
+                                                command=help_func,
+                                                corner_radius=6)
+        self.help_BTN.pack(side=tkinter.RIGHT, padx=10, pady=10)
 
 
 
