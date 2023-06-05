@@ -9,6 +9,9 @@ import ctypes
 from datetime import datetime, timedelta
 from CTkMessagebox import CTkMessagebox
 import matplotlib.pyplot as plt
+
+from tkinter import Tk, Label, Entry, Button
+from tkcalendar import Calendar
 from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg)
 
 # backend connection
@@ -86,7 +89,6 @@ class App(customtkinter.CTk):
         self.bt_profile = customtkinter.CTkButton(self.left_side_panel, text="Profile", command=lambda : self.profile(user.id))
         self.bt_profile.grid(row=2, column=0, padx=20, pady=10)
         if user.type == 3:
-            print('yes')
             self.bt_categories = customtkinter.CTkButton(self.left_side_panel, text="Manager Options",
                                                          command=self.manager)
             self.bt_categories.grid(row=4, column=0, padx=20, pady=10)
@@ -107,6 +109,11 @@ class App(customtkinter.CTk):
 
     #  self.right_dashboard   ----> dashboard widget
     def homie(self, id):
+        self.bt_homepage.configure(fg_color='#b8bda8')
+        self.bt_profile.configure(fg_color=['#2CC985', '#2FA572'])
+        self.bt_noti.configure(fg_color=['#2CC985', '#2FA572'])
+        if user.type ==3:
+            self.bt_categories.configure(fg_color=['#2CC985', '#2FA572'])
         self.clear_frame()
         create_table(self, 'supply')
         def help_func():
@@ -122,6 +129,11 @@ class App(customtkinter.CTk):
 
     #  self.right_dashboard   ----> statement widget
     def profile(self, id):
+        self.bt_homepage.configure(fg_color=['#2CC985', '#2FA572'])
+        self.bt_profile.configure(fg_color='#b8bda8')
+        self.bt_noti.configure(fg_color=['#2CC985', '#2FA572'])
+        if user.type ==3:
+            self.bt_categories.configure(fg_color=['#2CC985', '#2FA572'])
         self.clear_frame()
         create_table(self, 'profile')
 
@@ -170,6 +182,11 @@ class App(customtkinter.CTk):
 
     #  self.right_dashboard   ----> categories widget
     def manager(self):
+        self.bt_homepage.configure(fg_color=['#2CC985', '#2FA572'])
+        self.bt_profile.configure(fg_color=['#2CC985', '#2FA572'])
+        self.bt_noti.configure(fg_color=['#2CC985', '#2FA572'])
+        if user.type ==3:
+            self.bt_categories.configure(fg_color='#b8bda8')
         self.clear_frame()
 
         # The email selection combo box
@@ -427,6 +444,11 @@ class App(customtkinter.CTk):
         order_button.pack(pady=10)  #
 
     def notification(self, id):
+        self.bt_homepage.configure(fg_color=['#2CC985', '#2FA572'])
+        self.bt_profile.configure(fg_color=['#2CC985', '#2FA572'])
+        self.bt_noti.configure(fg_color='#b8bda8')
+        if user.type ==3:
+            self.bt_categories.configure(fg_color=['#2CC985', '#2FA572'])
         self.clear_frame()
         create_table(self, 'noti')
 
@@ -478,8 +500,6 @@ class App(customtkinter.CTk):
 
     def acquire_item(self):
 
-        def slider_event2(window):
-                label_item2.configure(text=slider.get())
         def slider_event3(window):
                 label_item3.configure(text=slider2.get())
         def combolicious(choice):
@@ -521,15 +541,11 @@ class App(customtkinter.CTk):
         # Create a label for the return time selection
         label_return = customtkinter.CTkLabel(master=window, text="When will you return it?")
         label_return.pack()
-        now = datetime.now()
-        rounded_hour = (now + timedelta(hours=1)).replace(minute=0, second=0, microsecond=0)
-        rounded_hour = rounded_hour.hour
-
-        slider = customtkinter.CTkSlider(window, from_=rounded_hour, to=22, number_of_steps=(22-rounded_hour)*2, command=slider_event2)
-        slider.pack()
-
-        label_item2 = customtkinter.CTkLabel(master=window, text=slider.get())
-        label_item2.pack()
+        date =[ datetime.now()]
+        btn_choose_date = customtkinter.CTkButton(master=window,text='choose date and time',command= lambda:self.choose_date_time(date))
+        btn_choose_date.pack()
+        self.label_time = customtkinter.CTkLabel(master=window, text=f"return time : {date[0].strftime('%Y-%m-%d %H:%M')}")
+        self.label_time.pack()
 
         label_quantity = customtkinter.CTkLabel(master=window, text="How many would you like to borrow?")
         label_quantity.pack()
@@ -549,24 +565,62 @@ class App(customtkinter.CTk):
         # Create a button to confirm the acquisition
         button_confirm = customtkinter.CTkButton(window, text="Confirm",
                                                  command=lambda: self.confirm_acquisition(combo_item.get(),
-                                                                                          slider.get(),
+                                                                                          date[0],
                                                                                           slider2.get()))
         button_confirm.pack()
+
+    def choose_date_time(self,date):
+        def on_date_selected(date):
+            # Get the selected date and time
+            selected_date = cal.selection_get()
+            selected_time = time_entry.get()
+
+            # Combine the date and time into a single string
+            selected_datetime = f"{selected_date} {selected_time}"
+
+            # Assign the selected datetime to the 'data' variable
+            temp_date = selected_datetime
+            date[0] = datetime.strptime(temp_date, '%Y-%m-%d %H:%M')
+            self.label_time.configure(text=f"return time : {date[0].strftime('%Y-%m-%d %H:%M')}")
+            # Close the widget
+            root.destroy()
+
+        # Create the root Tkinter window
+        root = Tk()
+        root.title("Choose Date and Time")
+        h = 300
+        w = 300
+        spawn_x = int(self.winfo_width() * .5 + self.winfo_x() - .5 * w + 7)
+        spawn_y = int(self.winfo_height() * .5 + self.winfo_y() - .5 * h + 20)
+        root.geometry(f"{w}x{h}+{spawn_x}+{spawn_y}")
+        # Create the calendar widget
+        cal = Calendar(root, selectmode="day")
+        cal.pack()
+
+        # Create a label and entry for the time
+        time_label = Label(root, text="Time:")
+        time_label.pack()
+
+        time_entry = Entry(root)
+        time_entry.insert(0, '00:00')
+        time_entry.pack()
+
+        # Create a button to confirm the selection
+        confirm_button = Button(root, text="OK", command=lambda: on_date_selected(date))
+        confirm_button.pack()
+
+        # Start the Tkinter event loop
+        root.mainloop()
 
     def confirm_acquisition(self, item, return_time, quantity):
         quantity = int(quantity)
         id = supply_lst.get_id_by_name(item)
         remain = supply_lst.borrow_item_by_id(id,quantity)
-        hour, minute = map(int, str(return_time).split('.'))
-        if minute == 5:
-            minute = 30
-        now = datetime.now()
-        dt = datetime(now.year, now.month, now.day, hour, minute)
         if remain :
             data = {
                 'user_id' : user.id,
                 'item_id' : id,
-                'return_time' : dt,
+                'return_time' : return_time,
                 'num_of_items_remain' : remain,
                 'num_of_items' : quantity
             }
@@ -1069,5 +1123,15 @@ def create_table(self, type):
                                          "Description", 0)
 
 
+
 if __name__ == '__main__':
+    # Example usage
+    # data = None
+    # choose_date_time()
+    #
+    # # Print the selected datetime
+    # if data:
+    #     print("Selected datetime:", data)
+    # else:
+    #     print("No datetime selected.")
     login_page(app)

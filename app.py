@@ -94,6 +94,7 @@ def get_all_borrows():
 
 @app.route('/borrowItem',methods = ['POST'])
 def borrow_item():
+    print(request.form['return_time'])
     if db.borrow_item(request.form['user_id'], request.form['item_id'],
                       request.form['return_time'], request.form['num_of_items'], request.form['num_of_items_remain']):
         return jsonify({'message': 'change successful'})
