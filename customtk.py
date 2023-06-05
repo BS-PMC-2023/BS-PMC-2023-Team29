@@ -164,9 +164,9 @@ class App(customtkinter.CTk):
     def manager(self):
         self.clear_frame()
 
-        self.title = customtkinter.CTkLabel(self.right_dashboard, text="Supply Solutions - Manager Options \n",
+        self.toptitle = customtkinter.CTkLabel(self.right_dashboard, text="Supply Solutions - Manager Options \n",
                                             font=customtkinter.CTkFont(size=20, weight="bold"))
-        self.title.pack(pady=10)
+        self.toptitle.pack(pady=10)
 
         # The email selection combo box
         email_type = {}  # keys = emails, values = user type
@@ -943,9 +943,9 @@ def create_table(self, type):
     self.table = ttk.Treeview(self.right_dashboard, style="Custom.Treeview")
     if type == 'supply':
 
-        self.title = customtkinter.CTkLabel(self.right_dashboard, text="Supply Solutions - Homepage \n",
+        self.toptitle = customtkinter.CTkLabel(self.right_dashboard, text="Supply Solutions - Homepage \n",
                                             font=customtkinter.CTkFont(size=20, weight="bold"))
-        self.title.pack(pady=10)
+        self.toptitle.pack(pady=10)
 
         self.table.pack(side=tkinter.TOP, fill=tkinter.BOTH, expand=True)
         # Define the columns of the table
@@ -987,9 +987,9 @@ def create_table(self, type):
 
     elif type == 'profile':
 
-        self.title = customtkinter.CTkLabel(self.right_dashboard, text="Supply Solutions - Profile \n",
+        self.toptitle = customtkinter.CTkLabel(self.right_dashboard, text="Supply Solutions - Profile \n",
                                             font=customtkinter.CTkFont(size=20, weight="bold"))
-        self.title.pack(pady=10)
+        self.toptitle.pack(pady=10)
 
         self.table.pack(side=tkinter.TOP, fill=tkinter.BOTH, expand=True)
         # Define the columns of the table
@@ -1054,9 +1054,9 @@ def create_table(self, type):
 
     elif type == 'noti':
 
-        self.title = customtkinter.CTkLabel(self.right_dashboard, text="Supply Solutions - Notifications \n",
+        self.toptitle = customtkinter.CTkLabel(self.right_dashboard, text="Supply Solutions - Notifications \n",
                                             font=customtkinter.CTkFont(size=20, weight="bold"))
-        self.title.pack(pady=10)
+        self.toptitle.pack(pady=10)
 
         self.table.pack(side=tkinter.TOP, fill=tkinter.BOTH, expand=True)
         # Define the columns of the table
