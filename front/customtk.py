@@ -765,7 +765,6 @@ def login_function(app, entry1, entry2):
     else:
         print('Failed to authenticate user')
 
-
 def login_page(app):
     if app:
         app.destroy()
@@ -783,32 +782,36 @@ def login_page(app):
     frame.place(relx=0.5, rely=0.5, anchor=tkinter.CENTER)
 
     l2 = customtkinter.CTkLabel(master=frame, text="Log into your account", font=('Century Gothic', 20))
-    l2.place(x=50, y=45)
+    l2.grid(row=0, column=0, columnspan=2, pady=10)
 
     entry1 = customtkinter.CTkEntry(master=frame, width=220, placeholder_text='Username')
-    entry1.place(x=50, y=110)
+    entry1.grid(row=1, column=0, columnspan=2, pady=10)
 
     entry2 = customtkinter.CTkEntry(master=frame, width=220, placeholder_text='Password', show="*")
-    entry2.place(x=50, y=165)
+    entry2.grid(row=2, column=0, columnspan=2, pady=10)
 
     l3 = customtkinter.CTkButton(master=frame, text="Forget password?", font=('Century Gothic', 12),
                                  command=lambda: forget_password(app))
-    l3.place(x=155, y=195)
+    l3.grid(row=3, column=0, columnspan=2, pady=10)
 
-    # Create custom button
+    # Create custom buttons
     login_button = customtkinter.CTkButton(master=frame, width=120, height=40, text="Login",
                                            command=lambda: login_function(app, entry1, entry2), corner_radius=6)
-    login_button.place(x=30, y=235)
+    login_button.grid(row=4, column=0, pady=10)
+
     register_button = customtkinter.CTkButton(master=frame, width=120, height=40, text="Register",
                                               command=lambda: register_function(app), corner_radius=6)
-    register_button.place(x=170, y=235)
+    register_button.grid(row=4, column=1, pady=10)
 
     img3 = customtkinter.CTkImage(Image.open("../samilogo.png").resize((40, 40)))
 
-    img3 = customtkinter.CTkButton(master=frame, image=img3, text="Sami Shamoon College of Engineering", width=40,
-                                   height=40, compound="left", fg_color='white', text_color='black',
-                                   hover_color='#AFAFAF')
-    img3.place(x=160, y=320, anchor=tkinter.CENTER)
+    img3_button = customtkinter.CTkButton(master=frame, image=img3, text="Sami Shamoon College of Engineering",
+                                          width=40, height=40, compound="left", fg_color='white',
+                                          text_color='black', hover_color='#AFAFAF')
+    img3_button.grid(row=5, column=0, columnspan=2, pady=10)
+
+    app.mainloop()
+
 
     def about_func():
         ctypes.windll.user32.MessageBoxW(0, "Made with love by:\n\nAlex, Bar, Aden and Basel", "About Us", 0)
