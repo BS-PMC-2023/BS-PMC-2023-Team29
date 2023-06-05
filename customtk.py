@@ -684,7 +684,7 @@ class App(customtkinter.CTk):
         button_confirm = customtkinter.CTkButton(window, text="Confirm",
                                                  command=lambda: report_stuff(self,
                                                      window) if self.textbox.get()!= '' else CTkMessagebox(
-                                                     icon='warning', title="Warning", option_1="Ok",
+                                                     icon='warning', title="Warning", option_1="Ok", bg_color='red',
                                                      message="Please describe the problem").get())
         button_confirm.pack(pady=10)
 
