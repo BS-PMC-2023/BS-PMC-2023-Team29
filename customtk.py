@@ -491,8 +491,18 @@ class App(customtkinter.CTk):
         window = customtkinter.CTkToplevel(self)
         window.title("Acquire Item")
 
+        height = 250
+        width = 300
+        spawn_x = int(self.winfo_width() * .5 + self.winfo_x() - .5 * width + 7)
+        spawn_y = int(self.winfo_height() * .5 + self.winfo_y() - .5 * height + 20)
+        window.geometry(f"{width}x{height}+{spawn_x}+{spawn_y}")
+
+
         # Set the window size and disable resizing
-        window.geometry("300x250")
+        # window.geometry("300x250")
+
+        # Center the window so it would appear in the middle of the screen
+
         window.resizable(False, False)
 
         # Make the new window appear on top of the parent window
@@ -629,8 +639,15 @@ class App(customtkinter.CTk):
         window = customtkinter.CTkToplevel(self)
         window.title("Report Item")
 
+        height = 300
+        width = 300
+        spawn_x = int(self.winfo_width() * .5 + self.winfo_x() - .5 * width + 7)
+        spawn_y = int(self.winfo_height() * .5 + self.winfo_y() - .5 * height + 20)
+        window.geometry(f"{width}x{height}+{spawn_x}+{spawn_y}")
+
+
         # Set the window size and disable resizing
-        window.geometry("300x300")
+        # window.geometry("300x300")
         window.resizable(False, False)
 
         # Make the new window appear on top of the parent window
