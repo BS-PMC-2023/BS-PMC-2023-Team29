@@ -116,15 +116,7 @@ class App(customtkinter.CTk):
             self.bt_categories.configure(fg_color=['#2CC985', '#2FA572'])
         self.clear_frame()
         create_table(self, 'supply')
-        def help_func():
-            ctypes.windll.user32.MessageBoxW(0,
-                                             "Here are the app instructions:\n\n1. asd\n2. sdfs\n3. sdfgsdg\n4. hrth",
-                                             "Help", 0)
 
-        self.help_BTN = customtkinter.CTkButton(master=self.right_dashboard, width=60, height=20, text="Help",
-                                                command=help_func,
-                                                corner_radius=6)
-        self.help_BTN.place(relx=0.95, rely=0.9, anchor=tkinter.CENTER)
 
 
     #  self.right_dashboard   ----> statement widget
@@ -189,6 +181,10 @@ class App(customtkinter.CTk):
             self.bt_categories.configure(fg_color='#b8bda8')
         self.clear_frame()
 
+        self.toptitle = customtkinter.CTkLabel(self.right_dashboard, text="Supply Solutions - Manager Options \n",
+                                            font=customtkinter.CTkFont(size=20, weight="bold"))
+        self.toptitle.pack(pady=10)
+
         # The email selection combo box
         email_type = {}  # keys = emails, values = user type
         response = requests.get(url + 'getUsersTypes')
@@ -228,7 +224,7 @@ class App(customtkinter.CTk):
             temp_data['email'] = temp_email
 
             if CTkMessagebox(icon='warning', title="Warning", option_1="Yes", option_2="Cancel",
-                             message="Are you sure you want to delete this user?").get() == 'Yes':
+                             message="Are you sure you want to delete this user?", bg_color='red').get() == 'Yes':
                 del email_type[combobox1.get()]
                 response = requests.post(url + 'removeUser', data=temp_data)
                 if response.status_code == 200:
@@ -515,8 +511,18 @@ class App(customtkinter.CTk):
         window = customtkinter.CTkToplevel(self)
         window.title("Acquire Item")
 
+        height = 250
+        width = 300
+        spawn_x = int(self.winfo_width() * .5 + self.winfo_x() - .5 * width + 7)
+        spawn_y = int(self.winfo_height() * .5 + self.winfo_y() - .5 * height + 20)
+        window.geometry(f"{width}x{height}+{spawn_x}+{spawn_y}")
+
+
         # Set the window size and disable resizing
-        window.geometry("300x250")
+        # window.geometry("300x250")
+
+        # Center the window so it would appear in the middle of the screen
+
         window.resizable(False, False)
 
         # Make the new window appear on top of the parent window
@@ -687,8 +693,15 @@ class App(customtkinter.CTk):
         window = customtkinter.CTkToplevel(self)
         window.title("Report Item")
 
+        height = 300
+        width = 300
+        spawn_x = int(self.winfo_width() * .5 + self.winfo_x() - .5 * width + 7)
+        spawn_y = int(self.winfo_height() * .5 + self.winfo_y() - .5 * height + 20)
+        window.geometry(f"{width}x{height}+{spawn_x}+{spawn_y}")
+
+
         # Set the window size and disable resizing
-        window.geometry("300x300")
+        # window.geometry("300x300")
         window.resizable(False, False)
 
         # Make the new window appear on top of the parent window
@@ -725,7 +738,7 @@ class App(customtkinter.CTk):
         button_confirm = customtkinter.CTkButton(window, text="Confirm",
                                                  command=lambda: report_stuff(self,
                                                      window) if self.textbox.get()!= '' else CTkMessagebox(
-                                                     icon='warning', title="Warning", option_1="Ok",
+                                                     icon='warning', title="Warning", option_1="Ok", bg_color='red',
                                                      message="Please describe the problem").get())
         button_confirm.pack(pady=10)
 
@@ -755,7 +768,7 @@ def register_in_db(w, entry1, entry2, entry3, entry4):
 def register_function(app):
     app.destroy()  # destroy current window and creating new one
     w = customtkinter.CTk()
-    w.geometry("600x440")
+    w.geometry("600x540")
     w.title('Register')
     img1 = ImageTk.PhotoImage(Image.open("pattern.png"))
     l1 = customtkinter.CTkLabel(master=w, image=img1)
@@ -767,23 +780,29 @@ def register_function(app):
 
     l2 = customtkinter.CTkLabel(master=frame, text="Register to our system", font=('Century Gothic', 20))
     l2.place(x=50, y=45)
+    l2.pack(pady=10, padx=30)
 
     entry1 = customtkinter.CTkEntry(master=frame, width=220, placeholder_text='Email')
     entry1.place(x=50, y=100)
+    entry1.pack(pady=10, padx=30)
     entry2 = customtkinter.CTkEntry(master=frame, width=220, placeholder_text='First name')
     entry2.place(x=50, y=155)
+    entry2.pack(pady=10, padx=30)
     entry3 = customtkinter.CTkEntry(master=frame, width=220, placeholder_text='Last name')
     entry3.place(x=50, y=210)
+    entry3.pack(pady=10, padx=30)
     entry4 = customtkinter.CTkEntry(master=frame, width=220, placeholder_text='Password', show="*")
     entry4.place(x=50, y=265)
+    entry4.pack(pady=10, padx=30)
     register_button = customtkinter.CTkButton(master=frame, width=120, height=40, text="Register",
                                               command=lambda: register_in_db(w, entry1, entry2, entry3, entry4),
                                               corner_radius=6)
     register_button.place(x=105, y=325)
+    register_button.pack(pady=10, padx=30)
 
     return_button = customtkinter.CTkButton(master=frame, width=50, height=25, text="Back",
                                            command=lambda: back_to_login_page(w), corner_radius=6)
-    return_button.place(x=2, y=2)
+    return_button.pack(pady=10, padx=30)
 
     w.mainloop()
 
@@ -820,7 +839,7 @@ def login_page(app):
 
     img1 = ImageTk.PhotoImage(Image.open("pattern.png"))
     l1 = customtkinter.CTkLabel(master=app, image=img1)
-    l1.pack(pady=10)
+    l1.pack()
 
     # creating custom frame
     frame = customtkinter.CTkFrame(master=l1, width=320, height=500, corner_radius=15)
@@ -860,7 +879,7 @@ def login_page(app):
                                    height=40, compound="left", fg_color='white', text_color='black',
                                    hover_color='#AFAFAF')
     img3.place(x=160, y=320, anchor=tkinter.CENTER)
-    img3.pack(pady=10)
+    img3.pack(pady=10, padx=10)
 
     def about_func():
         ctypes.windll.user32.MessageBoxW(0, "Made with love by:\n\nAlex, Bar, Aden and Basel", "About Us", 0)
@@ -983,6 +1002,8 @@ def create_table(self, type):
     #         temp = result['borrows']
     #         print(temp)
 
+
+
     # Create a simple table
     style = ttk.Style()
     style.configure("Treeview", font=("TkDefaultFont", 18))  # Adjust the size as per your requirement
@@ -992,6 +1013,11 @@ def create_table(self, type):
 
     self.table = ttk.Treeview(self.right_dashboard, style="Custom.Treeview")
     if type == 'supply':
+
+        self.toptitle = customtkinter.CTkLabel(self.right_dashboard, text="Supply Solutions - Homepage \n",
+                                            font=customtkinter.CTkFont(size=20, weight="bold"))
+        self.toptitle.pack(pady=10)
+
         self.table.pack(side=tkinter.TOP, fill=tkinter.BOTH, expand=True)
         # Define the columns of the table
         self.table["columns"] = ("Item name", "Quantity", "Available", "Type")
@@ -1018,9 +1044,24 @@ def create_table(self, type):
                                                       command=self.acquire_item)
         self.button_acquire.pack(side=tkinter.LEFT, padx=10, pady=10)
 
+        def help_func():
+            ctypes.windll.user32.MessageBoxW(0,
+                                             "Here are the app instructions:\n\n1. Press aquire to choose a product to rent\n2. Choose amount and return date\n3. Press confirm\n4. Enjoy and don't forget to return the product!\n5. Go to your profile to see which products you have rented\n6. Chech the notifications once in a while",
+                                             "Help", 0)
+
+        self.help_BTN = customtkinter.CTkButton(master=self.right_dashboard, text="Help",
+                                                command=help_func,
+                                                corner_radius=6)
+        self.help_BTN.pack(side=tkinter.RIGHT, padx=10, pady=10)
+
 
 
     elif type == 'profile':
+
+        self.toptitle = customtkinter.CTkLabel(self.right_dashboard, text="Supply Solutions - Profile \n",
+                                            font=customtkinter.CTkFont(size=20, weight="bold"))
+        self.toptitle.pack(pady=10)
+
         self.table.pack(side=tkinter.TOP, fill=tkinter.BOTH, expand=True)
         # Define the columns of the table
         self.table["columns"] = ("Item name", "Quantity", "Borrow date", "Expected return date")
@@ -1083,6 +1124,11 @@ def create_table(self, type):
 
 
     elif type == 'noti':
+
+        self.toptitle = customtkinter.CTkLabel(self.right_dashboard, text="Supply Solutions - Notifications \n",
+                                            font=customtkinter.CTkFont(size=20, weight="bold"))
+        self.toptitle.pack(pady=10)
+
         self.table.pack(side=tkinter.TOP, fill=tkinter.BOTH, expand=True)
         # Define the columns of the table
         self.table["columns"] = ("Report number", "Item name", "Issue", "Description")
