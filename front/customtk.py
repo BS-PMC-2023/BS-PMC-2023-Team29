@@ -837,8 +837,9 @@ def forget_password(app):
 
     entry1 = customtkinter.CTkEntry(master=frame, width=220, placeholder_text='Username')
     entry1.place(x=50, y=100)
-    b1 = customtkinter.CTkButton(master=frame, text="send new password to this mail", font=('Century Gothic', 12),
-                                 command=lambda: generate_new_password(entry1.get().lower()))
+    b1 = customtkinter.CTkButton(master=frame, width=220, height=40, text="send new password to this mail", font=('Century Gothic', 12),
+                                 command=lambda: generate_new_password(entry1.get().lower()),
+                                 corner_radius=6)
     b1.place(x=50, y=135)
 
     entry2 = customtkinter.CTkEntry(master=frame, width=220, placeholder_text='password we send to your mail', show="*")
