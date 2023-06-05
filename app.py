@@ -1,10 +1,6 @@
 from db import Db
 from flask import Flask, jsonify, request
 from models import User
-from models import User, Repair, Interface
-from models import Interface
-
-
 
 
 db = Db()
@@ -13,7 +9,6 @@ cursor = db.cursor
 
 #init app
 app = Flask("app")
-submitted_interfaces = []
 
 # Define a route to get data from the database
 
@@ -23,22 +18,9 @@ def login():
     temp.email, temp.password = request.form['email'],request.form['password']
     if db.login(temp):
         user = db.get_user_by_email(temp.email).totuple()
-        if user.is_admin:
-            return jsonify({'message': 'Admin Login successful', 'user': user.totuple()})
-        else:
-            return jsonify({'message': 'User Login successful', 'user': user.totuple()})
+        return jsonify({'message': 'Login successful','user': user})
     else:
         return jsonify({'message': 'Invalid username or password'})
-
-
-@app.route('/register',methods=['POST'])
-def register():
-    temp = User()
-    temp.insert(request.form['email'],request.form['password'],request.form['firstname'],request.form['Last_name'])
-    if db.insert_user(temp):
-        return jsonify({'message': 'register successful'})
-    else:
-        return jsonify({'message': 'register not successful'})
 
 @app.route('/register',methods=['POST'])
 def register():
@@ -57,7 +39,6 @@ def user():
         return jsonify({'message': 'register successful', 'user': user.totuple()})
     else:
         return jsonify({'message': 'register not successful'})
-@app.route('/changeType', methods=['POST'])
 
 @app.route('/changeType',methods =['POST'])
 def change_type():
@@ -159,92 +140,6 @@ def report_item():
     if db.report_problem_item(request.form['user_id'],request.form['id'],request.form['des'],request.form['units']):
         return jsonify({'message': 'change successful'})
     return jsonify({'message': 'change not successful'})
-
-
-@app.route('/orderRepair', methods=['POST'])
-def order_repair():
-    repair = Repair()
-    repair.item_id = request.form['item_id']
-    repair.manager_id = request.form['manager_id']
-    repair.description = request.form['description']
-
-    # Insert the repair order into the database
-    repair.insert(repair.item_id, repair.manager_id, repair.description)
-
-    return jsonify({'message': 'Repair order placed successfully'})
-
-
-@app.route('/updateRepairStatus', methods=['POST'])
-def update_repair_status():
-    repair_id = request.form['repair_id']
-    status = request.form['status']
-
-    # Update the status of the repair order in the database
-    repair = Repair()
-    repair.update_status(repair_id, status)
-
-    return jsonify({'message': 'Repair status updated successfully'})
-
-
-@app.route('/getRepairsByItem', methods=['POST'])
-def get_repairs_by_item():
-    item_id = request.form['item_id']
-
-    # Retrieve repair orders for the specified item from the database
-    repair = Repair()
-    repairs = repair.get_repairs_by_item(item_id)
-
-    return jsonify({'repairs': repairs})
-
-
-@app.route('/getRepairsByManager', methods=['POST'])
-def get_repairs_by_manager():
-    manager_id = request.form['manager_id']
-
-    # Retrieve repair orders for the specified manager from the database
-    repair = Repair
-
-@app.route('/sendNotification', methods=['POST'])
-def send_notification():
-    recipient_email = request.form['recipient_email']
-    subject = request.form['subject']
-    message = request.form['message']
-
-    # Send the notification
-    if db.send_notification(recipient_email, subject, message):
-        return jsonify({'message': 'Notification sent successfully'})
-    else:
-        return jsonify({'message': 'Failed to send notification'})
-
-@app.route('/submitInterface', methods=['POST'])
-def submit_interface():
-    name = request.form['name']
-    description = request.form['description']
-
-    interface = Interface(name, description)
-    if interface.submit_interface():
-        submitted_interfaces.append(interface)
-        return jsonify({'message': 'Interface submitted successfully'})
-    else:
-        return jsonify({'message': 'Failed to submit interface'})
-
-@app.route('/getSubmittedInterfaces', methods=['GET'])
-def get_submitted_interfaces():
-    interfaces = [interface.to_dict() for interface in submitted_interfaces]
-    return jsonify({'interfaces': interfaces})
-
-@app.route('/approveInterface', methods=['POST'])
-def approve_interface():
-    interface_name = request.form['name']
-
-    for interface in submitted_interfaces:
-        if interface.name == interface_name:
-            if interface.approve_interface():
-                return jsonify({'message': 'Interface approved successfully'})
-            else:
-                return jsonify({'message': 'Failed to approve interface'})
-
-    return jsonify({'message': 'Interface not found'})
 
 if __name__ == '__main__':
     app.run(debug=True)
