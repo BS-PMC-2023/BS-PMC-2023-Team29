@@ -211,7 +211,7 @@ class App(customtkinter.CTk):
             temp_data['email'] = temp_email
 
             if CTkMessagebox(icon='warning', title="Warning", option_1="Yes", option_2="Cancel",
-                             message="Are you sure you want to delete this user?").get() == 'Yes':
+                             message="Are you sure you want to delete this user?",bg_color='red').get() == 'Yes':
                 del email_type[combobox1.get()]
                 response = requests.post(url + 'removeUser', data=temp_data)
                 if response.status_code == 200:
@@ -671,7 +671,7 @@ class App(customtkinter.CTk):
         button_confirm = customtkinter.CTkButton(window, text="Confirm",
                                                  command=lambda: report_stuff(self,
                                                      window) if self.textbox.get()!= '' else CTkMessagebox(
-                                                     icon='warning', title="Warning", option_1="Ok",
+                                                     icon='warning', title="Warning", option_1="Ok",bg_color='red',
                                                      message="Please describe the problem").get())
         button_confirm.pack(pady=10)
 
@@ -784,7 +784,7 @@ def login_page(app):
     l2 = customtkinter.CTkLabel(master=frame, text="Log into your account", font=('Century Gothic', 20))
     l2.grid(row=0, column=0, columnspan=2, pady=10)
 
-    entry1 = customtkinter.CTkEntry(master=frame, width=220, placeholder_text='Username')
+    entry1 = customtkinter.CTkEntry(master=frame, width=220, placeholder_text='Username',)
     entry1.grid(row=1, column=0, columnspan=2, pady=10)
 
     entry2 = customtkinter.CTkEntry(master=frame, width=220, placeholder_text='Password', show="*")
