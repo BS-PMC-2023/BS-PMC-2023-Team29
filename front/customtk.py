@@ -1024,6 +1024,8 @@ def create_table(self, type):
                                                       command=self.fix_item)
         self.button_fix.pack(side=tkinter.LEFT, padx=10, pady=10)
 
+    self.table.place(relx=0.5, rely=0.5, anchor=tkinter.CENTER)
+
     self.button_item_desc = customtkinter.CTkButton(self.right_dashboard, text="Item Description",
                                                 command=lambda:item_desc(self))
     self.button_item_desc.pack(side=tkinter.LEFT, padx=10, pady=10)
