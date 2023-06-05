@@ -701,7 +701,7 @@ def register_in_db(w, entry1, entry2, entry3, entry4):
 def register_function(app):
     app.destroy()  # destroy current window and creating new one
     w = customtkinter.CTk()
-    w.geometry("600x440")
+    w.geometry("600x540")
     w.title('Register')
     img1 = ImageTk.PhotoImage(Image.open("pattern.png"))
     l1 = customtkinter.CTkLabel(master=w, image=img1)
@@ -713,23 +713,29 @@ def register_function(app):
 
     l2 = customtkinter.CTkLabel(master=frame, text="Register to our system", font=('Century Gothic', 20))
     l2.place(x=50, y=45)
+    l2.pack(pady=10, padx=30)
 
     entry1 = customtkinter.CTkEntry(master=frame, width=220, placeholder_text='Email')
     entry1.place(x=50, y=100)
+    entry1.pack(pady=10, padx=30)
     entry2 = customtkinter.CTkEntry(master=frame, width=220, placeholder_text='First name')
     entry2.place(x=50, y=155)
+    entry2.pack(pady=10, padx=30)
     entry3 = customtkinter.CTkEntry(master=frame, width=220, placeholder_text='Last name')
     entry3.place(x=50, y=210)
+    entry3.pack(pady=10, padx=30)
     entry4 = customtkinter.CTkEntry(master=frame, width=220, placeholder_text='Password', show="*")
     entry4.place(x=50, y=265)
+    entry4.pack(pady=10, padx=30)
     register_button = customtkinter.CTkButton(master=frame, width=120, height=40, text="Register",
                                               command=lambda: register_in_db(w, entry1, entry2, entry3, entry4),
                                               corner_radius=6)
     register_button.place(x=105, y=325)
+    register_button.pack(pady=10, padx=30)
 
     return_button = customtkinter.CTkButton(master=frame, width=50, height=25, text="Back",
                                            command=lambda: back_to_login_page(w), corner_radius=6)
-    return_button.place(x=2, y=2)
+    return_button.pack(pady=10, padx=30)
 
     w.mainloop()
 
