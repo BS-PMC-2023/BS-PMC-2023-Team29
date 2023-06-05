@@ -207,7 +207,7 @@ class App(customtkinter.CTk):
             temp_data['email'] = temp_email
 
             if CTkMessagebox(icon='warning', title="Warning", option_1="Yes", option_2="Cancel",
-                             message="Are you sure you want to delete this user?").get() == 'Yes':
+                             message="Are you sure you want to delete this user?", bg_color='red').get() == 'Yes':
                 del email_type[combobox1.get()]
                 response = requests.post(url + 'removeUser', data=temp_data)
                 if response.status_code == 200:
@@ -992,7 +992,7 @@ def create_table(self, type):
 
         def help_func():
             ctypes.windll.user32.MessageBoxW(0,
-                                             "Here are the app instructions:\n\n1. asd\n2. sdfs\n3. sdfgsdg\n4. hrth",
+                                             "Here are the app instructions:\n\n1. Press aquire to choose a product to rent\n2. Choose amount and return date\n3. Press confirm\n4. Enjoy and don't forget to return the product!\n5. Go to your profile to see which products you have rented\n6. Chech the notifications once in a while",
                                              "Help", 0)
 
         self.help_BTN = customtkinter.CTkButton(master=self.right_dashboard, text="Help",
