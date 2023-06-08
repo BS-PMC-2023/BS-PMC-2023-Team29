@@ -43,6 +43,33 @@ class Db:
             "CREATE TABLE Users (id INT AUTO_INCREMENT PRIMARY KEY , email VARCHAR(255) , password VARCHAR(255) , "
             "type int(2) , name VARCHAR(255) , lastname VARCHAR(255))")
 
+    def create_supply_table(self):
+        self.cursor.execute(
+            """
+            CREATE TABLE Supply (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                type VARCHAR(255),
+                name VARCHAR(255),
+                all_units INT,
+                available_units INT,
+                description TEXT,
+                broken_units INT
+            )
+            """
+        )
+
+    # Create a table named Borrow
+    def create_borrow_table(self):
+        self.cursor.execute(
+            "CREATE TABLE Borrow (id INT AUTO_INCREMENT PRIMARY KEY, id_supply INT, id_user INT, num_of_items INT, "
+            "borrow_date DATETIME, return_expected DATETIME, return_real DATETIME, status INT DEFAULT 0)")
+
+    # Create a table named Orders
+    def create_orders_table(self):
+        self.cursor.execute(
+            "CREATE TABLE Orders (id INT AUTO_INCREMENT PRIMARY KEY, user_id INT, item_id INT, "
+            "order_date DATETIME, status VARCHAR(255))")
+
     def insert_user(self, user):
         user.email = user.email.lower()
         query = "INSERT INTO users (email, password,type,name,lastname) VALUES (%s, %s,%s, %s,%s)"
@@ -70,6 +97,26 @@ class Db:
         lg.debug("great success")
         return True
 
+    # Insert Supply
+    def insert_supply(self, name, all_units, available_units, type, description):
+        query = "INSERT INTO Supply (name, all_units, available_units, type, description) VALUES (%s, %s, %s, %s, %s)"
+        self.cursor.execute(query, (name, all_units, available_units, type, description))
+        self.mydb.commit()
+
+    # Insert Borrow
+    def insert_borrow(self, id_supply, id_user, num_of_items, borrow_date, return_expected, return_real=None, status=0):
+        query = "INSERT INTO Borrow (id_supply, id_user, num_of_items, borrow_date, return_expected, return_real, status) " \
+                "VALUES (%s, %s, %s, %s, %s, %s, %s)"
+        self.cursor.execute(query,
+                            (id_supply, id_user, num_of_items, borrow_date, return_expected, return_real, status))
+        self.mydb.commit()
+
+    # Insert Order
+    def insert_order(self, user_id, item_id, order_date, status):
+        query = "INSERT INTO Orders (user_id, item_id, order_date, status) VALUES (%s, %s, %s, %s)"
+        self.cursor.execute(query, (user_id, item_id, order_date, status))
+        self.mydb.commit()
+
     # Retrieve some data from the 'customers' table
     def print_user_table(self):
         self.cursor.execute("SELECT * FROM users")
@@ -77,7 +124,6 @@ class Db:
         for row in result:
             lg.debug(row)
         return result
-
 
     def login(self, user):
         user.email = user.email.lower()
@@ -87,7 +133,7 @@ class Db:
         for i in result:
             if i[0] == user.email:
                 flag = True
-                if i[1] == 1234:
+                if i[1] == user.password:
                     lg.debug("login worked great success")
                     return True
                 else:
@@ -110,6 +156,11 @@ class Db:
                 return user
         return False
 
+    def get_user_id_by_email(self, email):
+        self.cursor.execute("SELECT id FROM users WHERE email = %s", (email,))
+        result = self.cursor.fetchone()
+        return result[0] if result else None
+
     def get_user_by_email(self, email):
         email = email.lower()
         self.cursor.execute("SELECT * FROM users")
@@ -129,10 +180,10 @@ class Db:
         self.mydb.commit()
         return True
 
-    def change_password(self, email,temp_password, new_password):
+    def change_password(self, email, temp_password, new_password):
         email = email.lower()
         query = "UPDATE users SET password = %s WHERE email = %s AND password=%s"
-        self.cursor.execute(query, (new_password, email,temp_password))
+        self.cursor.execute(query, (new_password, email, temp_password))
         self.mydb.commit()
         return True
 
@@ -163,16 +214,16 @@ class Db:
             lg.debug(row)
         return result
 
-    def borrow_item(self, user_id, item_id, return_time, num_of_items, num_of_items_remain):
-        query_borrow = "INSERT INTO borrow (id_supply, id_user,num_of_items,borrow_date,return_expacted) " \
-                       "VALUES (%s, %s,%s, %s,%s)"
+    def borrow_item(self, user_id, item_id, return_time, num_of_items, num_of_items_remain, status=0):
+        query_borrow = "INSERT INTO borrow (id_supply, id_user, num_of_items, borrow_date, return_expected, status) " \
+                       "VALUES (%s, %s, %s, %s, %s, %s)"
         query_supply = "UPDATE supply SET available_units=%s WHERE id = %s"
         # update supply table
         self.cursor.execute(query_supply, (num_of_items_remain, item_id))
         # update borrow table
         now = datetime.now()
         formatted_date_time = now.strftime("%Y-%m-%d %H:%M:%S")
-        self.cursor.execute(query_borrow, (item_id, user_id, num_of_items, formatted_date_time, return_time))
+        self.cursor.execute(query_borrow, (item_id, user_id, num_of_items, formatted_date_time, return_time, status))
         self.mydb.commit()
         lg.debug(self.cursor.rowcount, "record(s) inserted.")
         lg.debug("great success")
@@ -197,11 +248,11 @@ class Db:
             return False
 
     def return_item(self, user_id, item_id, how_much_items):
-        query_find_items = "SELECT id_borrow,num_of_items,borrow_date,return_expacted FROM borrow WHERE id_user =%s" \
+        query_find_items = "SELECT id_borrow,num_of_items,borrow_date,return_expected FROM borrow WHERE id_user =%s" \
                            " AND id_supply = %s AND return_real IS NULL"
         query_update_borrow = "UPDATE borrow SET return_real=%s ,num_of_items =%s WHERE  id_borrow = %s"
         query_update_supply = "UPDATE supply SET available_units=available_units+%s WHERE  id = %s"
-        query_add_remain_borrow = "INSERT INTO borrow (id_supply, id_user,num_of_items,borrow_date,return_expacted) " \
+        query_add_remain_borrow = "INSERT INTO borrow (id_supply, id_user,num_of_items,borrow_date,return_expected) " \
                                   "VALUES (%s, %s,%s, %s,%s)"
         query_update_borrow_return_all = "UPDATE borrow SET return_real=%s WHERE id_borrow = %s"
         now = datetime.now()
@@ -227,14 +278,15 @@ class Db:
         return self.cursor.fetchall()
 
     def get_items_dosent_return(self, user_id):
-        query = "SELECT * FROM borrow WHERE id_user = %s AND return_real IS NULL"
-        self.cursor.execute(query, [user_id])
+        userid = self.get_user_id_by_email(user_id)
+        query = "SELECT * FROM borrow WHERE id_user = %s AND return_real IS NULL AND status=1"
+        self.cursor.execute(query, [userid])
         return self.cursor.fetchall()
 
-    def add_item_to_supply(self, item_name, units, item_type,description):
+    def add_item_to_supply(self, item_name, units, item_type, description):
         query = "INSERT INTO supply (name,all_units,available_units,type,description) VALUES (%s,%s,%s,%s,%s)"
         query_id = "SELECT id FROM supply WHERE name = %s"
-        self.cursor.execute(query, (item_name, units, units, item_type,description))
+        self.cursor.execute(query, (item_name, units, units, item_type, description))
         self.mydb.commit()
         self.cursor.execute(query_id, [item_name])
         return self.cursor.fetchall()
@@ -250,21 +302,20 @@ class Db:
         # new password 16 chars
         characters = string.ascii_letters + string.digits
         new_password = '' + ''.join(random.choice(characters) for _ in range(16))
-        self.send_mail(new_password,user_mail)
+        self.send_mail(new_password, user_mail)
         self.cursor.execute(query, (new_password, user_mail))
         self.mydb.commit()
         return True
-
 
     def get_all_borrows(self):
         query = "SELECT id_supply, id_user, num_of_items FROM borrow"
         self.cursor.execute(query)
         return self.cursor.fetchall()
 
-    def send_mail(self,new_password,user_mail):
+    def send_mail(self, new_password, user_mail):
         load_dotenv()
-        smtp_server, smtp_port, smtp_username, smtp_password = os.getenv('smtp_server'), os.getenv('smtp_port'),\
-            os.getenv('smtp_username'), os.getenv('smtp_password')
+        smtp_server, smtp_port, smtp_username, smtp_password = os.getenv('smtp_server'), os.getenv('smtp_port'), \
+                                                               os.getenv('smtp_username'), os.getenv('smtp_password')
 
         # Set up the email message
         msg = MIMEMultipart()
@@ -283,26 +334,69 @@ class Db:
             server.login(smtp_username, smtp_password)
             server.sendmail(smtp_username, msg['To'], msg.as_string())
 
-
     def plot_borrow(self):
         query = 'SELECT borrow_date, num_of_items From borrow'
         self.cursor.execute(query)
         data = self.cursor.fetchall()
-        borrow_data= [i[0] for i in data]
-        num_of_items=[i[1] for i in data]
-        return borrow_data,num_of_items
+        borrow_data = [i[0] for i in data]
+        num_of_items = [i[1] for i in data]
+        return borrow_data, num_of_items
 
-    def report_problem_item(self,user_id,id_item,des,units):
-        self.return_item(user_id,id_item,units)
+    def report_problem_item(self, user_id, id_item, des, units):
+        self.return_item(user_id, id_item, units)
         query_prob = 'INSERT INTO problems(item_id,description,units) VALUES (%s,%s,%s)'
         query_supply = "UPDATE supply SET available_units=available_units - %s, broken_units = broken_units+ %s WHERE id = %s"
-        self.cursor.execute(query_prob,(id_item,des,units))
-        self.cursor.execute(query_supply, (units,units,id_item))
+        self.cursor.execute(query_prob, (id_item, des, units))
+        self.cursor.execute(query_supply, (units, units, id_item))
         self.mydb.commit()
         return True
 
+    def get_late_returns(self):
+        now = datetime.now()
+        query = "SELECT * FROM Borrow WHERE return_expected < %s"
+        self.cursor.execute(query, (now,))
+        return self.cursor.fetchall()
 
+    def get_pending_orders(self):
+        query = "SELECT * FROM borrow WHERE status = 0"
+        self.cursor.execute(query)
+        return self.cursor.fetchall()
+
+    def approve_order(self, borrow_id):
+        query = "UPDATE borrow SET status = 1 WHERE id = %s"
+        self.cursor.execute(query, (borrow_id,))
+        self.mydb.commit()
+        return self.cursor.rowcount > 0
+
+    def get_borrowed_items(self, user_id):
+        query = "SELECT COUNT(*) FROM borrow WHERE user_id = %s"
+        self.cursor.execute(query, (user_id,))
+        return self.cursor.fetchone()[0]
+
+    def get_closest_return_date(self, user_id):
+        query = "SELECT MIN(expected_return) FROM borrow WHERE user_id = %s"
+        self.cursor.execute(query, (user_id,))
+        return self.cursor.fetchone()[0]
+
+    def get_total_borrowed_items(self):
+        query = "SELECT COUNT(*) FROM borrow"
+        self.cursor.execute(query)
+        return self.cursor.fetchone()[0]
+
+    def get_total_users(self):
+        query = "SELECT COUNT(*) FROM users"
+        self.cursor.execute(query)
+        return self.cursor.fetchone()[0]
+
+    def get_total_items(self):
+        query = "SELECT COUNT(*) FROM items"
+        self.cursor.execute(query)
+        return self.cursor.fetchone()[0]
 # db = Db()
+# db.create_user_table()
+# db.create_supply_table()
+# db.create_borrow_table()
+# db.create_orders_table()
 # db.add_item_to_supply("Sketchbooks", 50, "Stationery", "Blank paper for sketching and drawing.")
 # db.add_item_to_supply("Colored Pencils", 100, "Art Supplies", "Assorted colors for coloring and shading.")
 # db.add_item_to_supply("Watercolor Set", 20, "Art Supplies", "A set of watercolor paints for painting.")

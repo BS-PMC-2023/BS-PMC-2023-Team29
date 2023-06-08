@@ -20,8 +20,6 @@ class User:
         self.email = tupple_insert[1]
         self.password = tupple_insert[2]
         self.type = int(tupple_insert[3])
-        self.name = tupple_insert[4]
-        self.lastname = tupple_insert[5]
 
     def totuple(self):
         if not self.id:
@@ -59,7 +57,6 @@ class Supply:
         self.available_units = tupple_insert[3]
         self.type = tupple_insert[4]
         self.description = tupple_insert[5]
-        self.broken_units = tupple_insert[6]
 
     def borrow(self, how_much_items):
         if self.available_units - how_much_items >= 0:
