@@ -15,7 +15,7 @@ from tkcalendar import Calendar
 from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg)
 
 # backend connection
-url = 'http://localhost:5000/'
+url = 'http://10.0.0.9:5000/'
 user = User()
 supply_lst = SupplyList()
 customtkinter.set_appearance_mode("System")  # Modes: system (default), light, dark
@@ -1066,20 +1066,20 @@ def create_table(self, type):
 
         self.table.pack(side=tkinter.TOP, fill=tkinter.BOTH, expand=True)
         # Define the columns of the table
-        self.table["columns"] = ("Item name", "Quantity", "Available", "Type")
+        self.table["columns"] = ("Item Category", "Item Name", "Total Quantity", "Available Quantity")
 
         # Set the headings of the columns
-        self.table.column("Item name", width=150, anchor="center", stretch=True)
-        self.table.heading("Item name", text="Item name")
+        self.table.column("Item Category", width=150, anchor="center", stretch=True)
+        self.table.heading("Item Category", text="Item Category")
 
-        self.table.column("Quantity", width=150, anchor="center", stretch=True)
-        self.table.heading("Quantity", text="Quantity")
+        self.table.column("Item Name", width=150, anchor="center", stretch=True)
+        self.table.heading("Item Name", text="Item Name")
 
-        self.table.column("Available", width=150, anchor="center", stretch=True)
-        self.table.heading("Available", text="Available")
+        self.table.column("Available Quantity", width=150, anchor="center", stretch=True)
+        self.table.heading("Available Quantity", text="Available Quantity")
 
-        self.table.column("Type", width=150, anchor="center", stretch=True)
-        self.table.heading("Type", text="Type")
+        self.table.column("Total Quantity", width=150, anchor="center", stretch=True)
+        self.table.heading("Total Quantity", text="Total Quantity")
 
         # Add some data to the table
         for index, x in enumerate(supply_lst.list):
@@ -1125,7 +1125,7 @@ def create_table(self, type):
         self.table.column("Expected return date", width=100, anchor="center", stretch=True)
         self.table.heading("Expected return date", text="Expected return date")
 
-        response = requests.post(url + 'getBorrowedItems', data={'user_id': user.id})
+        response = requests.get(url + 'getAllBorrows', data={'user_id': user.id})
         items = []
         return_time = []
         take_time = []
@@ -1134,7 +1134,7 @@ def create_table(self, type):
         if response.status_code == 200:
             result = response.json()
             if result['message'] == 'successful':
-                temp = result['items']
+                temp = result['borrows']
                 t = 1
                 datez = datetime.now()
                 for i in temp:
@@ -1240,7 +1240,7 @@ def create_table(self, type):
             closest_return_date_label.pack(pady=5)
 
             pending_orders_label = customtkinter.CTkLabel(self.right_dashboard,
-                                                          text="Pending Orders: " + str(len(data['pending_orders'])),
+                                                          text="Pending Orders: " + str((data['pending_orders'])),
                                                           font=customtkinter.CTkFont(size=14))
             pending_orders_label.pack(pady=5)
 
@@ -1320,9 +1320,9 @@ def create_table(self, type):
             ord['borrow_id'], ord['item_id'], ord['user_id'], ord['num_of_items'], ord['borrow_date'],
             ord['expected_return'], ord['real_return']))
 
-    self.approve_button = customtkinter.CTkButton(self.right_dashboard, text="Approve",
-                                                  command=self.approve_order)
-    self.approve_button.pack(side=tkinter.LEFT, padx=10, pady=10)
+        self.approve_button = customtkinter.CTkButton(self.right_dashboard, text="Approve",
+                                                      command=self.approve_order)
+        self.approve_button.pack(side=tkinter.LEFT, padx=10, pady=10)
 
 
 if __name__ == '__main__':

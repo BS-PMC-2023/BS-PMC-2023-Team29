@@ -11,8 +11,6 @@ cursor = db.cursor
 app = Flask("app")
 
 
-# Define a route to get data from the database
-
 @app.route('/login', methods=['POST'])
 def login():
     temp = User()
@@ -101,7 +99,8 @@ def get_all_supply():
 
 @app.route('/getAllBorrows', methods=['GET'])
 def get_all_borrows():
-    borrows = db.get_all_borrows()
+    user_id = (request.form['user_id'])
+    borrows = db.get_all_my_borrows(user_id)
     return jsonify({'message': 'successful', 'borrows': borrows})
 
 
@@ -130,7 +129,7 @@ def get_late_returns():
 @app.route('/borrowItem', methods=['POST'])
 def borrow_item():
     # get values from form data
-    user_id = db.get_user_id_by_email(request.form['user_id'])
+    user_id = (request.form['user_id'])
     item_id = request.form['item_id']
     return_time = request.form['return_time']
     num_of_items = request.form['num_of_items']
@@ -195,7 +194,7 @@ def report_item():
 
 @app.route('/getPendingOrders', methods=['GET'])
 def get_pending_orders():
-    pending_orders = db.get_pending_orders()
+    pending_orders = db.get_pending_borrows()
     if pending_orders:
         # Assuming the returned format from db.get_pending_orders() is a list of tuples
         # where each tuple represents (borrow_id, item_id, user_id, num_of_items, borrow_date, expected_return, real_return)
@@ -231,31 +230,31 @@ def get_user_data():
     user_type = request.args.get('user_type')
 
     if user_type == '1':
-        borrowed_items = db.get_borrowed_items(user_id) or []
-        closest_return_date = db.get_closest_return_date(user_id) or 'No return date'
-        pending_orders = db.get_pending_orders() or []
-        approved_orders = db.get_approved_orders() or []
+        borrowed_items = db.get_borrowed_items(user_id)
+        closest_return_date = db.get_closest_return_date(user_id)
+        pending_orders = db.get_pending_orders(user_id)
+        approved_orders = db.get_approved_orders(user_id)
 
         return jsonify({
-            'borrowed_items': borrowed_items,
-            'closest_return_date': closest_return_date,
-            'pending_orders': pending_orders,
-            'approved_orders': approved_orders,
+            'borrowed_items': borrowed_items if borrowed_items is not None else 0,
+            'closest_return_date': closest_return_date if closest_return_date is not None else 0,
+            'pending_orders': pending_orders if pending_orders is not None else 0,
+            'approved_orders': approved_orders if approved_orders is not None else 0,
         })
 
     elif user_type == '3':
-        total_borrowed_items = db.get_total_borrowed_items() or 0
-        total_late_returns = db.get_total_late_returns() or 0
-        total_users = db.get_total_users() or 0
-        total_items = db.get_total_items() or 0
+        total_borrowed_items = db.get_total_borrowed_items()
+        total_late_returns = db.get_total_late_returns()
+        total_users = db.get_total_users()
+        total_items = db.get_total_items()
 
         return jsonify({
-            'total_borrowed_items': total_borrowed_items,
-            'total_late_returns': total_late_returns,
-            'total_users': total_users,
-            'total_items': total_items,
+            'total_borrowed_items': total_borrowed_items if total_borrowed_items is not None else 0,
+            'total_late_returns': total_late_returns if total_late_returns is not None else 0,
+            'total_users': total_users if total_users is not None else 0,
+            'total_items': total_items if total_items is not None else 0,
         })
 
 
-if __name__ == '__main__':
-    app.run(debug=True)
+if __name__ == "__main__":
+    app.run(host='0.0.0.0', port=5000, debug=True)

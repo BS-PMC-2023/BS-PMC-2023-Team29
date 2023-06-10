@@ -29,7 +29,7 @@ class Db:
         self.cursor = self.mydb.cursor()
 
     def __enter__(self):
-        self.cursor = self.mydb.cursor()
+        self.cursor = self.mydb.cursor(bufered=True)
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
@@ -217,6 +217,8 @@ class Db:
     def borrow_item(self, user_id, item_id, return_time, num_of_items, num_of_items_remain, status=0):
         query_borrow = "INSERT INTO borrow (id_supply, id_user, num_of_items, borrow_date, return_expected, status) " \
                        "VALUES (%s, %s, %s, %s, %s, %s)"
+        print(num_of_items)
+        print(num_of_items_remain)
         query_supply = "UPDATE supply SET available_units=%s WHERE id = %s"
         # update supply table
         self.cursor.execute(query_supply, (num_of_items_remain, item_id))
@@ -230,9 +232,9 @@ class Db:
         return True
 
     def return_all_items(self, user_id):
-        query_find_items = "SELECT id_borrow,num_of_items,id_supply FROM borrow WHERE id_user =%s AND return_real IS NULL"
+        query_find_items = "SELECT id,num_of_items,id_supply FROM borrow WHERE id_user =%s AND return_real IS NULL"
         query_return_supply = "UPDATE supply SET available_units=available_units+%s WHERE id = %s"
-        query_update_borrow = "UPDATE borrow SET return_real=%s WHERE id_borrow = %s"
+        query_update_borrow = "UPDATE borrow SET return_real=%s WHERE id = %s"
         now = datetime.now()
         formatted_date_time = now.strftime("%Y-%m-%d %H:%M:%S")
         self.cursor.execute(query_find_items, [user_id])
@@ -248,32 +250,38 @@ class Db:
             return False
 
     def return_item(self, user_id, item_id, how_much_items):
-        query_find_items = "SELECT id_borrow,num_of_items,borrow_date,return_expected FROM borrow WHERE id_user =%s" \
-                           " AND id_supply = %s AND return_real IS NULL"
-        query_update_borrow = "UPDATE borrow SET return_real=%s ,num_of_items =%s WHERE  id_borrow = %s"
-        query_update_supply = "UPDATE supply SET available_units=available_units+%s WHERE  id = %s"
-        query_add_remain_borrow = "INSERT INTO borrow (id_supply, id_user,num_of_items,borrow_date,return_expected) " \
-                                  "VALUES (%s, %s,%s, %s,%s)"
-        query_update_borrow_return_all = "UPDATE borrow SET return_real=%s WHERE id_borrow = %s"
-        now = datetime.now()
-        formatted_date_time = now.strftime("%Y-%m-%d %H:%M:%S")
+        # Query to find items in borrow table where the return date is NULL
+        query_find_items = "SELECT id,num_of_items,borrow_date,return_expected FROM borrow WHERE id_user =%s AND id_supply = %s AND return_real IS NULL"
         self.cursor.execute(query_find_items, (user_id, item_id))
         result = self.cursor.fetchall()
+
+        # Check if there are any items to return
+        if not result or how_much_items > result[0][1]:
+            return False
+
+        now = datetime.now()
+        formatted_date_time = now.strftime("%Y-%m-%d %H:%M:%S")
         remain_to_return = int(result[0][1]) - int(how_much_items)
-        # update supply table
-        self.cursor.execute(query_update_supply, (how_much_items, item_id))
+
+        # If all items are returned, update return_real in borrow
         if remain_to_return == 0:
-            self.cursor.execute(query_update_borrow_return_all, (formatted_date_time, result[0][0]))
+            query_update_borrow = "UPDATE borrow SET return_real=%s WHERE  id = %s"
+            self.cursor.execute(query_update_borrow, (formatted_date_time, result[0][0]))
+        # If only some items are returned, create a new record in borrow with the remaining items
         else:
-            self.cursor.execute(query_update_borrow, (formatted_date_time, how_much_items, result[0][0]))
+            query_add_remain_borrow = "INSERT INTO borrow (id_supply, id_user, num_of_items, borrow_date, return_expected) VALUES (%s, %s, %s, %s, %s)"
             self.cursor.execute(query_add_remain_borrow,
                                 (item_id, user_id, remain_to_return, result[0][2], result[0][3]))
-        # result = (id_borrow,num_of_items)
+
+        # Update supply table
+        query_update_supply = "UPDATE supply SET available_units=available_units+%s WHERE id = %s"
+        self.cursor.execute(query_update_supply, (how_much_items, item_id))
+
         self.mydb.commit()
         return True
 
     def get_all_my_borrows(self, user_id):
-        query = "SELECT * FROM borrow WHERE id_user = %s"
+        query = "SELECT * FROM borrow WHERE id_user = %s AND status=1"
         self.cursor.execute(query, [user_id])
         return self.cursor.fetchall()
 
@@ -353,14 +361,15 @@ class Db:
 
     def get_late_returns(self):
         now = datetime.now()
-        query = "SELECT * FROM Borrow WHERE return_expected < %s"
+        query = "SELECT * FROM Borrow WHERE return_expected < %s AND return_real IS NULL"
         self.cursor.execute(query, (now,))
         return self.cursor.fetchall()
 
-    def get_pending_orders(self):
-        query = "SELECT * FROM borrow WHERE status = 0"
-        self.cursor.execute(query)
-        return self.cursor.fetchall()
+    def get_pending_orders(self, user_id):
+
+        query = "SELECT COUNT(*) FROM borrow WHERE status = 0 AND id_user = %s"
+        self.cursor.execute(query, (user_id,))
+        return self.cursor.fetchone()[0]
 
     def approve_order(self, borrow_id):
         query = "UPDATE borrow SET status = 1 WHERE id = %s"
@@ -369,12 +378,12 @@ class Db:
         return self.cursor.rowcount > 0
 
     def get_borrowed_items(self, user_id):
-        query = "SELECT COUNT(*) FROM borrow WHERE user_id = %s"
+        query = "SELECT COUNT(*) FROM borrow WHERE id_user = %s"
         self.cursor.execute(query, (user_id,))
         return self.cursor.fetchone()[0]
 
     def get_closest_return_date(self, user_id):
-        query = "SELECT MIN(expected_return) FROM borrow WHERE user_id = %s"
+        query = "SELECT MIN(return_expected) FROM borrow WHERE id_user = %s"
         self.cursor.execute(query, (user_id,))
         return self.cursor.fetchone()[0]
 
@@ -389,9 +398,25 @@ class Db:
         return self.cursor.fetchone()[0]
 
     def get_total_items(self):
-        query = "SELECT COUNT(*) FROM items"
+        query = "SELECT COUNT(*) FROM supply"
         self.cursor.execute(query)
         return self.cursor.fetchone()[0]
+
+    def get_total_late_returns(self):
+        now = datetime.now()
+        query = "SELECT COUNT(*) FROM borrow WHERE return_expected < %s AND return_real IS NULL"
+        self.cursor.execute(query, (now,))
+        return self.cursor.fetchone()[0]
+
+    def get_approved_orders(self, user_id):
+        query = "SELECT * FROM borrow WHERE id_user = %s AND status=1"
+        self.cursor.execute(query, (user_id,))
+        return self.cursor.fetchone()[0]
+
+    def get_pending_borrows(self):
+        query = "SELECT * FROM borrow WHERE status=0"
+        self.cursor.execute(query)
+        return self.cursor.fetchall()
 # db = Db()
 # db.create_user_table()
 # db.create_supply_table()
