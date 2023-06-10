@@ -137,7 +137,6 @@ class App(customtkinter.CTk):
             self.bt_categories.configure(fg_color=['#2CC985', '#2FA572'])
         self.clear_frame()
         create_table(self, 'profile')
-
         self.name = customtkinter.CTkLabel(master=self.right_dashboard, text="First name: ",
                                            font=('Century Gothic', 18))
         self.name_entry = customtkinter.CTkEntry(master=self.right_dashboard, width=220)
@@ -460,9 +459,10 @@ class App(customtkinter.CTk):
         create_table(self, 'late')
 
     def notifications(self, id):
-        self.bt_homepage.configure(fg_color=['#2CC985', '#2FA572'])
-        self.bt_profile.configure(fg_color=['#2CC985', '#2FA572'])
-        self.bt_notifications.configure(fg_color=['#2CC985', '#2FA572'])
+        self.bt_homepage.configure(fg_color='#000000')
+        self.bt_profile.configure(fg_color='#000000')
+        self.bt_notifications.configure(fg_color='#000000')
+
         if user.type == 3:
             self.bt_orders.configure(fg_color=['#2CC985', '#2FA572'])
             self.bt_late_returns.configure(fg_color=['#2CC985', '#2FA572'])
@@ -1222,7 +1222,8 @@ def create_table(self, type):
     elif type == 'noti':
 
         self.toptitle = customtkinter.CTkLabel(self.right_dashboard, text="Supply Solutions - Notifications \n",
-                                               font=customtkinter.CTkFont(size=20, weight="bold"))
+                                               font=customtkinter.CTkFont(size=20, weight="bold"), text_color="red")
+
         self.toptitle.pack(pady=10)
 
         response = requests.get(url + 'getUserData', params={'user_id': user.id, 'user_type': user.type})
@@ -1231,44 +1232,52 @@ def create_table(self, type):
         if user.type == 1:
             borrowed_items_label = customtkinter.CTkLabel(self.right_dashboard,
                                                           text="Borrowed Items: " + str(data['borrowed_items']),
-                                                          font=customtkinter.CTkFont(size=14))
+                                                          font=customtkinter.CTkFont(size=20, weight="bold"),
+                                                          text_color="red")
             borrowed_items_label.pack(pady=5)
 
             closest_return_date_label = customtkinter.CTkLabel(self.right_dashboard, text="Closest Return Date: " + str(
                 data['closest_return_date']),
-                                                               font=customtkinter.CTkFont(size=14))
+                                                               font=customtkinter.CTkFont(size=20, weight="bold"),
+                                                               text_color="red")
             closest_return_date_label.pack(pady=5)
 
             pending_orders_label = customtkinter.CTkLabel(self.right_dashboard,
                                                           text="Pending Orders: " + str((data['pending_orders'])),
-                                                          font=customtkinter.CTkFont(size=14))
+                                                          font=customtkinter.CTkFont(size=20, weight="bold"),
+                                                          text_color="red")
             pending_orders_label.pack(pady=5)
 
             approved_orders_label = customtkinter.CTkLabel(self.right_dashboard,
                                                            text="Approved Orders: " + str(len(data['approved_orders'])),
-                                                           font=customtkinter.CTkFont(size=14))
+                                                           font=customtkinter.CTkFont(size=20, weight="bold"),
+                                                           text_color="red")
             approved_orders_label.pack(pady=5)
 
         elif user.type == 3:
             total_borrowed_items_label = customtkinter.CTkLabel(self.right_dashboard,
                                                                 text="Total Borrowed Items: " + str(
                                                                     data['total_borrowed_items']),
-                                                                font=customtkinter.CTkFont(size=14))
+                                                                font=customtkinter.CTkFont(size=20, weight="bold"),
+                                                                text_color="red")
             total_borrowed_items_label.pack(pady=5)
 
             total_late_returns_label = customtkinter.CTkLabel(self.right_dashboard, text="Total Late Returns: " + str(
                 data['total_late_returns']),
-                                                              font=customtkinter.CTkFont(size=14))
+                                                              font=customtkinter.CTkFont(size=20, weight="bold"),
+                                                              text_color="red")
             total_late_returns_label.pack(pady=5)
 
             total_users_label = customtkinter.CTkLabel(self.right_dashboard,
                                                        text="Total Users: " + str(data['total_users']),
-                                                       font=customtkinter.CTkFont(size=14))
+                                                       font=customtkinter.CTkFont(size=20, weight="bold"),
+                                                       text_color="red")
             total_users_label.pack(pady=5)
 
             total_items_label = customtkinter.CTkLabel(self.right_dashboard,
                                                        text="Total Items: " + str(data['total_items']),
-                                                       font=customtkinter.CTkFont(size=14))
+                                                       font=customtkinter.CTkFont(size=20, weight="bold"),
+                                                       text_color="red")
             total_items_label.pack(pady=5)
 
     elif type == 'orders':

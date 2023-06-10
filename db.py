@@ -26,7 +26,7 @@ class Db:
             database=database
         )
         lg.info('db connect great success')
-        self.cursor = self.mydb.cursor()
+        self.cursor = self.mydb.cursor(buffered=True)
 
     def __enter__(self):
         self.cursor = self.mydb.cursor(bufered=True)
@@ -281,7 +281,7 @@ class Db:
         return True
 
     def get_all_my_borrows(self, user_id):
-        query = "SELECT * FROM borrow WHERE id_user = %s AND status=1"
+        query = "SELECT * FROM borrow WHERE id_user = %s AND status=1 AND return_real IS NULL"
         self.cursor.execute(query, [user_id])
         return self.cursor.fetchall()
 
@@ -380,27 +380,32 @@ class Db:
     def get_borrowed_items(self, user_id):
         query = "SELECT COUNT(*) FROM borrow WHERE id_user = %s"
         self.cursor.execute(query, (user_id,))
-        return self.cursor.fetchone()[0]
+        result = self.cursor.fetchall()
+        return result[0][0] if result else 0
 
     def get_closest_return_date(self, user_id):
-        query = "SELECT MIN(return_expected) FROM borrow WHERE id_user = %s"
+        query = "SELECT MIN(return_expected) FROM borrow WHERE id_user = %s AND return_real IS NULL"
         self.cursor.execute(query, (user_id,))
-        return self.cursor.fetchone()[0]
+        result = self.cursor.fetchall()
+        return result[0][0] if result else None
 
     def get_total_borrowed_items(self):
         query = "SELECT COUNT(*) FROM borrow"
         self.cursor.execute(query)
-        return self.cursor.fetchone()[0]
+        result = self.cursor.fetchall()
+        return result[0][0] if result else 0
 
     def get_total_users(self):
         query = "SELECT COUNT(*) FROM users"
         self.cursor.execute(query)
-        return self.cursor.fetchone()[0]
+        result = self.cursor.fetchall()
+        return result[0][0] if result else 0
 
     def get_total_items(self):
         query = "SELECT COUNT(*) FROM supply"
         self.cursor.execute(query)
-        return self.cursor.fetchone()[0]
+        result = self.cursor.fetchall()
+        return result[0][0] if result else 0
 
     def get_total_late_returns(self):
         now = datetime.now()
@@ -414,7 +419,7 @@ class Db:
         return self.cursor.fetchone()[0]
 
     def get_pending_borrows(self):
-        query = "SELECT * FROM borrow WHERE status=0"
+        query = "SELECT * FROM borrow WHERE status=0 AND return_real IS NULL"
         self.cursor.execute(query)
         return self.cursor.fetchall()
 # db = Db()

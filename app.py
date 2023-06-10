@@ -150,7 +150,7 @@ def return_all_items():
 
 @app.route('/returnSomeItem', methods=['POST'])
 def return_some_items():
-    if db.return_item(request.form['user_id'], request.form['item_id'], int(request.form['num_of_items'])):
+    if db.return_all_items(request.form['user_id']):
         return jsonify({'message': 'change successful'})
     return jsonify({'message': 'change not successful'})
 
